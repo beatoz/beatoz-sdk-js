@@ -1,6 +1,6 @@
 {
   "name": "@beatoz/web3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "license": "Apache-2.0",
@@ -36,7 +36,6 @@
     "test": "jest --config=./test/unit/jest.config.js",
     "test:silent": "jest --silent --config=./test/unit/jest.config.js"
   },
-
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
@@ -56,12 +55,11 @@
     "ts-jest": "^28.0.7",
     "@types/jest": "^28.1.6"
   },
-
   "dependencies": {
-    "@beatoz/web3-methods" : "1.0.0",
-    "@beatoz/web3-core" : "1.0.0",
-    "@beatoz/web3-providers-http" : "1.0.0",
-    "@beatoz/web3-validator" : "1.0.0",
-    "@beatoz/web3-contract" : "1.0.0"
+    "@beatoz/web3-methods": "^1.0.0",
+    "@beatoz/web3-core": "^1.0.0",
+    "@beatoz/web3-providers-http": "^1.0.0",
+    "@beatoz/web3-validator": "^1.0.0",
+    "@beatoz/web3-contract": "^1.0.0"
   }
 }

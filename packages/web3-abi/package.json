@@ -1,6 +1,6 @@
 {
   "name": "@beatoz/web3-abi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "license": "Apache-2.0",
@@ -51,9 +51,9 @@
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
-    "@beatoz/web3-types": "1.0.0",
-    "@beatoz/web3-errors": "1.0.0",
-    "@beatoz/web3-utils": "1.0.0",
-    "@beatoz/web3-rpc": "1.0.0"
+    "@beatoz/web3-types": "^1.0.0",
+    "@beatoz/web3-errors": "^1.0.0",
+    "@beatoz/web3-utils": "^1.0.0",
+    "@beatoz/web3-rpc": "^1.0.0"
   }
 }
