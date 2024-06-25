@@ -9,13 +9,13 @@ Web3.js
 ### Using NPM
 
 ```bash
-npm install web3
+npm install @beatoz/web3
 ```
 
 ### Using Yarn
 
 ```bash
-yarn add web3
+yarn add @beatoz/web3
 ```
 
 ## Getting Started
