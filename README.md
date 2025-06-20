@@ -68,7 +68,7 @@ npm run build:web
 
 ### Documentation / API-Document 
 
-You can find documents at english https://beatoz.gitbook.io/beatoz-sdk-js/docs-en
+You can find documents https://beatoz.gitbook.io/beatoz-sdk-js/docs-en
 
 ## License
 ```
