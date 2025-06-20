@@ -1,0 +1,23 @@
+.idea/
+.tmp/
+.deploy/
+.DS_Store
+node_modules/
+any_test/
+build/
+dist/
+lib/
+examples/beatoz.js
+examples/beatoz.min.js
+documents/site
+lerna-debug.log
+
+.secrets.json
+
+# Unsupported lock files
+package-lock.json
+yarn.lock
+
+.npm
+.coverage
+.tool-versions
