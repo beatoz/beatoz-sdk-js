@@ -23,6 +23,19 @@ export const getDevWsServer = (): string => {
     return secrets.DEVNET.WS;
 };
 
+export const getDevAccountAddress = (): string => {
+    return secrets.TESTNET.ACCOUNT.address;
+};
+
+export const getDevAccountPrivateKey = (): string => {
+    return secrets.TESTNET.ACCOUNT.privateKey;
+};
+
+export const getDevProposalAccountPrivateKey = (): string => {
+    return secrets.TESTNET.PROPOSAL_ACCOUNT.privateKey;
+};
+
+
 export const getTestServer = (): string => {
     return secrets.TESTNET.HTTP;
 };
@@ -35,10 +48,10 @@ export const getTestAccountAddress = (): string => {
     return secrets.TESTNET.ACCOUNT.address;
 };
 
-export const getTestProposalAccountPrivateKey = (): string => {
-    return secrets.TESTNET.PROPOSAL_ACCOUNT.privateKey;
-};
-
 export const getTestAccountPrivateKey = (): string => {
     return secrets.TESTNET.ACCOUNT.privateKey;
+};
+
+export const getTestProposalAccountPrivateKey = (): string => {
+    return secrets.TESTNET.PROPOSAL_ACCOUNT.privateKey;
 };
