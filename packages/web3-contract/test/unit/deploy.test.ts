@@ -27,7 +27,7 @@ describe('deploy test', () => {
         const web3account: Web3Account = privateKeyToAccount(getTestProposalAccountPrivateKey());
 
         erc20Contract
-            .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, 'testnet0', 10000000)
+            .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, 'localnet0', 10000000)
             .send()
             .then((res) => {
                 console.log(res);
