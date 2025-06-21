@@ -19,7 +19,7 @@ import {
     AbiFragment,
     AbiFunctionFragment,
     Address,
-    BroadcastTxSyncResponse,
+    BroadcastTxCommitResponse,
     ContractAbi,
     ContractEvents,
     ContractMethod,
@@ -436,7 +436,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
 
         return {
-            send: (): Promise<BroadcastTxSyncResponse> => {
+            send: (): Promise<BroadcastTxCommitResponse> => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return sendDeploy(
                     this,
