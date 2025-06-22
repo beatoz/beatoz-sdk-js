@@ -20,8 +20,8 @@ module.exports = {
         },
     },
     rootDir: '../..',
-    testMatch: ['<rootDir>/packages/**/test/**/?(*.)+(spec|test).+(ts|tsx|js)'],
-    setupFilesAfterEnv: ['<rootDir>/packages/**/test/config/setup.js'],
+    testMatch: ['<rootDir>/test/**/?(*.)+(spec|test).+(ts|tsx|js)'],
+    setupFilesAfterEnv: ['<rootDir>/test/config/setup.js'],
     transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest',
     },
