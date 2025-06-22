@@ -18,4 +18,5 @@ export * from './tx/trx_pb.js';
 export * from './tx/tx_types.js';
 
 export * from './account.js';
+export * from './wallet.js';
 export * from './types.js';

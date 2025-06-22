@@ -30,6 +30,8 @@ import {
     ContractAbi,
     HexString32Bytes,
     Uint,
+    BroadcastTxSyncResponse,
+    BroadcastTxCommitResponse,
 } from '@beatoz/web3-types';
 
 export type NonPayableTxOptions = NonPayableCallOptions;
@@ -114,6 +116,10 @@ export interface NonPayableMethodObject<Inputs = unknown[], Outputs = unknown[]>
         SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
     >;
 
+    broadcast (
+        tx?: NonPayableTxOptions,
+    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
+
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.
      * This can be used to send a transaction, call a method, or pass it into another smart contract’s method as arguments.
@@ -140,6 +146,10 @@ export interface PayableMethodObject<Inputs = unknown[], Outputs = unknown[]> {
         FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>,
         SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
     >;
+
+    broadcast (
+        tx?: PayableTxOptions,
+    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.

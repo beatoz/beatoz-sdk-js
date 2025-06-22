@@ -102,9 +102,9 @@ export interface Web3AccountProvider<T> {
 }
 
 export abstract class Web3BaseWallet<T extends Web3BaseWalletAccount> extends Array<T> {
-    protected readonly _accountProvider: Web3AccountProvider<T>;
+    protected readonly _accountProvider?: Web3AccountProvider<T>;
 
-    public constructor(accountProvider: Web3AccountProvider<T>) {
+    public constructor(accountProvider?: Web3AccountProvider<T>) {
         super();
         this._accountProvider = accountProvider;
     }

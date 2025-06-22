@@ -24,15 +24,15 @@ export const getDevWsServer = (): string => {
 };
 
 export const getDevAccountAddress = (): string => {
-    return secrets.TESTNET.ACCOUNT.address;
+    return secrets.DEVNET.ACCOUNT.address;
 };
 
 export const getDevAccountPrivateKey = (): string => {
-    return secrets.TESTNET.ACCOUNT.privateKey;
+    return secrets.DEVNET.ACCOUNT.privateKey;
 };
 
 export const getDevProposalAccountPrivateKey = (): string => {
-    return secrets.TESTNET.PROPOSAL_ACCOUNT.privateKey;
+    return secrets.DEVNET.PROPOSAL_ACCOUNT.privateKey;
 };
 
 

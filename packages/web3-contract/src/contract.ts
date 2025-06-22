@@ -19,6 +19,7 @@ import {
     AbiFragment,
     AbiFunctionFragment,
     Address,
+    BroadcastTxSyncResponse,
     BroadcastTxCommitResponse,
     ContractAbi,
     ContractEvents,
@@ -34,6 +35,7 @@ import {
     PayableCallOptions,
     BeatozExecutionAPI,
     Web3ValidationErrorObject,
+    AbiInput,
 } from '@beatoz/web3-types';
 import { Web3Context } from '@beatoz/web3-core';
 import {
@@ -52,6 +54,7 @@ import {
     isAbiErrorFragment,
     isAbiFunctionFragment,
     jsonInterfaceMethodToString,
+    encodeParameters,
 } from '@beatoz/web3-abi';
 import {
     Web3ValidatorError,
@@ -62,8 +65,8 @@ import {
 import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
-import { call, sendDeploy } from '@beatoz/web3-methods';
-import { Web3Account } from '@beatoz/web3-accounts';
+import { broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy } from '@beatoz/web3-methods';
+import { TrxProtoBuilder, Web3Account, walletManager } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { LogsSubscription } from './log_subscription.js';
@@ -199,11 +202,11 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
                 // make constant and payable backwards compatible
                 abi.constant =
-                    abi.stateMutability === 'view' ??
-                    abi.stateMutability === 'pure' ??
+                    abi.stateMutability === 'view' ||
+                    abi.stateMutability === 'pure' ||
                     abi.constant;
 
-                abi.payable = abi.stateMutability === 'payable' ?? abi.payable;
+                abi.payable = abi.stateMutability === 'payable' || abi.payable;
                 this._overloadedMethodAbis.set(abi.name, [
                     ...(this._overloadedMethodAbis.get(abi.name) ?? []),
                     abi,
@@ -301,6 +304,9 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                 send: (options?: PayableTxOptions | NonPayableTxOptions): Promise<any> =>
                     this._contractMethodSend(methodAbi, abiParams, internalErrorsAbis, options),
 
+                broadcast: (options?: PayableTxOptions | NonPayableTxOptions): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse> => 
+                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
+
                 encodeABI: () => encodeMethodABI(methodAbi, abiParams),
             };
 
@@ -350,7 +356,6 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
     }
 
-    // TODO : 여기 발행 함수 최종 확인 해야됨
     private _contractMethodSend<Options extends PayableCallOptions | NonPayableCallOptions>(
         abi: AbiFunctionFragment,
         params: unknown[],
@@ -390,6 +395,56 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         });
 
         return transactionToSend;
+    }
+
+
+
+    private async _contractMethodBroadcast<Options extends PayableCallOptions | NonPayableCallOptions>(
+        abi: AbiFunctionFragment,
+        params: unknown[],
+        errorsAbi: AbiErrorFragment[],
+        options?: Options,
+        contractOptions?: ContractOptions,
+    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse> {
+        let modifiedContractOptions = contractOptions ?? this.options;
+        modifiedContractOptions = {
+            ...modifiedContractOptions,
+            input: undefined,
+            from: modifiedContractOptions.from ?? undefined,
+        };
+
+        const fromWallet = walletManager.get(options!.from!)
+        if(fromWallet === undefined) {
+            throw new Web3ContractError(
+                `Not found wallet of ${options!.from}`,
+            );
+        }
+
+        const _tx = getSendTxParams({
+            abi,
+            params,
+            options,
+            contractOptions: modifiedContractOptions,
+        });
+
+        const ruleObject = await rule(this);
+        const genesisObj = await genesis(this);
+        const acctInfo = await getAccount(this, fromWallet.address);
+    
+        // 10000000000000000 = 0 16개 - 17개 자리
+        const txProto = TrxProtoBuilder.buildContractTrxProto({
+            from: fromWallet.address,
+            to: _tx.to,
+            nonce: acctInfo.value.nonce,
+            gas: parseInt(options?.gas ?? ruleObject.value.minTrxGas),
+            gasPrice: ruleObject.value.gasPrice,
+            amount: '0',
+            payload: { data: _tx.input },
+        });
+
+        fromWallet.signTransaction(txProto, genesisObj.chain_id);
+        // TrxProtoBuilder.signTrxProto(txProto, fromWallet, genesisObj.chain_id);
+        return broadcastTxCommit(this, txProto);
     }
 
     private _getAbiParams(abi: AbiFunctionFragment, params: unknown[]): Array<unknown> {
