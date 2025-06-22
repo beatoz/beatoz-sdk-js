@@ -18,6 +18,7 @@ import tokenJson from '../fixtures/erc20-contract.json';
 import { getTestProposalAccountPrivateKey, getTestWsServer } from './e2e_utils';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { privateKeyToAccount, Web3Account } from '@beatoz/web3-accounts';
+import { BytesUint8Array } from '@beatoz/web3-types';
 
 describe('deploy test', () => {
     it('deploy function', (done) => {
@@ -30,11 +31,20 @@ describe('deploy test', () => {
             .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, 'localnet0', 10000000)
             .send()
             .then((res) => {
-                console.log(res);
-                done();
+                // console.log(res);
+                const data = res?.deliver_tx?.data;
+                if (typeof data === 'string') {
+                    let contAddr = BytesUint8Array.b64ToBytes(data).toHex();
+                    console.log("contract address:", contAddr);
+                    console.log("deployer address:", web3account.address)
+                    done();
+                } else {
+                    done(new Error('deliver_tx.data is undefined or not a string'));
+                }
             })
             .catch((err) => {
                 console.log(err);
+                done(err);
+            })
             });
     });
-});
