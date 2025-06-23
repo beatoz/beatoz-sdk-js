@@ -33,9 +33,9 @@ export type Web3ContextObject<API extends Web3APISpec = BeatozExecutionAPI> = {
 
 export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     public readonly providers = Web3RequestManager.providers;
-    protected _requestManager: Web3RequestManager<API>;
+    protected _requestManager?: Web3RequestManager<API>;
     public get requestManager() {
-        return this._requestManager;
+        return this._requestManager!;
     }
 
     public constructor(providerOrContext?: string) {

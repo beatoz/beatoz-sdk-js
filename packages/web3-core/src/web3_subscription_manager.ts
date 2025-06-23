@@ -173,7 +173,7 @@ export class Web3SubscriptionManager<
      * @returns An array of all the un-subscribed subscriptions
      */
     public async unsubscribe(condition?: ShouldUnsubscribeCondition) {
-        const result = [];
+        const result: any[] = [];
         for (const [id, sub] of this.subscriptions.entries()) {
             if (!condition || (typeof condition === 'function' && condition({ id, sub }))) {
             }
