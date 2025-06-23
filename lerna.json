@@ -2,11 +2,11 @@
     "lerna": "4.0.0",
     "npmClient": "yarn",
     "useWorkspaces": true,
-    "version": "1.1.0",
+    "version": "1.1.1",
     "packages": ["packages/*", "tools/*"],
     "command": {
-      "version": {
-        "postversion": "yarn build && git add src/version.ts && git commit -m 'chore: update version.ts'"
-      }
+        "version": {
+            "postversion": "yarn build && git add src/version.ts && git commit -m 'chore: update version.ts'"
+        }
     }
 }
