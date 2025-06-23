@@ -32,7 +32,7 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "version": "yarn run bootstrap && yarn build",
+    "version": "yarn run bootstrap && yarn build && git add packages/*/src/version.ts",
     "prebuild": "yarn clean && lerna bootstrap",
     "build": "lerna run build --stream",
     "build:types": "lerna run build:types --stream",
