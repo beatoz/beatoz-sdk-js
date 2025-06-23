@@ -6,7 +6,7 @@
     "packages": ["packages/*", "tools/*"],
     "command": {
         "version": {
-            "postversion": "yarn build && git add src/version.ts && git commit -m 'chore: update version.ts'"
+            "postversion": "git add packages/*/src/version.ts && git commit -m 'chore: update all packages version.ts'"
         }
     }
 }
