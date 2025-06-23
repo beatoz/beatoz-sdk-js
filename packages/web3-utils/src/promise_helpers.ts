@@ -81,7 +81,7 @@ export async function pollTillDefined<T>(
 ): Promise<Exclude<T, undefined>> {
     const awaitableRes = waitWithTimeout(func, interval);
 
-    let intervalId: NodeJS.Timer | undefined;
+    let intervalId: NodeJS.Timeout | undefined;
     const polledRes = new Promise<Exclude<T, undefined>>((resolve, reject) => {
         intervalId = setInterval(() => {
             (async () => {
@@ -144,7 +144,7 @@ export function rejectIfConditionAtInterval<T>(
     cond: AsyncFunction<T | undefined>,
     interval: number,
 ): [NodeJS.Timer, Promise<never>] {
-    let intervalId: NodeJS.Timer | undefined;
+    let intervalId: NodeJS.Timeout | undefined;
     const rejectIfCondition = new Promise<never>((_, reject) => {
         intervalId = setInterval(() => {
             (async () => {

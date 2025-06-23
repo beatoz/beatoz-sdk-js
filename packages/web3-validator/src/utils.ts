@@ -301,7 +301,7 @@ export const transformJsonDataToAbiFormat = (
                 ),
             );
         } else if (baseType === 'tuple' && isArray) {
-            const tupleData = [];
+            const tupleData: unknown[] = [];
             for (const tupleItem of dataItem as Array<unknown>) {
                 // Nested array
                 if (arraySizes.length > 1) {
@@ -309,7 +309,7 @@ export const transformJsonDataToAbiFormat = (
                         tupleItem as Array<unknown>,
                         arraySizes.length - 1,
                     );
-                    const nestedData = [];
+                    const nestedData: unknown[] = [];
 
                     for (const nestedItem of nestedItems as Array<unknown>) {
                         nestedData.push(
