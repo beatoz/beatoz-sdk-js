@@ -27,7 +27,6 @@ import { rpcMethods } from '@beatoz/web3-rpc';
 import { TrxProto } from '@beatoz/web3-types';
 import { Stream } from 'xstream';
 import { Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
-import * as trxPb from '@beatoz/web3-accounts/lib/commonjs/tx/trx_pb';
 import { encodeParameters } from '@beatoz/web3-abi';
 import { atob } from 'buffer';
 
