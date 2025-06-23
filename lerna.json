@@ -3,5 +3,10 @@
     "npmClient": "yarn",
     "useWorkspaces": true,
     "version": "1.1.0",
-    "packages": ["packages/*", "tools/*"]
+    "packages": ["packages/*", "tools/*"],
+    "command": {
+      "version": {
+        "postversion": "yarn build && git add src/version.ts && git commit -m 'chore: update version.ts'"
+      }
+    }
 }
