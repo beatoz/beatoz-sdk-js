@@ -574,7 +574,7 @@ function decodeValidatorParams(data: RpcValidatorParams): ValidatorParams {
 
 function decodeVersionParams(data: RpcVersionParams): VersionParams {
     return {
-        app_version: apiToSmallInt(data.app_version),
+        app_version: apiToSmallInt(data?.app_version ?? 0),
     };
 }
 

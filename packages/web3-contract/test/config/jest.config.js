@@ -16,7 +16,7 @@
 module.exports = {
     globals: {
         'ts-jest': {
-            tsconfig: './test/tsconfig.json',
+            tsconfig: './packages/web3-contract/test/tsconfig.json',
         },
     },
     rootDir: '../..',
@@ -27,6 +27,7 @@ module.exports = {
     },
     moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@beatoz/(.*)$': '<rootDir>/../$1/src',
     },
     verbose: false,
     collectCoverage: false,

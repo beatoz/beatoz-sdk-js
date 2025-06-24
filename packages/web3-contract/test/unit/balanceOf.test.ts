@@ -13,27 +13,25 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+import { VmCallResponse } from '@beatoz/web3-types';
 import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
-import { getTestWsServer } from './e2e_utils';
+import { getDevWsServer } from './e2e_utils';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 
 describe('deploy test', () => {
     it('balanceOf function', (done) => {
         const erc20Contract = new Contract(
             erc20Json,
-            '4b007901049a210f8e1ce8f4d4ab8e6e1efd1b10',
+            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
         ) as any;
 
-        erc20Contract.setProvider(new WebsocketProvider(getTestWsServer()));
-        const fromObject = {
-            from: '20838EBC355D287F71830FE60DD717BA14301AE0',
-        };
+        erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
         erc20Contract.methods
-            .balanceOf('0x0Ab16465885e27108Ad15586586E96A5718A2bd0')
-            .call(fromObject, 1)
-            .then((balance: string) => {
-                console.log('balance', balance);
+            .balanceOf('0x8576FC0F3AA066FD8880863CF5A6B632A8DDE209')
+            .call()
+            .then((resp: VmCallResponse) => {
+                console.log('resp', resp);
                 done();
             });
     });

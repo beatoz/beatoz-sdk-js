@@ -16,7 +16,7 @@
 
 import {
     AbiFunctionFragment,
-    BroadcastTxSyncResponse,
+    BroadcastTxCommitResponse,
     BytesUint8Array,
     BeatozExecutionAPI,
     SubscriptionEvent,
@@ -27,7 +27,6 @@ import { rpcMethods } from '@beatoz/web3-rpc';
 import { TrxProto } from '@beatoz/web3-types';
 import { Stream } from 'xstream';
 import { Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
-import * as trxPb from '@beatoz/web3-accounts/lib/commonjs/tx/trx_pb';
 import { encodeParameters } from '@beatoz/web3-abi';
 import { atob } from 'buffer';
 
@@ -39,7 +38,7 @@ export async function sendDeploy(
     rWeb3Account: Web3Account,
     chainId: string,
     gas: number,
-): Promise<BroadcastTxSyncResponse> {
+): Promise<BroadcastTxCommitResponse> {
     let encodedArguments;
     let bytecodeWithArguments;
 
@@ -63,7 +62,7 @@ export async function sendDeploy(
         payload: { data: bytecodeWithArguments },
     });
     TrxProtoBuilder.signTrxProto(tx, rWeb3Account, chainId);
-    return broadcastTxSync(web3Context, tx);
+    return broadcastTxCommit(web3Context, tx);
 }
 
 export async function call(

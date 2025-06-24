@@ -31,7 +31,7 @@ export const encodeErrorSignature = (functionName: string | AbiErrorFragment): s
     if (functionName && (typeof functionName === 'function' || typeof functionName === 'object')) {
         name = jsonInterfaceMethodToString(functionName);
     } else {
-        name = functionName;
+        name = functionName as string;
     }
 
     return sha3Raw(name);

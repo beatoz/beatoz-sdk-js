@@ -15,7 +15,7 @@
 */
 import { Web3Account, SignTransactionResult } from './types.js';
 import { PrvKey, PubKey } from './tx/tx_types.js';
-import { HexString, TrxProto, BytesUint8Array } from '@beatoz/web3-types';
+import { HexString, TrxProto, BytesUint8Array, KeyStore, Web3AccountProvider } from '@beatoz/web3-types';
 import { sha3Raw } from '@beatoz/web3-utils';
 import { TrxProtoUtils } from './tx/trx_pb.js';
 import { RlpUtils } from './tx/trx_rlp.js';

@@ -20,6 +20,7 @@ import {
     AbiFunctionFragment,
     Address,
     BroadcastTxSyncResponse,
+    BroadcastTxCommitResponse,
     ContractAbi,
     ContractEvents,
     ContractMethod,
@@ -34,9 +35,14 @@ import {
     PayableCallOptions,
     BeatozExecutionAPI,
     Web3ValidationErrorObject,
+    AbiInput,
+    BroadcastTxAsyncResponse,
+    FormatType,
+    TransactionReceipt,
 } from '@beatoz/web3-types';
-import { Web3Context } from '@beatoz/web3-core';
+import { Web3Context, Web3ContextObject, Web3PromiEvent } from '@beatoz/web3-core';
 import {
+    BroadcastTxOptions,
     ContractAbiWithSignature,
     ContractEventOptions,
     ContractOptions,
@@ -52,6 +58,7 @@ import {
     isAbiErrorFragment,
     isAbiFunctionFragment,
     jsonInterfaceMethodToString,
+    encodeParameters,
 } from '@beatoz/web3-abi';
 import {
     Web3ValidatorError,
@@ -62,11 +69,12 @@ import {
 import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
-import { call, sendDeploy } from '@beatoz/web3-methods';
-import { Web3Account } from '@beatoz/web3-accounts';
+import { broadcastTxAsync, broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy, SendTransactionEvents } from '@beatoz/web3-methods';
+import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { LogsSubscription } from './log_subscription.js';
+import { isNull } from 'util';
 
 type ContractBoundMethod<
     Abi extends AbiFunctionFragment,
@@ -140,29 +148,16 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     private readonly _overloadedMethodAbis: Map<string, AbiFunctionFragment[]>;
 
-    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
+    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?:Address | Web3Context) {
         super();
 
-        let provider;
-        if (
-            typeof addressOrOptionsOrContext === 'object' &&
-            'provider' in addressOrOptionsOrContext
-        ) {
-            provider = addressOrOptionsOrContext.provider;
-        }
-
         this._overloadedMethodAbis = new Map<string, AbiFunctionFragment[]>();
-
-        const address =
-            typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
-
+        
+        
         this._parseAndSetJsonInterface(jsonInterface);
 
-        // Address CheckSum Settings
-        if (!isNullish(address)) {
-            this._parseAndSetAddress(address);
-        }
-
+        // TODO: Address CheckSum Settings
+        const address = typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
         this.options = {
             address,
             jsonInterface: this._jsonInterface,
@@ -199,11 +194,11 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
                 // make constant and payable backwards compatible
                 abi.constant =
-                    abi.stateMutability === 'view' ??
-                    abi.stateMutability === 'pure' ??
+                    abi.stateMutability === 'view' ||
+                    abi.stateMutability === 'pure' ||
                     abi.constant;
 
-                abi.payable = abi.stateMutability === 'payable' ?? abi.payable;
+                abi.payable = abi.stateMutability === 'payable' || abi.payable;
                 this._overloadedMethodAbis.set(abi.name, [
                     ...(this._overloadedMethodAbis.get(abi.name) ?? []),
                     abi,
@@ -297,9 +292,16 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                         height,
                     ),
 
-                // TODO Promise any
-                send: (options?: PayableTxOptions | NonPayableTxOptions): Promise<any> =>
-                    this._contractMethodSend(methodAbi, abiParams, internalErrorsAbis, options),
+                // original:
+                // send: (options?: PayableTxOptions | NonPayableTxOptions): Web3PromiEvent< FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>, SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>>
+                send: (
+                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions
+                ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> =>
+                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
+                
+                broadcast: (options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions)
+                    : Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> => 
+                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
 
                 encodeABI: () => encodeMethodABI(methodAbi, abiParams),
             };
@@ -350,7 +352,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
     }
 
-    // TODO : 여기 발행 함수 최종 확인 해야됨
+    // DEPRECATED
     private _contractMethodSend<Options extends PayableCallOptions | NonPayableCallOptions>(
         abi: AbiFunctionFragment,
         params: unknown[],
@@ -380,7 +382,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         // });
 
         // eslint-disable-next-line no-void
-        // TODO ts-ignore 제거
+        // TODO Remove ts-ignore 
         // @ts-ignore
         void transactionToSend.on('error', (error: unknown) => {
             if (error instanceof ContractExecutionError) {
@@ -390,6 +392,65 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         });
 
         return transactionToSend;
+    }
+
+    private async _contractMethodBroadcast<Options extends PayableCallOptions | NonPayableCallOptions | BroadcastTxOptions>(
+        abi: AbiFunctionFragment,
+        params: unknown[],
+        errorsAbi: AbiErrorFragment[],
+        options?: Options,
+        contractOptions?: ContractOptions,
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> {
+        let modifiedContractOptions = contractOptions ?? this.options;
+        modifiedContractOptions = {
+            ...modifiedContractOptions,
+            input: undefined,
+            from: modifiedContractOptions.from ?? undefined,
+        };
+
+        const _tx = getSendTxParams({
+            abi,
+            params,
+            options: (options && 'from' in options) ? options : undefined,
+            contractOptions: modifiedContractOptions,
+        });
+
+        const fromAcct = this.wallet?.get(_tx.from!);
+        if(fromAcct === undefined) {
+            throw new Web3ContractError( `not found account of ${_tx.from}` );
+        }
+        
+        const chainId = this.chainId ?? await this.decideChainId()
+        const nonce = Number(_tx.nonce ?? (await getAccount(this, fromAcct.address)).value.nonce);
+        if(isNullish(_tx.gas) || isNullish(_tx.gasPrice)) {
+            const govParams = (await rule(this)).value;
+            if(isNullish(_tx.gas))      _tx.gas = govParams.minTrxGas;
+            if(isNullish(_tx.gasPrice)) _tx.gasPrice = govParams.gasPrice;
+        }
+        const gas = Number(_tx.gas);
+        const gasPrice = Number(_tx.gasPrice);
+
+        const txProto = TrxProtoBuilder.buildContractTrxProto({
+            from: fromAcct.address,
+            to: _tx.to,
+            nonce: nonce,
+            gas: gas,
+            gasPrice: gasPrice.toString(),
+            amount: '0',
+            payload: { data: _tx.input },
+        });
+
+        fromAcct.signTransaction(txProto, chainId);        
+
+        if(!isNullish(options) && 'sendMode' in options) {
+            if(options.sendMode === 'sync') {
+                return broadcastTxSync(this, txProto);
+            }
+            else if(options.sendMode === 'async') {
+                return broadcastTxAsync(this, txProto);
+            }
+        }
+        return broadcastTxCommit(this, txProto);        
     }
 
     private _getAbiParams(abi: AbiFunctionFragment, params: unknown[]): Array<unknown> {
@@ -436,7 +497,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
 
         return {
-            send: (): Promise<BroadcastTxSyncResponse> => {
+            send: (): Promise<BroadcastTxCommitResponse> => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return sendDeploy(
                     this,

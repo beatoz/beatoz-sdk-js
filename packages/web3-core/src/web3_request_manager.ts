@@ -62,7 +62,7 @@ export class Web3RequestManager<
 > extends Web3EventEmitter<{
     [key in Web3RequestManagerEvent]: SupportedProviders<API> | undefined;
 }> {
-    private _provider: HttpProvider | WebsocketProvider;
+    private _provider?: HttpProvider | WebsocketProvider;
     private readonly useRpcCallSpecification?: boolean;
 
     public constructor(provider?: string, useRpcCallSpecification?: boolean) {
@@ -103,7 +103,7 @@ export class Web3RequestManager<
     }
 
     public get provider(): HttpProvider | WebsocketProvider {
-        return this._provider;
+        return this._provider!;
     }
 
     public async send<

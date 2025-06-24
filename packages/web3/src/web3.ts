@@ -45,6 +45,8 @@ export class Web3 extends Web3Context {
         }
 
         const accounts = initAccountsForContext();
+        this._wallet = accounts.wallet;
+        this._accountProvider = accounts;
 
         // Have to use local alias to initiate contract context
         // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -53,8 +55,11 @@ export class Web3 extends Web3Context {
         class ContractBuilder<Abi extends ContractAbi> extends Contract<Abi> {
             constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
                 super(jsonInterface, addressOrOptionsOrContext);
-                const providers = self.requestManager.provider;
-                super.settingsProvider(providers);
+
+                this._requestManager = self.requestManager;
+                this._wallet = self.wallet
+                this._accountProvider = self.accountProvider;
+                this._chainId = self.chainId;
             }
         }
 
