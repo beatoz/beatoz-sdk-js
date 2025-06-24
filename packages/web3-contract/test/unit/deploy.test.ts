@@ -15,17 +15,20 @@
 */
 import { Contract } from '../../src';
 import tokenJson from '../fixtures/erc20-contract.json';
-import { getDevChainId, getDevProposalAccountPrivateKey, getDevWsServer } from './e2e_utils';
+import { getDevAccountAddress, getDevChainId, getDevProposalAccountPrivateKey, getDevWsServer } from './e2e_utils';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { privateKeyToAccount, Web3Account } from '@beatoz/web3-accounts';
 import { BytesUint8Array } from '@beatoz/web3-types';
+import { Web3 } from '@beatoz/web3';
 
 describe('deploy test', () => {
+    const web3 = new Web3(getDevWsServer());
+    const wallet = web3.beatoz.accounts.wallet.add(getDevProposalAccountPrivateKey())
     it('deploy function', (done) => {
         const erc20Contract = new Contract(tokenJson.abi);
         erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
 
-        const web3account: Web3Account = privateKeyToAccount(getDevProposalAccountPrivateKey());
+        const web3account: Web3Account = wallet.get(getDevAccountAddress())!;
 
         erc20Contract
             .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, getDevChainId(), 10000000)

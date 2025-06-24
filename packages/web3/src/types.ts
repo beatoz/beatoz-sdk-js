@@ -26,7 +26,7 @@ import {
     encodeParameter,
     encodeParameters,
 } from '@beatoz/web3-abi';
-import { Web3Account, SignTransactionResult } from '@beatoz/web3-accounts';
+import { Web3Account, SignTransactionResult, Wallet } from '@beatoz/web3-accounts';
 import { HexString, TrxProto } from '@beatoz/web3-types';
 
 export interface Web3MethodInterface extends Beatoz {
@@ -49,5 +49,6 @@ export interface Web3MethodInterface extends Beatoz {
             privateKey: HexString,
             chainId: string,
         ) => SignTransactionResult;
+        wallet: Wallet,
     };
 }

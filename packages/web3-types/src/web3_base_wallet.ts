@@ -13,7 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-// TODO : Wallet 작업 필요함
 import { HexString } from './primitives_types.js';
 import { BytesUint8Array } from './bytes_unit8array.js';
 import { TrxProto } from './trx_proto.js';
@@ -102,9 +101,9 @@ export interface Web3AccountProvider<T> {
 }
 
 export abstract class Web3BaseWallet<T extends Web3BaseWalletAccount> extends Array<T> {
-    protected readonly _accountProvider?: Web3AccountProvider<T>;
+    protected readonly _accountProvider: Web3AccountProvider<T>;
 
-    public constructor(accountProvider?: Web3AccountProvider<T>) {
+    public constructor(accountProvider: Web3AccountProvider<T>) {
         super();
         this._accountProvider = accountProvider;
     }

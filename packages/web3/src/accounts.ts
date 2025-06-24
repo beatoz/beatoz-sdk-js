@@ -21,15 +21,35 @@ import {
     prvKeyToAccount,
     sign,
     signTransaction,
+    Wallet,
+    Web3Account,
 } from '@beatoz/web3-accounts';
+import { KeyStore } from 'packages/web3-types/src/web3_base_wallet';
 
 export const initAccountsForContext = () => {
+    const decryptWithContext = async (
+		keystore: KeyStore | string,
+		password: string,
+		options?: Record<string, unknown>,
+	) => {
+		throw new Error('Not supported yet');
+	};
+
+
+    const wallet: Wallet = new Wallet( {
+        create: create, //createWithContext,
+		privateKeyToAccount: privateKeyToAccount, //privateKeyToAccountWithContext,
+		decrypt: decryptWithContext,
+    });
+
     return {
         create: create,
         privateKeyToAccount: privateKeyToAccount,
         privateKeyToPrvKey: privateKeyToPrvKey,
         prvKeyToAccount: prvKeyToAccount,
+        decrypt: decryptWithContext,
         sign: sign,
         signTransaction: signTransaction,
+        wallet,
     };
 };

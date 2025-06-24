@@ -71,18 +71,3 @@ export const signTransaction = (
         transactionHash: transactionHash,
     };
 };
-
-
-export class web3AccountProvider implements Web3AccountProvider<Web3Account> {
-    privateKeyToAccount(privateKey: string): Web3Account {
-        return privateKeyToAccount(privateKey);
-    }
-    
-    create(): Web3Account {
-        return create();
-    }
-    
-    async decrypt(keystore: KeyStore | string, password: string, options?: Record<string, unknown>): Promise<Web3Account> {
-        throw new Error('decrypt method not implemented');
-    }
-}

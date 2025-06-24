@@ -15,7 +15,7 @@
 */
 
 import { Web3PkgInfo } from './version.js';
-import { Web3Context } from '@beatoz/web3-core';
+import { Web3Context, Web3ContextObject } from '@beatoz/web3-core';
 import Web3Method from '@beatoz/web3-methods';
 import { isNullish } from '@beatoz/web3-validator';
 import { Web3MethodInterface } from './types';
@@ -45,6 +45,8 @@ export class Web3 extends Web3Context {
         }
 
         const accounts = initAccountsForContext();
+        this._wallet = accounts.wallet;
+        this._accountProvider = accounts;
 
         // Have to use local alias to initiate contract context
         // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -52,9 +54,8 @@ export class Web3 extends Web3Context {
 
         class ContractBuilder<Abi extends ContractAbi> extends Contract<Abi> {
             constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
-                super(jsonInterface, addressOrOptionsOrContext);
-                const providers = self.requestManager.provider;
-                super.settingsProvider(providers);
+                const context = self.getContextObject() as Web3ContextObject
+                super(jsonInterface, addressOrOptionsOrContext, context);
             }
         }
 

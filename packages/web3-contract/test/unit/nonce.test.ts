@@ -17,26 +17,25 @@ import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
 import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress, getDevChainId } from './e2e_utils';
 import { WebsocketProvider } from '@beatoz/web3-providers-ws';
-import { TrxProtoBuilder, walletManager } from '@beatoz/web3-accounts';
+import { TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
-import { getAccount } from '@beatoz/web3-methods';
 import { Web3 } from '@beatoz/web3';
 
-describe('transfer toekn test', () => {
+describe('transfer token test', () => {
+    const web3 = new Web3(getDevWsServer());
+    const wallet = web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
     it('transfer function', (done) => {
-        walletManager.add(getDevAccountPrivateKey())
-        const fromAcct = walletManager.get(getDevAccountAddress())
+        const fromAcct = wallet.get(getDevAccountAddress())
         if (fromAcct === undefined) {
             console.error(`not found wallet of ${getDevAccountAddress()}`)
             done();
         }
 
-        const erc20Contract = new Contract(
+        const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xb612e45f15320f4b793bbabfcd00a45be982ac8e',
+            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
         ) as any;
-        erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
 
         erc20Contract.methods
             .transfer('0x0000000000000000000000000000000000000001', '1000')
@@ -59,8 +58,7 @@ describe('transfer toekn test', () => {
     it('transfer coin test (not evm)', async () => {
         const web3 = new Web3(getDevWsServer());
 
-        walletManager.add(getDevAccountPrivateKey())
-        const fromAcct = walletManager.get(getDevAccountAddress())
+        const fromAcct = wallet.get(getDevAccountAddress())
         if (fromAcct === undefined) {
             console.error(`not found wallet of ${getDevAccountAddress()}`);
             return;

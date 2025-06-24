@@ -37,7 +37,7 @@ import {
     Web3ValidationErrorObject,
     AbiInput,
 } from '@beatoz/web3-types';
-import { Web3Context } from '@beatoz/web3-core';
+import { Web3Context, Web3ContextObject } from '@beatoz/web3-core';
 import {
     ContractAbiWithSignature,
     ContractEventOptions,
@@ -66,10 +66,11 @@ import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
 import { broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy } from '@beatoz/web3-methods';
-import { TrxProtoBuilder, Web3Account, walletManager } from '@beatoz/web3-accounts';
+import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { LogsSubscription } from './log_subscription.js';
+import { isNull } from 'util';
 
 type ContractBoundMethod<
     Abi extends AbiFunctionFragment,
@@ -143,29 +144,24 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     private readonly _overloadedMethodAbis: Map<string, AbiFunctionFragment[]>;
 
-    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
+    // The type of addressOrOptionsOrContext is defined as `Address | Web3Context` for backward compatibility.
+    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?:Address | Web3Context, context?:Web3ContextObject) {
         super();
 
-        let provider;
-        if (
-            typeof addressOrOptionsOrContext === 'object' &&
-            'provider' in addressOrOptionsOrContext
-        ) {
-            provider = addressOrOptionsOrContext.provider;
+        if (!isNullish(context)) {
+            this._requestManager = context.requestManager;
+            this._wallet = context.wallet
+            this._accountProvider = context.accountProvider;
         }
 
+        
         this._overloadedMethodAbis = new Map<string, AbiFunctionFragment[]>();
-
-        const address =
-            typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
-
+        
+        
         this._parseAndSetJsonInterface(jsonInterface);
 
-        // Address CheckSum Settings
-        if (!isNullish(address)) {
-            this._parseAndSetAddress(address);
-        }
-
+        // TODO: Address CheckSum Settings
+        const address = typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
         this.options = {
             address,
             jsonInterface: this._jsonInterface,
@@ -385,7 +381,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         // });
 
         // eslint-disable-next-line no-void
-        // TODO ts-ignore 제거
+        // TODO Remove ts-ignore 
         // @ts-ignore
         void transactionToSend.on('error', (error: unknown) => {
             if (error instanceof ContractExecutionError) {
@@ -413,8 +409,8 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             from: modifiedContractOptions.from ?? undefined,
         };
 
-        const fromWallet = walletManager.get(options!.from!)
-        if(fromWallet === undefined) {
+        const fromAcct = this.wallet?.get(options!.from!)
+        if(fromAcct === undefined) {
             throw new Web3ContractError(
                 `Not found wallet of ${options!.from}`,
             );
@@ -429,11 +425,11 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
         const ruleObject = await rule(this);
         const genesisObj = await genesis(this);
-        const acctInfo = await getAccount(this, fromWallet.address);
+        const acctInfo = await getAccount(this, fromAcct.address);
     
         // 10000000000000000 = 0 16개 - 17개 자리
         const txProto = TrxProtoBuilder.buildContractTrxProto({
-            from: fromWallet.address,
+            from: fromAcct.address,
             to: _tx.to,
             nonce: acctInfo.value.nonce,
             gas: parseInt(options?.gas ?? ruleObject.value.minTrxGas),
@@ -442,7 +438,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             payload: { data: _tx.input },
         });
 
-        fromWallet.signTransaction(txProto, genesisObj.chain_id);
+        fromAcct.signTransaction(txProto, genesisObj.chain_id);
         // TrxProtoBuilder.signTrxProto(txProto, fromWallet, genesisObj.chain_id);
         return broadcastTxCommit(this, txProto);
     }

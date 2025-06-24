@@ -17,7 +17,7 @@
 import { Web3Config } from './web3_config.js';
 import { Web3RequestManager } from './web3_request_manager.js';
 import { isNullish } from '@beatoz/web3-validator';
-import { Web3APISpec, BeatozExecutionAPI } from '@beatoz/web3-types';
+import { Web3APISpec, BeatozExecutionAPI, Web3AccountProvider, Web3BaseWalletAccount, Web3BaseWallet } from '@beatoz/web3-types';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 
@@ -29,11 +29,15 @@ export type Web3ContextConstructor<T extends Web3Context, T2 extends unknown[]> 
 // To avoid circular dependencies, we need to export type from here.
 export type Web3ContextObject<API extends Web3APISpec = BeatozExecutionAPI> = {
     requestManager: Web3RequestManager<API>;
+	wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
+    accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
 };
 
 export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     public readonly providers = Web3RequestManager.providers;
     protected _requestManager?: Web3RequestManager<API>;
+	protected _accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
+	protected _wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
     public get requestManager() {
         return this._requestManager!;
     }
@@ -63,6 +67,14 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
         return useContext;
     }
 
+	public get wallet() {
+		return this._wallet;
+	}
+
+	public get accountProvider() {
+		return this._accountProvider;
+	}
+
     public set provider(provider: HttpProvider | WebsocketProvider | string | undefined) {
         this.requestManager.setProvider(provider);
     }
@@ -70,6 +82,8 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     public getContextObject(): Web3ContextObject<API> {
         return {
             requestManager: this.requestManager,
+            wallet: this.wallet,
+            accountProvider: this.accountProvider
         };
     }
 

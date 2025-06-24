@@ -23,7 +23,7 @@ describe('deploy test', () => {
     it('balanceOf function', (done) => {
         const erc20Contract = new Contract(
             erc20Json,
-            '0x4e4a3260d21f2d95e6b3e9176b6b91f5135168a7',
+            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
         ) as any;
 
         erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
