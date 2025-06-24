@@ -408,34 +408,34 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             from: modifiedContractOptions.from ?? undefined,
         };
 
-        let fromAddr: string
-        if(isNullish(options) || !('from' in options)) {
-            throw new Web3ContractError( `no sender address`);
-        }
-
         const _tx = getSendTxParams({
             abi,
             params,
-            options: (options && 'gas' in options) ? options : undefined,
+            options: (options && 'from' in options) ? options : undefined,
             contractOptions: modifiedContractOptions,
         });
 
-        const fromAcct = this.wallet?.get(options.from!);
+        const fromAcct = this.wallet?.get(_tx.from!);
         if(fromAcct === undefined) {
-            throw new Web3ContractError( `not found account of ${options!.from}` );
+            throw new Web3ContractError( `not found account of ${_tx.from}` );
         }
         
         const chainId = this.chainId ?? await this.decideChainId()
-        const ruleObject = await rule(this);
-        const acctInfo = await getAccount(this, fromAcct.address);
-    
-        // 10000000000000000 = 0 16개 - 17개 자리
+        const nonce = Number(_tx.nonce ?? (await getAccount(this, fromAcct.address)).value.nonce);
+        if(isNullish(_tx.gas) || isNullish(_tx.gasPrice)) {
+            const govParams = (await rule(this)).value;
+            if(isNullish(_tx.gas))      _tx.gas = govParams.minTrxGas;
+            if(isNullish(_tx.gasPrice)) _tx.gasPrice = govParams.gasPrice;
+        }
+        const gas = Number(_tx.gas);
+        const gasPrice = Number(_tx.gasPrice);
+
         const txProto = TrxProtoBuilder.buildContractTrxProto({
             from: fromAcct.address,
             to: _tx.to,
-            nonce: acctInfo.value.nonce,
-            gas: parseInt(options?.gas ?? ruleObject.value.minTrxGas),
-            gasPrice: ruleObject.value.gasPrice,
+            nonce: nonce,
+            gas: gas,
+            gasPrice: gasPrice.toString(),
             amount: '0',
             payload: { data: _tx.input },
         });

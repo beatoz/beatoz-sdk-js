@@ -18,6 +18,7 @@ import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress } from '.
 import { BroadcastTxCommitResponse, VmCallResponse, ContractAbi, SubscriptionEvent } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3, WebsocketProvider } from '@beatoz/web3';
+import { numberToHex } from '@beatoz/web3-utils';
 
 
 const web3 = new Web3(getDevWsServer());
@@ -72,15 +73,18 @@ describe('transfer loop test', () => {
             '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
         ) as any;
 
-        for(let i=0; i<2000; i++) {
+
+        
+        for(let i=0; i<100; i++) {
             const resp = await erc20Contract.methods
                 .transfer('0x0000000000000000000000000000000000000001', '1000')
-                .broadcast({from: fromAcct.address, gas:"300000"});
+                .broadcast({from: fromAcct.address, gas:"300000", sendMode: "commit"});
+            // if (resp.check_tx.code != 0 || resp.deliver_tx?.code != 0) {
             if (resp.check_tx.code != 0 || resp.deliver_tx?.code != 0) {
                 console.error(resp);
                 break;
             }
-            process.stdout.write(`test[${i}] success. gas wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
+            process.stdout.write(`transfer[${i}] txhash:${resp.hash}\n`);
         }
         
     }, 1000 * 60 * 60);
@@ -123,23 +127,23 @@ describe('transfer sync test', () => {
 
         process.stdout.write("start transfer tokens\n")
 
-        const fromAcct = web3.beatoz.accounts.wallet.get(getDevAccountAddress())
-        if (fromAcct === undefined) {
-            console.error(`not found account of ${getDevAccountAddress()}`)
-            return;
-        }
+        const fromAcctInfo = await web3.beatoz.getAccount(getDevAccountAddress());
+        let nonce = fromAcctInfo.value.nonce
+
 
         const mapTxs = new Map();
         for(let i=0; i<2000; i++) {
             const resp = await erc20Contract.methods
                 .transfer('0x0000000000000000000000000000000000000001', '1000')
-                .broadcast({from: fromAcct.address, gas:"300000", sendMode: "commit"});
-            if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0 ) {
+                .broadcast({from: getDevAccountAddress(), gas:"300000", nonce: numberToHex(nonce), sendMode: "sync"});
+            if (resp.code != 0 ) {
                 console.error(resp);
                 break;
             }
             mapTxs.set(resp.hash, false);
-            process.stdout.write(`test[${i}] success. hash:${resp.hash}\n`);
+            process.stdout.write(`transfer[${i}] txhash:${resp.hash}, nonce: ${nonce}\n`);
+
+            nonce = nonce+1;
         }
         
     }, 1000 * 60 * 60);
