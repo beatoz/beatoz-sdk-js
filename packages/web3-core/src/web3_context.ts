@@ -17,7 +17,7 @@
 import { Web3Config } from './web3_config.js';
 import { Web3RequestManager } from './web3_request_manager.js';
 import { isNullish } from '@beatoz/web3-validator';
-import { Web3APISpec, BeatozExecutionAPI, Web3AccountProvider, Web3BaseWalletAccount, Web3BaseWallet } from '@beatoz/web3-types';
+import { Web3APISpec, BeatozExecutionAPI, Web3AccountProvider, Web3BaseWalletAccount, Web3BaseWallet, ResponsesDecoder } from '@beatoz/web3-types';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 
@@ -31,27 +31,43 @@ export type Web3ContextObject<API extends Web3APISpec = BeatozExecutionAPI> = {
     requestManager: Web3RequestManager<API>;
 	wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
     accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
+    chainId?:string;
 };
 
 export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     public readonly providers = Web3RequestManager.providers;
-    protected _requestManager?: Web3RequestManager<API>;
+    protected _requestManager: Web3RequestManager<API>;
 	protected _accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
 	protected _wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
+    protected _chainId?:string;
+    
     public get requestManager() {
         return this._requestManager!;
+    }
+	public get wallet() {
+		return this._wallet;
+	}
+	public get accountProvider() {
+		return this._accountProvider;
+	}
+    public get chainId() {
+        return this._chainId!;
+    }
+    
+    public set provider(provider: HttpProvider | WebsocketProvider | string | undefined) {
+        this.requestManager.setProvider(provider);
     }
 
     public constructor(providerOrContext?: string) {
         super();
-        // If "providerOrContext" is provided as "string" or an objects matching "SupportedProviders" interface
-        if (
-            isNullish(providerOrContext) ||
-            (typeof providerOrContext === 'string' && providerOrContext.trim() !== '')
-        ) {
-            this._requestManager = new Web3RequestManager(providerOrContext);
-            return;
-        }
+
+        // //If "providerOrContext" is provided as "string" or an objects matching "SupportedProviders" interface
+        // if (
+        //     isNullish(providerOrContext) ||
+        //     (typeof providerOrContext === 'string' && providerOrContext.trim() !== '')
+        // ) {
+            this._requestManager = new Web3RequestManager(providerOrContext as undefined | string);
+        // }
     }
 
     public use<T extends Web3Context, T2 extends unknown[]>(
@@ -63,27 +79,15 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
         );
 
         useContext._requestManager = this.requestManager;
-
         return useContext;
-    }
-
-	public get wallet() {
-		return this._wallet;
-	}
-
-	public get accountProvider() {
-		return this._accountProvider;
-	}
-
-    public set provider(provider: HttpProvider | WebsocketProvider | string | undefined) {
-        this.requestManager.setProvider(provider);
     }
 
     public getContextObject(): Web3ContextObject<API> {
         return {
             requestManager: this.requestManager,
             wallet: this.wallet,
-            accountProvider: this.accountProvider
+            accountProvider: this.accountProvider,
+            chainId: this._chainId
         };
     }
 
@@ -103,8 +107,17 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
                 this.provider = new WebsocketProvider(provider);
             }
         }
-        this.requestManager.setProvider(provider);
         this.provider = provider;
         return true;
+    }
+
+    public async decideChainId() {
+        const resp = await this.requestManager.send({
+            method: 'genesis',
+            params: {},
+        })
+        const gen = ResponsesDecoder.decodeGenesis(resp);
+        this._chainId = gen.chain_id;
+        return this._chainId;
     }
 }

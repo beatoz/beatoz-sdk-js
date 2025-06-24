@@ -15,7 +15,7 @@
 */
 
 import { Web3PkgInfo } from './version.js';
-import { Web3Context, Web3ContextObject } from '@beatoz/web3-core';
+import { Web3Context } from '@beatoz/web3-core';
 import Web3Method from '@beatoz/web3-methods';
 import { isNullish } from '@beatoz/web3-validator';
 import { Web3MethodInterface } from './types';
@@ -54,8 +54,12 @@ export class Web3 extends Web3Context {
 
         class ContractBuilder<Abi extends ContractAbi> extends Contract<Abi> {
             constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
-                const context = self.getContextObject() as Web3ContextObject
-                super(jsonInterface, addressOrOptionsOrContext, context);
+                super(jsonInterface, addressOrOptionsOrContext);
+
+                this._requestManager = self.requestManager;
+                this._wallet = self.wallet
+                this._accountProvider = self.accountProvider;
+                this._chainId = self.chainId;
             }
         }
 

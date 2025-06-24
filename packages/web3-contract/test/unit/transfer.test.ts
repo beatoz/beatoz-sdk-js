@@ -13,17 +13,16 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
 import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress } from './e2e_utils';
-import { WebsocketProvider } from '@beatoz/web3-providers-ws';
-import { BroadcastTxCommitResponse, VmCallResponse } from '@beatoz/web3-types';
+import { BroadcastTxCommitResponse, VmCallResponse, ContractAbi, SubscriptionEvent } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
-import { Web3 } from '@beatoz/web3';
+import { Web3, WebsocketProvider } from '@beatoz/web3';
 
+
+const web3 = new Web3(getDevWsServer());
+web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
 describe('transfer test', () => {
-    const web3 = new Web3(getDevWsServer());
-    web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
     it('transfer function', (done) => {
         
         const fromAcct = web3.beatoz.accounts.wallet.get(getDevAccountAddress())
@@ -36,15 +35,14 @@ describe('transfer test', () => {
             erc20Json,
             '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
         ) as any;
-        // erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
 
         erc20Contract.methods
-            .transfer('0x0000000000000000000000000000000000000001', '1000')
+            .transfer('0x0000000000000000000000000000000000000001', '1')
             .broadcast({from: fromAcct!.address, gas:"250000"})
             .then((res:BroadcastTxCommitResponse) => {
                 console.log('response', res);
 
-                if (res.check_tx.code == 0 && res.deliver_tx?.code == 0) {
+                if (res.check_tx.code == 0 && res.deliver_tx!.code == 0) {
                     erc20Contract.methods.balanceOf('0x0000000000000000000000000000000000000001')
                     .call()
                     .then( (resp: VmCallResponse) => {
@@ -53,7 +51,96 @@ describe('transfer test', () => {
                         console.log('balance', decodeParameter('uint', hexBalance));
                         done();
                     })
+                } else {
+                    done(res.check_tx.log ?? res.deliver_tx!.log);
                 }
             });
     });
+});
+
+describe('transfer loop test', () => {
+    it('transfer function',  async () => {
+        
+        const fromAcct = web3.beatoz.accounts.wallet.get(getDevAccountAddress())
+        if (fromAcct === undefined) {
+            console.error(`not found account of ${getDevAccountAddress()}`)
+            return;
+        }
+
+        const erc20Contract = new web3.beatoz.Contract(
+            erc20Json,
+            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
+        ) as any;
+
+        for(let i=0; i<2000; i++) {
+            const resp = await erc20Contract.methods
+                .transfer('0x0000000000000000000000000000000000000001', '1000')
+                .broadcast({from: fromAcct.address, gas:"300000"});
+            if (resp.check_tx.code != 0 || resp.deliver_tx?.code != 0) {
+                console.error(resp);
+                break;
+            }
+            process.stdout.write(`test[${i}] success. gas wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
+        }
+        
+    }, 1000 * 60 * 60);
+});
+
+
+describe('transfer sync test', () => {
+    it('transfer function',  async () => {
+        
+        const erc20Contract = new web3.beatoz.Contract(
+            erc20Json,
+            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
+        ) as any;
+
+        const eventListener = new Web3(getDevWsServer());
+        const stream = eventListener.beatoz.subscribeTx();
+        const events: SubscriptionEvent[] = [];
+        const subscription = stream.subscribe({
+            error: (err) => console.error(err),
+            complete: () => console.log('subscription should not complete'),
+            next: (event: SubscriptionEvent) => {
+                events.push(event);
+                //expect(event.query).toEqual(query);
+                // if (events.length === 2) {
+                //     // make sure they are consecutive heights
+                //     subscription.unsubscribe();
+
+                //     // wait 1.5 * blockTime and check we did not get more events
+                //     setTimeout(() => {
+                //         expect(events.length).toEqual(2);
+                //         done();
+                //     }, 1.5 * blockTime);
+                // }
+
+                // const jsonEvt = JSON.stringify(event, null, 2);
+                const txhash = event.events["tx.hash"][0]
+                process.stdout.write(`event txhash: ${txhash}\n`);
+            },
+        });
+
+        process.stdout.write("start transfer tokens\n")
+
+        const fromAcct = web3.beatoz.accounts.wallet.get(getDevAccountAddress())
+        if (fromAcct === undefined) {
+            console.error(`not found account of ${getDevAccountAddress()}`)
+            return;
+        }
+
+        const mapTxs = new Map();
+        for(let i=0; i<2000; i++) {
+            const resp = await erc20Contract.methods
+                .transfer('0x0000000000000000000000000000000000000001', '1000')
+                .broadcast({from: fromAcct.address, gas:"300000", sendMode: "commit"});
+            if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0 ) {
+                console.error(resp);
+                break;
+            }
+            mapTxs.set(resp.hash, false);
+            process.stdout.write(`test[${i}] success. hash:${resp.hash}\n`);
+        }
+        
+    }, 1000 * 60 * 60);
 });
