@@ -30,12 +30,16 @@ import {
     ContractAbi,
     HexString32Bytes,
     Uint,
+    BroadcastTxAsyncResponse,
     BroadcastTxSyncResponse,
     BroadcastTxCommitResponse,
 } from '@beatoz/web3-types';
 
 export type NonPayableTxOptions = NonPayableCallOptions;
 export type PayableTxOptions = PayableCallOptions;
+export type BroadcastTxOptions = {
+    sendMode?: string // 'async' | 'sync' | 'commit'
+}
 
 export type ContractAbiWithSignature = ReadonlyArray<AbiFragment & { signature: HexString }>;
 
@@ -109,16 +113,19 @@ export interface NonPayableMethodObject<Inputs = unknown[], Outputs = unknown[]>
         block?: BlockNumberOrTag,
     ): Promise<SpecialOutput>;
 
+    // send(
+    //     tx?: NonPayableTxOptions,
+    // ): Web3PromiEvent<
+    //     FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>,
+    //     SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
+    // >;
     send(
-        tx?: NonPayableTxOptions,
-    ): Web3PromiEvent<
-        FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>,
-        SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
-    >;
+        tx?: NonPayableTxOptions | BroadcastTxOptions,
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     broadcast (
-        tx?: NonPayableTxOptions,
-    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
+        tx?: NonPayableTxOptions | BroadcastTxOptions,
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.
@@ -140,16 +147,19 @@ export interface PayableMethodObject<Inputs = unknown[], Outputs = unknown[]> {
         block?: BlockNumberOrTag,
     ): Promise<SpecialOutput>;
 
+    // send(
+    //     options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
+    // ): Web3PromiEvent<
+    //     FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>,
+    //     SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
+    // >;
     send(
-        tx?: PayableTxOptions,
-    ): Web3PromiEvent<
-        FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>,
-        SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
-    >;
+        tx?: PayableTxOptions | BroadcastTxOptions,
+    ):Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     broadcast (
-        tx?: PayableTxOptions,
-    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
+        tx?: PayableTxOptions | BroadcastTxOptions,
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.

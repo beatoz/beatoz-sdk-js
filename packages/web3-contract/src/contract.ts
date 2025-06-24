@@ -36,9 +36,13 @@ import {
     BeatozExecutionAPI,
     Web3ValidationErrorObject,
     AbiInput,
+    BroadcastTxAsyncResponse,
+    FormatType,
+    TransactionReceipt,
 } from '@beatoz/web3-types';
-import { Web3Context, Web3ContextObject } from '@beatoz/web3-core';
+import { Web3Context, Web3ContextObject, Web3PromiEvent } from '@beatoz/web3-core';
 import {
+    BroadcastTxOptions,
     ContractAbiWithSignature,
     ContractEventOptions,
     ContractOptions,
@@ -65,7 +69,7 @@ import {
 import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
-import { broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy } from '@beatoz/web3-methods';
+import { broadcastTxAsync, broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy, SendTransactionEvents } from '@beatoz/web3-methods';
 import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
@@ -144,17 +148,9 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     private readonly _overloadedMethodAbis: Map<string, AbiFunctionFragment[]>;
 
-    // The type of addressOrOptionsOrContext is defined as `Address | Web3Context` for backward compatibility.
-    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?:Address | Web3Context, context?:Web3ContextObject) {
+    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?:Address | Web3Context) {
         super();
 
-        if (!isNullish(context)) {
-            this._requestManager = context.requestManager;
-            this._wallet = context.wallet
-            this._accountProvider = context.accountProvider;
-        }
-
-        
         this._overloadedMethodAbis = new Map<string, AbiFunctionFragment[]>();
         
         
@@ -296,11 +292,15 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                         height,
                     ),
 
-                // TODO Promise any
-                send: (options?: PayableTxOptions | NonPayableTxOptions): Promise<any> =>
-                    this._contractMethodSend(methodAbi, abiParams, internalErrorsAbis, options),
-
-                broadcast: (options?: PayableTxOptions | NonPayableTxOptions): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse> => 
+                // original:
+                // send: (options?: PayableTxOptions | NonPayableTxOptions): Web3PromiEvent< FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>, SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>>
+                send: (
+                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions
+                ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> =>
+                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
+                
+                broadcast: (options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions)
+                    : Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> => 
                     this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
 
                 encodeABI: () => encodeMethodABI(methodAbi, abiParams),
@@ -352,6 +352,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
     }
 
+    // DEPRECATED
     private _contractMethodSend<Options extends PayableCallOptions | NonPayableCallOptions>(
         abi: AbiFunctionFragment,
         params: unknown[],
@@ -393,15 +394,13 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         return transactionToSend;
     }
 
-
-
-    private async _contractMethodBroadcast<Options extends PayableCallOptions | NonPayableCallOptions>(
+    private async _contractMethodBroadcast<Options extends PayableCallOptions | NonPayableCallOptions | BroadcastTxOptions>(
         abi: AbiFunctionFragment,
         params: unknown[],
         errorsAbi: AbiErrorFragment[],
         options?: Options,
         contractOptions?: ContractOptions,
-    ): Promise<BroadcastTxSyncResponse | BroadcastTxCommitResponse> {
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> {
         let modifiedContractOptions = contractOptions ?? this.options;
         modifiedContractOptions = {
             ...modifiedContractOptions,
@@ -409,22 +408,25 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             from: modifiedContractOptions.from ?? undefined,
         };
 
-        const fromAcct = this.wallet?.get(options!.from!)
-        if(fromAcct === undefined) {
-            throw new Web3ContractError(
-                `Not found wallet of ${options!.from}`,
-            );
+        let fromAddr: string
+        if(isNullish(options) || !('from' in options)) {
+            throw new Web3ContractError( `no sender address`);
         }
 
         const _tx = getSendTxParams({
             abi,
             params,
-            options,
+            options: (options && 'gas' in options) ? options : undefined,
             contractOptions: modifiedContractOptions,
         });
 
+        const fromAcct = this.wallet?.get(options.from!);
+        if(fromAcct === undefined) {
+            throw new Web3ContractError( `not found account of ${options!.from}` );
+        }
+        
+        const chainId = this.chainId ?? await this.decideChainId()
         const ruleObject = await rule(this);
-        const genesisObj = await genesis(this);
         const acctInfo = await getAccount(this, fromAcct.address);
     
         // 10000000000000000 = 0 16개 - 17개 자리
@@ -438,9 +440,17 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             payload: { data: _tx.input },
         });
 
-        fromAcct.signTransaction(txProto, genesisObj.chain_id);
-        // TrxProtoBuilder.signTrxProto(txProto, fromWallet, genesisObj.chain_id);
-        return broadcastTxCommit(this, txProto);
+        fromAcct.signTransaction(txProto, chainId);        
+
+        if(!isNullish(options) && 'sendMode' in options) {
+            if(options.sendMode === 'sync') {
+                return broadcastTxSync(this, txProto);
+            }
+            else if(options.sendMode === 'async') {
+                return broadcastTxAsync(this, txProto);
+            }
+        }
+        return broadcastTxCommit(this, txProto);        
     }
 
     private _getAbiParams(abi: AbiFunctionFragment, params: unknown[]): Array<unknown> {
