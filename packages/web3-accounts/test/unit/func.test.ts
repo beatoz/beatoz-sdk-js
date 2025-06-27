@@ -15,13 +15,13 @@
 */
 import { create, privateKeyToAccount } from '../../src';
 import { Web3Account } from '../../src/types';
-import { getTestProposalAccountPrivateKey } from './e2e_utils';
+import { getDevAccountPrivateKey, getDevAccountAddress } from './e2e_utils';
 
 describe('account.ts class test', () => {
     it('create func test && privateKeyToAccount Equal', () => {
         const account: Web3Account = create();
-        console.log(account.address);
-        console.log(account.privateKey);
+        console.log("private key", account.privateKey);
+        console.log("address    ", account.address);
 
         const account2: Web3Account = privateKeyToAccount(account.privateKey);
 
@@ -30,10 +30,9 @@ describe('account.ts class test', () => {
     });
 
     it('getTestProposalAccountPrivateKey account test', () => {
-        const proposalAccount: Web3Account = privateKeyToAccount(
-            getTestProposalAccountPrivateKey(),
+        const account: Web3Account = privateKeyToAccount(
+            getDevAccountPrivateKey(),
         );
-
-        console.log('proposalAccount.address', proposalAccount.address);
+        expect(getDevAccountAddress()).toEqual(account.address.toUpperCase());
     });
 });
