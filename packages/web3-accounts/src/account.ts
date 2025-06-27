@@ -19,6 +19,7 @@ import { HexString, TrxProto, BytesUint8Array, KeyStore, Web3AccountProvider } f
 import { sha3Raw } from '@beatoz/web3-utils';
 import { TrxProtoUtils } from './tx/trx_pb.js';
 import { RlpUtils } from './tx/trx_rlp.js';
+import { createHash } from 'crypto';
 
 export const create = (): Web3Account => {
     const prvKey = new PrvKey();
@@ -63,11 +64,14 @@ export const signTransaction = (
     const prefixedData = Buffer.concat([Buffer.from(prefix), encodedData]);
     trxProto.sig = sign(new BytesUint8Array(prefixedData), privateKey);
 
+
+    const sha256 = createHash('sha256');
+
     const signedTxByte = new BytesUint8Array(TrxProtoUtils.encode(trxProto).finish());
-    const rawTransaction = Buffer.from(signedTxByte).toString('base64');
-    const transactionHash = sha3Raw(rawTransaction);
+    const rawTransaction = Buffer.from(signedTxByte); //.toString('base64');
+    const transactionHash = sha256.update(rawTransaction).digest(); //sha3Raw(rawTransaction);
     return {
-        rawTransaction: rawTransaction,
-        transactionHash: transactionHash,
+        rawTransaction: rawTransaction.toString('base64'),
+        transactionHash: transactionHash.toString('hex'),
     };
 };
