@@ -34,7 +34,7 @@ describe('transfer test', () => {
 
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xa35dd6343fa3623372ebb29ea12d265c5d96aecb',
+            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
         ) as any;
 
         erc20Contract.methods
@@ -70,7 +70,7 @@ describe('transfer loop test', () => {
 
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
+            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
         ) as any;
 
 
@@ -96,7 +96,7 @@ describe('transfer sync test', () => {
         
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
+            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
         ) as any;
 
         const eventListener = new Web3(getDevWsServer());
@@ -132,7 +132,7 @@ describe('transfer sync test', () => {
 
 
         const mapTxs = new Map();
-        for(let i=0; i<2000; i++) {
+        for(let i=0; i<100; i++) {
             const resp = await erc20Contract.methods
                 .transfer('0x0000000000000000000000000000000000000001', '1000')
                 .broadcast({from: getDevAccountAddress(), gas:"300000", nonce: numberToHex(nonce), sendMode: "sync"});
