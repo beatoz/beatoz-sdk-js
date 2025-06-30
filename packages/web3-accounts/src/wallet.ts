@@ -14,7 +14,10 @@ export class Wallet extends Web3BaseWallet<Web3Account> {
 
     public add(account: Web3Account | string): this {
         if (typeof account === 'string') {
-			return this.add(this._accountProvider.privateKeyToAccount(account));
+			if(account.startsWith('0x')) {
+                account = account.substring(2);
+            }
+            return this.add(this._accountProvider.privateKeyToAccount(account));
 		}
 		let index = this.length;
 		const existAccount = this.get(account.address);
@@ -30,7 +33,10 @@ export class Wallet extends Web3BaseWallet<Web3Account> {
 
     public get(addressOrIndex: string | number): Web3Account | undefined {
         if (typeof addressOrIndex === 'string') {
-			const index = this._addressMap.get(addressOrIndex.toLowerCase());
+            if(addressOrIndex.startsWith('0x')) {
+                addressOrIndex = addressOrIndex.substring(2);
+            }
+            const index = this._addressMap.get(addressOrIndex.toLowerCase());
 
 			if (!isNullish(index)) {
 				return this[index];
@@ -44,7 +50,10 @@ export class Wallet extends Web3BaseWallet<Web3Account> {
 
     public remove(addressOrIndex: string | number): boolean {
         if (typeof addressOrIndex === 'string') {
-			const index = this._addressMap.get(addressOrIndex.toLowerCase());
+			if(addressOrIndex.startsWith('0x')) {
+                addressOrIndex = addressOrIndex.substring(2);
+            }
+            const index = this._addressMap.get(addressOrIndex.toLowerCase());
 			if (isNullish(index)) {
 				return false;
 			}

@@ -38,7 +38,7 @@ export const prvKeyToAccount = (prvKey: PrvKey): Web3Account => {
     const pubKey = new PubKey(prvKey);
 
     return {
-        address: '0x'+pubKey.toAddress().toHex(),
+        address: pubKey.toAddress().toHex(),
         prvKey: prvKey,
         pubKey: pubKey,
         privateKey: prvKey.export().toHex(),

@@ -34,7 +34,7 @@ describe('transfer test', () => {
 
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
+            '0xef797d884fb605fd4621d98e7e81222b5f169243',
         ) as any;
 
         erc20Contract.methods
@@ -70,7 +70,7 @@ describe('transfer loop test', () => {
 
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
+            '0xef797d884fb605fd4621d98e7e81222b5f169243',
         ) as any;
 
 
@@ -96,7 +96,7 @@ describe('transfer sync test', () => {
         
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xc8b0b7e2a0224fb9e2dda6b31316c96edf74391e',
+            '0xef797d884fb605fd4621d98e7e81222b5f169243',
         ) as any;
 
         const eventListener = new Web3(getDevWsServer());

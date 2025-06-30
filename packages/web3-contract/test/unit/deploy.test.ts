@@ -29,6 +29,7 @@ describe('deploy test', () => {
         erc20Contract.setProvider(new WebsocketProvider(getDevWsServer()));
 
         const web3account: Web3Account = wallet.get(getDevAccountAddress())!;
+        console.log(web3account);
 
         erc20Contract
             .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, getDevChainId(), 10000000)
