@@ -15,13 +15,12 @@
 */
 import { create, privateKeyToAccount } from '../../src';
 import { Web3Account } from '../../src/types';
-import { getTestProposalAccountPrivateKey } from './e2e_utils';
 
 describe('account.ts class test', () => {
     it('create func test && privateKeyToAccount Equal', () => {
         const account: Web3Account = create();
-        console.log(account.address);
-        console.log(account.privateKey);
+        console.log("private key", account.privateKey);
+        console.log("address    ", account.address);
 
         const account2: Web3Account = privateKeyToAccount(account.privateKey);
 
@@ -29,11 +28,11 @@ describe('account.ts class test', () => {
         expect(account.privateKey).toEqual(account2.privateKey);
     });
 
-    it('getTestProposalAccountPrivateKey account test', () => {
-        const proposalAccount: Web3Account = privateKeyToAccount(
-            getTestProposalAccountPrivateKey(),
-        );
+    it('ethereum compatible address test', () => {
+        const privateKey = "2926cd769094b2755d84b74b9180811adf71d9a1bfacf86f81dbfcfd4b9da163";
+        const expectedAddr:string = "334B4F940D938839c59094714A239a05dB84FdBe";
 
-        console.log('proposalAccount.address', proposalAccount.address);
+        const account: Web3Account = privateKeyToAccount(privateKey);
+        expect(expectedAddr.toUpperCase()).toEqual(account.address.toUpperCase());
     });
 });

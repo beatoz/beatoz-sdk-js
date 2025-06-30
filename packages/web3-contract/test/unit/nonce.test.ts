@@ -34,7 +34,7 @@ describe('transfer token test', () => {
 
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0x10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d',
+            '0xa35dd6343fa3623372ebb29ea12d265c5d96aecb',
         ) as any;
 
         erc20Contract.methods

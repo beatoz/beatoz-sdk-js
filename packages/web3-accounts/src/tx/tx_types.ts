@@ -13,7 +13,10 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
+import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { BytesUint8Array } from '@beatoz/web3-types';
+import { sha3Raw } from '@beatoz/web3-utils';
 import { createHash, randomBytes } from 'crypto';
 import * as secp256k1 from 'secp256k1';
 
@@ -56,7 +59,7 @@ export class PubKey {
     }
 
     toAddress(): BytesUint8Array {
-        return this.btcAddress();
+        return this.ethAddress();
     }
 
     shaAddress(): BytesUint8Array {
@@ -75,7 +78,10 @@ export class PubKey {
     }
 
     ethAddress(): BytesUint8Array {
-        throw Error('not supported');
+        const decompressed = new BytesUint8Array([...this.x, ...this.y]);
+        const pubKeyHash = keccak256(decompressed);
+        const addr = pubKeyHash.slice(-20);
+        return new BytesUint8Array(addr);
     }
 
     verify(sig: Uint8Array, msg: Uint8Array): boolean {
