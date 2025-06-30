@@ -24,7 +24,7 @@ import {
     Wallet,
     Web3Account,
 } from '@beatoz/web3-accounts';
-import { KeyStore } from 'packages/web3-types/src/web3_base_wallet';
+import { KeyStore } from '@beatoz/web3-types';
 
 export const initAccountsForContext = () => {
     const decryptWithContext = async (

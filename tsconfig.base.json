@@ -16,9 +16,5 @@
 		"strictNullChecks": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
-		"paths": {
-			"@beatoz/*": ["packages/*/src"]
-		}
 	}
 }
