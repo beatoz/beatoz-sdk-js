@@ -47,6 +47,7 @@ import {
     DelegateeResponse,
     RuleResponse,
     VmCallResponse,
+    VmEstimateGasResponse,
     ProposalResponse,
     StakesResponse,
     AccountResponse,
@@ -577,6 +578,32 @@ export async function vmCall(
             },
         }),
     );
+}
+
+export async function vmEstimateGas(
+    requestManager: Web3RequestManager,
+    addr: string,
+    to: string,
+    data: string,
+): Promise<Number> {
+    if (!addr.startsWith('0x')) {
+        addr = '0x' + addr;
+    }
+    if (!to.startsWith('0x')) {
+        to = '0x' + to;
+    }
+
+    const response = await requestManager.send({
+        method: 'vm_estimate_gas',
+        params: {
+            addr: addr,
+            to: to,
+            height: "0",
+            data: Buffer.from(BytesUint8Array.fromHex(data)).toString('base64'),
+        },
+    })
+    const ret = response.result.value as VmEstimateGasResponse;
+    return new Number(ret.usedGas);
 }
 
 export async function blockSearch(

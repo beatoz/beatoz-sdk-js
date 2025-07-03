@@ -1043,6 +1043,11 @@ export interface VmCallResponse {
     };
 }
 
+export interface VmEstimateGasResponse {
+    usedGas: string;
+    err: string;
+}
+
 export interface DateWithNanoseconds extends Date {
     /** Nanoseconds after the time stored in a vanilla Date (millisecond granularity) */
     nanoseconds?: number;

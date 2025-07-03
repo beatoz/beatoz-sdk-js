@@ -69,7 +69,7 @@ import {
 import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
-import { broadcastTxAsync, broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy, SendTransactionEvents } from '@beatoz/web3-methods';
+import { broadcastTxAsync, broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy, SendTransactionEvents, vmEstimateGas } from '@beatoz/web3-methods';
 import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
@@ -291,6 +291,9 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                         options,
                         height,
                     ),
+                
+                estimateGas: async (options?: NonPayableTxOptions) =>
+                    this._contractMethodEstimateGas(methodAbi, abiParams, internalErrorsAbis, options),
 
                 // original:
                 // send: (options?: PayableTxOptions | NonPayableTxOptions): Web3PromiEvent< FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>, SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>>
@@ -307,12 +310,12 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             };
 
             if (methodAbi.stateMutability === 'payable') {
-                return methods as PayableMethodObject<
+                return methods as unknown as PayableMethodObject<
                     ContractOverloadedMethodInputs<T>,
                     ContractOverloadedMethodOutputs<T>
                 >;
             }
-            return methods as NonPayableMethodObject<
+            return methods as unknown as NonPayableMethodObject<
                 ContractOverloadedMethodInputs<T>,
                 ContractOverloadedMethodOutputs<T>
             >;
@@ -342,6 +345,38 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         }
         try {
             return await call(this, tx.to, tx.input ? tx.input.toString() : '0x', tx.from, height);
+        } catch (error: unknown) {
+            if (error instanceof ContractExecutionError) {
+                // this will parse the error data by trying to decode the ABI error inputs according to EIP-838
+                decodeContractErrorData([], error.innerError);
+                // decodeContractErrorData(errorsAbi, error.innerError);
+            }
+            throw error;
+        }
+    }
+
+    private async _contractMethodEstimateGas<Options extends NonPayableCallOptions>(
+        abi: AbiFunctionFragment,
+        params: unknown[],
+        errorsAbi: AbiErrorFragment[],
+        options?: Options,
+    ) {
+        const tx = getEthTxCallParams({
+            abi,
+            params,
+            options,
+            contractOptions: {
+                ...this.options,
+                from: this.options.from ?? this.config.defaultAccount,
+            },
+        });
+
+        // If the from address is not set, enter the from address as the to address
+        if (!tx.from) {
+            tx.from = tx.to;
+        }
+        try {
+            return await vmEstimateGas(this, tx.to, tx.input ? tx.input.toString() : '0x', tx.from);
         } catch (error: unknown) {
             if (error instanceof ContractExecutionError) {
                 // this will parse the error data by trying to decode the ABI error inputs according to EIP-838

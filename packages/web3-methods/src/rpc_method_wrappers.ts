@@ -309,6 +309,15 @@ export async function vmCall(
     return rpcMethods.vmCall(web3Context.requestManager, addr, to, height, data);
 }
 
+export async function vmEstimateGas(
+    web3Context: Web3Context<BeatozExecutionAPI>,
+    addr: string,
+    to: string,
+    data: string,
+) {
+    return rpcMethods.vmEstimateGas(web3Context.requestManager, addr, to, data);
+}
+
 export function subscribe(
     web3Context: Web3Context<BeatozExecutionAPI>,
     query: string,
