@@ -13,29 +13,128 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import erc20Json from '../fixtures/erc20-abi.json';
-import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress, getDevChainId } from './e2e_utils';
+import rep1155Json from '../fixtures/REP1155.json';
+import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress, getDevChainId, getDevServer } from './e2e_utils';
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
-import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
+import { BytesUint8Array } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
+import { Web3Account } from '@beatoz/web3-accounts';
+import { WebsocketProvider } from '@beatoz/web3-providers-ws';
 
 describe('estimateGas test', () => {
     const web3 = new Web3(getDevWsServer());
-    const wallet = web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
+    web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
     it('estimateGas', (done) => {
-        const erc20Contract = new web3.beatoz.Contract(
-            erc20Json,
-            '0xead63659858b031d453624c7b1a2e563cbba3a44',
-        ) as any;
-
-        erc20Contract.methods
-            .transfer('0x0000000000000000000000000000000000000001', '1000')
-            .estimateGas()
-            .then((res:Number) => {
-                console.log('estimated gas', res.toString());
-                done();
-            });
+        async function deploy() {
+            const contract = new web3.beatoz.Contract(rep1155Json.abi);
+            contract.setProvider(new WebsocketProvider(getDevWsServer()));
         
+            const resp = await contract
+                .deploy(rep1155Json.bytecode, ['http://myurl', deployerAcct.address], deployerAcct, getDevChainId(), 10000000)
+                    .send();
+            const data = resp?.deliver_tx?.data;
+            if (typeof data === 'string') {
+                let contAddr = BytesUint8Array.b64ToBytes(data).toHex();
+                process.stdout.write(`contract address: ${contAddr}\n`);
+                process.stdout.write(`deployer address: ${deployerAcct.address}\n`);
+                return contAddr;
+            } else {
+                throw new Error(resp?.deliver_tx?.log);
+            }
+            return undefined;
+        }
+        
+        async function mint() {
+            const contAddr = await deploy()!;
+        
+            const contract = new web3.beatoz.Contract(rep1155Json.abi, contAddr) as any;
+            contract.setProvider(new WebsocketProvider(getDevWsServer()));
+        
+        
+            // create company
+            const rn = Math.floor(Date.now() / 1000);
+            const companyName = "Startbugs-" + rn;
+            const productName = "eGiftCard-" + rn;
+            const tokenIds:Array<number> = Array.from({ length: 2000 }, (v, i) => i + 1);
+            const prices:Array<number> = Array.from({ length: 2000 }, (v, i) => 100000);
+            const amounts:Array<number> = Array.from({ length: 2000 }, (v, i) => 100);
+            process.stdout.write(`company: ${companyName}, product: ${productName}\n`);
+        
+            // ===== STEP 1: 회사 생성 =====
+            process.stdout.write("\ncreateCompany: \n");
+            let resp = await contract.methods.createCompany(companyName).broadcast(commitOpt);
+            if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
+                throw new Error(`error: ${resp.deliver_tx.log}(${retData})`);
+            }
+            process.stdout.write("Success\n");
+        
+            // ===== STEP 2: createProduct =====
+            process.stdout.write("\ncreateProduct: \n");
+            resp = await contract.methods.createProduct(
+                companyName, 
+                productName,
+                "https://api.example.com/products/starbucks/ecard-20000/", // URI
+                "#RWA #giftcard",
+                "e-card"
+            ).broadcast(commitOpt);
+            if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
+                process.stdout.write(`error: ${resp.deliver_tx.log}(${retData})`);
+                return;
+            }
+            process.stdout.write("Success\n");
+        
+            const batchCnt = 50;
+            for (let idx = 0; idx < Math.min(3, tokenIds.length/batchCnt); idx++) {
+                // ===== STEP 3: addTokensToProductBatch =====
+                process.stdout.write(`\naddTokensToProductBatch: ${tokenIds[idx*batchCnt]} ~ ${tokenIds[idx*batchCnt+batchCnt-1]}\n`);
+                
+                let tx = contract.methods.addTokensToProductBatch(
+                    companyName, 
+                    productName, 
+                    tokenIds.slice(idx*batchCnt, idx*batchCnt+batchCnt),
+                    prices.slice(idx*batchCnt, idx*batchCnt+batchCnt)
+                );
+                let gasEsti = await tx.estimateGas(commitOpt);
+                let resp = await tx.broadcast({...commitOpt, gas: gasEsti.toString()});
+                process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
+                if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                    const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
+                    throw new Error(`error:  ${resp?.deliver_tx?.log}, ${retData}`);
+                }
+                
+                // ===== STEP 4: batchMint =====
+                process.stdout.write(`\nbatchMint: ${tokenIds[idx*batchCnt]} ~ ${tokenIds[idx*batchCnt+batchCnt-1]}\n`);
+                tx = await contract.methods.batchMint(
+                    contAddr,
+                    tokenIds.slice(idx*batchCnt, idx*batchCnt+batchCnt),
+                    amounts.slice(idx*batchCnt, idx*batchCnt+batchCnt),
+                    companyName,
+                    productName,
+                    "0x"
+                )
+                gasEsti = await tx.estimateGas(commitOpt);
+                resp = await tx.broadcast({...commitOpt, gas: gasEsti.toString()});
+                process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
+                if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                    const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
+                    throw new Error(`error:  ${resp?.deliver_tx?.log}, ${retData}`);
+                }
+            }
+            return;
+        }
+        
+        const web3 = new Web3(getDevServer());
+        web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey());
+        const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(getDevAccountAddress())!;
+        const commitOpt = {
+            from:getDevAccountAddress(), 
+            gas:"6000000", 
+            sendMode: "commit"
+        };
+
+        mint().then( () => done() );
     });
 });
