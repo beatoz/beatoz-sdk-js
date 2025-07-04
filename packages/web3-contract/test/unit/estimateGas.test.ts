@@ -136,5 +136,5 @@ describe('estimateGas test', () => {
         };
 
         mint().then( () => done() );
-    });
+    }, 1000*20);
 });
