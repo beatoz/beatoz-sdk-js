@@ -376,7 +376,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             tx.from = tx.to;
         }
         try {
-            return await vmEstimateGas(this, tx.to, tx.input ? tx.input.toString() : '0x', tx.from);
+            return await vmEstimateGas(this, tx.from, tx.to, tx.input ? tx.input.toString() : '0x');
         } catch (error: unknown) {
             if (error instanceof ContractExecutionError) {
                 // this will parse the error data by trying to decode the ABI error inputs according to EIP-838
