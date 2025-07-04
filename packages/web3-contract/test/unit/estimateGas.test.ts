@@ -26,7 +26,7 @@ describe('estimateGas test', () => {
     it('estimateGas', (done) => {
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xa35dd6343fa3623372ebb29ea12d265c5d96aecb',
+            '0xead63659858b031d453624c7b1a2e563cbba3a44',
         ) as any;
 
         erc20Contract.methods
