@@ -127,6 +127,10 @@ export interface NonPayableMethodObject<Inputs = unknown[], Outputs = unknown[]>
         tx?: NonPayableTxOptions | BroadcastTxOptions,
     ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
+    estimateGas<SpecialOutput = Outputs> (
+        tx?: PayableCallOptions | NonPayableTxOptions
+    ): Promise<SpecialOutput>;
+
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.
      * This can be used to send a transaction, call a method, or pass it into another smart contract’s method as arguments.
@@ -154,13 +158,17 @@ export interface PayableMethodObject<Inputs = unknown[], Outputs = unknown[]> {
     //     SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>
     // >;
     send(
-        tx?: PayableTxOptions | BroadcastTxOptions,
+        tx?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
     ):Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
     broadcast (
-        tx?: PayableTxOptions | BroadcastTxOptions,
+        tx?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
     ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
+    estimateGas<SpecialOutput = Outputs> (
+        tx?: PayableCallOptions | NonPayableTxOptions
+    ): Promise<SpecialOutput>;
+    
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.
      * This can be used to send a transaction, call a method, or pass it into another smart contract’s method as arguments.
