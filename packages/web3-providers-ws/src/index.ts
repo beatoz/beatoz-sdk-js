@@ -154,9 +154,9 @@ export default class WebsocketProvider<API extends Web3APISpec = BeatozExecution
     public constructor(baseUrl: string, onError: (err: any) => void = defaultErrorHandler) {
         // accept host.name:port and assume ws protocol
         // make sure we don't end up with ...//websocket
-        const path = baseUrl.endsWith('/') ? 'websocket' : '/websocket';
-        const cleanBaseUrl = hasProtocol(baseUrl) ? baseUrl : 'ws://' + baseUrl;
-        this.url = cleanBaseUrl + path;
+        let cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        cleanUrl = cleanUrl.endsWith('/websocket') ? cleanUrl : cleanUrl + '/websocket';
+        this.url = hasProtocol(cleanUrl) ? cleanUrl : 'ws://' + cleanUrl;
 
         this.socket = new ReconnectingSocket(this.url);
 
