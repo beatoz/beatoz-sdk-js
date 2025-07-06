@@ -585,7 +585,7 @@ export async function vmEstimateGas(
     addr: string,
     to: string,
     data: string,
-): Promise<Number> {
+): Promise<VmCallResponse> {
     if (!addr.startsWith('0x')) {
         addr = '0x' + addr;
     }
@@ -593,17 +593,17 @@ export async function vmEstimateGas(
         to = '0x' + to;
     }
 
-    const response = await requestManager.send({
-        method: 'vm_estimate_gas',
-        params: {
-            addr: addr,
-            to: to,
-            height: "0",
-            data: Buffer.from(BytesUint8Array.fromHex(data)).toString('base64'),
-        },
-    })
-    const ret = response.result.value as VmEstimateGasResponse;
-    return new Number(ret.usedGas);
+    return ResponsesDecoder.decodeVmCall(
+        await requestManager.send({
+            method: 'vm_estimate_gas',
+            params: {
+                addr: addr,
+                to: to,
+                height: "0",
+                data: Buffer.from(BytesUint8Array.fromHex(data)).toString('base64'),
+            },
+        })
+    );
 }
 
 export async function blockSearch(
