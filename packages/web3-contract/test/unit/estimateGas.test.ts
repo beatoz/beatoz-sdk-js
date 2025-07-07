@@ -61,7 +61,7 @@ describe('estimateGas test', () => {
             const amounts:Array<number> = Array.from({ length: 2000 }, (v, i) => 100);
             process.stdout.write(`company: ${companyName}, product: ${productName}\n`);
         
-            // ===== STEP 1: 회사 생성 =====
+            // ===== STEP 1: createCompany =====
             process.stdout.write("\ncreateCompany: \n");
             let resp = await contract.methods.createCompany(companyName).broadcast(commitOpt);
             if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
