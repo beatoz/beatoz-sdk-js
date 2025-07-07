@@ -1,6 +1,6 @@
 {
     "name": "@beatoz/web3-utils",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "main": "./lib/commonjs/index.js",
     "module": "./lib/esm/index.js",
     "license": "Apache-2.0",
@@ -52,9 +52,9 @@
         "typescript": "^4.7.4"
     },
     "dependencies": {
-        "@beatoz/web3-errors": "^1.6.2",
-        "@beatoz/web3-types": "^1.6.2",
-        "@beatoz/web3-validator": "^1.6.2",
+        "@beatoz/web3-errors": "^1.6.3",
+        "@beatoz/web3-types": "^1.6.3",
+        "@beatoz/web3-validator": "^1.6.3",
         "@types/crypto-js": "^4.1.1",
         "bn.js": "^5.2.1",
         "constants-browserify": "^1.0.0",
