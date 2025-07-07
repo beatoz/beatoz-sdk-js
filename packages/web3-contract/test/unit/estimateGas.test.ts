@@ -14,24 +14,25 @@
     limitations under the License.
 */
 import rep1155Json from '../fixtures/REP1155.json';
-import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress, getDevChainId, getDevServer } from './e2e_utils';
-import { TrxProtoBuilder } from '@beatoz/web3-accounts';
+import Providers from '../../../../.providers.json';
+const { DEVNET0: netInfo } = Providers;
 import { BytesUint8Array } from '@beatoz/web3-types';
-import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
 import { Web3Account } from '@beatoz/web3-accounts';
 import { WebsocketProvider } from '@beatoz/web3-providers-ws';
 
 describe('estimateGas test', () => {
-    const web3 = new Web3(getDevWsServer());
-    web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
+    const web3 = new Web3(netInfo.HTTP);
+    for (const acct of netInfo.ACCTS) {
+        web3.beatoz.accounts.wallet.add(acct.KEY);
+    }
     it('estimateGas', (done) => {
         async function deploy() {
             const contract = new web3.beatoz.Contract(rep1155Json.abi);
-            contract.setProvider(new WebsocketProvider(getDevWsServer()));
+            contract.setProvider(new WebsocketProvider(netInfo.WS));
         
             const resp = await contract
-                .deploy(rep1155Json.bytecode, ['http://myurl', deployerAcct.address], deployerAcct, getDevChainId(), 10000000)
+                .deploy(rep1155Json.bytecode, ['http://myurl', deployerAcct.address], deployerAcct, netInfo.CHAINID, 10000000)
                     .send();
             const data = resp?.deliver_tx?.data;
             if (typeof data === 'string') {
@@ -42,14 +43,13 @@ describe('estimateGas test', () => {
             } else {
                 throw new Error(resp?.deliver_tx?.log);
             }
-            return undefined;
         }
         
         async function mint() {
             const contAddr = await deploy()!;
         
             const contract = new web3.beatoz.Contract(rep1155Json.abi, contAddr) as any;
-            contract.setProvider(new WebsocketProvider(getDevWsServer()));
+            contract.setProvider(new WebsocketProvider(netInfo.WS));
         
         
             // create company
@@ -98,7 +98,7 @@ describe('estimateGas test', () => {
                     prices.slice(idx*batchCnt, idx*batchCnt+batchCnt)
                 );
                 let gasEsti = await tx.estimateGas(commitOpt);
-                let resp = await tx.broadcast({...commitOpt, gas: gasEsti.toString()});
+                let resp = await tx.broadcast({...commitOpt, gas: gasEsti.value.usedGas});
                 process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
                 if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
                     const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
@@ -116,7 +116,7 @@ describe('estimateGas test', () => {
                     "0x"
                 )
                 gasEsti = await tx.estimateGas(commitOpt);
-                resp = await tx.broadcast({...commitOpt, gas: gasEsti.toString()});
+                resp = await tx.broadcast({...commitOpt, gas: gasEsti.value.usedGas});
                 process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
                 if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
                     const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
@@ -126,15 +126,13 @@ describe('estimateGas test', () => {
             return;
         }
         
-        const web3 = new Web3(getDevServer());
-        web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey());
-        const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(getDevAccountAddress())!;
+        const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
         const commitOpt = {
-            from:getDevAccountAddress(), 
+            from:deployerAcct.address, 
             gas:"6000000", 
             sendMode: "commit"
         };
 
         mint().then( () => done() );
-    });
+    }, 1000*20);
 });

@@ -15,26 +15,25 @@
 */
 import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
-import { getDevWsServer, getDevAccountPrivateKey, getDevAccountAddress, getDevChainId } from './e2e_utils';
-import { WebsocketProvider } from '@beatoz/web3-providers-ws';
+import deployedContract from '../fixtures/deployed.contract.json';
+import Providers from '../../../../.providers.json';
+const { DEVNET0: devnet0 } = Providers;
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
 
 describe('transfer token test', () => {
-    const web3 = new Web3(getDevWsServer());
-    const wallet = web3.beatoz.accounts.wallet.add(getDevAccountPrivateKey())
+    const web3 = new Web3(devnet0.WS);
+    for(const acct of devnet0.ACCTS) {
+        web3.beatoz.accounts.wallet.add(acct.KEY);
+    }
+    
     it('transfer function', (done) => {
-        const fromAcct = wallet.get(getDevAccountAddress())
-        if (fromAcct === undefined) {
-            console.error(`not found wallet of ${getDevAccountAddress()}`)
-            done();
-        }
-
+        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR)
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
-            '0xa35dd6343fa3623372ebb29ea12d265c5d96aecb',
+            deployedContract.address,
         ) as any;
 
         erc20Contract.methods
@@ -56,14 +55,8 @@ describe('transfer token test', () => {
     });
 
     it('transfer coin test (not evm)', async () => {
-        const web3 = new Web3(getDevWsServer());
 
-        const fromAcct = wallet.get(getDevAccountAddress())
-        if (fromAcct === undefined) {
-            console.error(`not found wallet of ${getDevAccountAddress()}`);
-            return;
-        }
-        
+        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR);
         const acctInfo = await web3.beatoz.getAccount(fromAcct!.address)
         console.log("acctInfo", acctInfo);
 
@@ -76,7 +69,7 @@ describe('transfer token test', () => {
             gasPrice: '250000000000',
         });
 
-        const { rawTransaction } = fromAcct?.signTransaction(tx, getDevChainId())
+        const { rawTransaction } = fromAcct!.signTransaction(tx, devnet0.CHAINID);
 
         // broadcast raw transaction
         const result = await web3.beatoz.broadcastRawTxCommit(rawTransaction);

@@ -292,13 +292,13 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                         height,
                     ),
                 
-                estimateGas: async (options?: NonPayableTxOptions) =>
+                estimateGas: async (options?: PayableCallOptions | NonPayableTxOptions) =>
                     this._contractMethodEstimateGas(methodAbi, abiParams, internalErrorsAbis, options),
 
                 // original:
                 // send: (options?: PayableTxOptions | NonPayableTxOptions): Web3PromiEvent< FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>, SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>>
                 send: (
-                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions
+                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions | BroadcastTxOptions
                 ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> =>
                     this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
                 

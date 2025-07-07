@@ -13,20 +13,25 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
-import { getTestWsServer } from './e2e_utils';
+import deployedContract from '../fixtures/deployed.contract.json';
+import Providers from '../../../../.providers.json';
+const { DEVNET0: devnet0 } = Providers;
+import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
+import { VmCallResponse } from '@beatoz/web3-types';
+import { decodeParameter } from '@beatoz/web3-abi';
 
 describe('deploy test', () => {
     it('decimals function', (done) => {
-        const erc20Contract = new Contract(erc20Json, '10f19a005a0cadb8b46af4ae0fea8cafdeeffe3d');
-        erc20Contract.setProvider(new WebsocketProvider(getTestWsServer()));
+        const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
+        erc20Contract.setProvider(new WebsocketProvider(devnet0.WS));
 
         erc20Contract.methods
             .decimals()
             .call()
-            .then((decimals) => {
+            .then((resp: VmCallResponse) => {
+                const decimals = decodeParameter('uint', resp.value.returnData);
                 console.log('decimals', decimals);
                 done();
             });

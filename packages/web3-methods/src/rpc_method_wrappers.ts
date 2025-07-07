@@ -51,7 +51,6 @@ export async function sendDeploy(
     const searchAccount = await getAccount(web3Context, rWeb3Account.address);
     const ruleObject = await rule(web3Context);
 
-    // 10000000000000000 = 0 16개 - 17개 자리
     const tx = TrxProtoBuilder.buildContractTrxProto({
         from: rWeb3Account.address,
         to: '0000000000000000000000000000000000000000',
