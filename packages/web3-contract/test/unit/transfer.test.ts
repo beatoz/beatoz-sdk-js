@@ -16,21 +16,21 @@
 import erc20Json from '../fixtures/erc20-abi.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: devnet0 } = Providers;
+const { TESTNET0: netInfo } = Providers;
 import { BroadcastTxCommitResponse, VmCallResponse, ContractAbi, SubscriptionEvent, BroadcastTxSyncResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3, WebsocketProvider } from '@beatoz/web3';
 import { numberToHex } from '@beatoz/web3-utils';
 
 
-const web3 = new Web3(devnet0.WS);
-for(const acct of devnet0.ACCTS) {
+const web3 = new Web3(netInfo.WS);
+for(const acct of netInfo.ACCTS) {
     web3.beatoz.accounts.wallet.add(acct.KEY);
 }
 describe('transfer test', () => {
     it('transfer function', (done) => {
         
-        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR);
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
             deployedContract.address,
@@ -61,7 +61,7 @@ describe('transfer test', () => {
 describe('transfer loop test', () => {
     it('transfer loop function',  async () => {
         
-        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR);
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
             deployedContract.address,
@@ -93,7 +93,7 @@ describe('transfer sync test', () => {
             deployedContract.address,
         ) as any;
 
-        const eventListener = new Web3(devnet0.WS);
+        const eventListener = new Web3(netInfo.WS);
         const stream = eventListener.beatoz.subscribeTx();
         const mapTxs = new Map<string, boolean>();
         // const events: SubscriptionEvent[] = [];
@@ -136,7 +136,7 @@ describe('transfer sync test', () => {
             },
         });
 
-        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR)!;
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
         web3.beatoz.getAccount(fromAcct.address).then( (resp) => {
             let nonce = resp.value.nonce;
 
