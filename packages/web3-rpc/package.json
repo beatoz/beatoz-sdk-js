@@ -1,6 +1,6 @@
 {
     "name": "@beatoz/web3-rpc",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "main": "./lib/commonjs/index.js",
     "module": "./lib/esm/index.js",
     "license": "Apache-2.0",
@@ -50,11 +50,11 @@
         "typescript": "^4.7.4"
     },
     "dependencies": {
-        "@beatoz/web3-accounts": "^1.6.3",
-        "@beatoz/web3-core": "^1.6.3",
-        "@beatoz/web3-types": "^1.6.3",
-        "@beatoz/web3-utils": "^1.6.3",
-        "@beatoz/web3-validator": "^1.6.3",
+        "@beatoz/web3-accounts": "^1.6.4",
+        "@beatoz/web3-core": "^1.6.4",
+        "@beatoz/web3-types": "^1.6.4",
+        "@beatoz/web3-utils": "^1.6.4",
+        "@beatoz/web3-validator": "^1.6.4",
         "xstream": "^11.14.0"
     }
 }
