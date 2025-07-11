@@ -26,12 +26,12 @@ export const create = (): Web3Account => {
 };
 
 export const privateKeyToAccount = (privateKey: HexString | ArrayBufferLike): Web3Account => {
-    const prvKey = PrvKey.import(privateKey);
+    const prvKey = PrvKey.importKey(privateKey);
     return prvKeyToAccount(prvKey);
 };
 
 export const privateKeyToPrvKey = (privateKey: HexString | ArrayBufferLike): PrvKey => {
-    return PrvKey.import(privateKey);
+    return PrvKey.importKey(privateKey);
 };
 
 export const prvKeyToAccount = (prvKey: PrvKey): Web3Account => {
@@ -41,10 +41,10 @@ export const prvKeyToAccount = (prvKey: PrvKey): Web3Account => {
         address: pubKey.toAddress().toHex(),
         prvKey: prvKey,
         pubKey: pubKey,
-        privateKey: prvKey.export().toHex(),
-        sign: (msg: Uint8Array) => sign(msg, prvKey.export().toHex()),
+        privateKey: prvKey.exportKey().toHex(),
+        sign: (msg: Uint8Array) => sign(msg, prvKey.exportKey().toHex()),
         signTransaction: (trxProto: TrxProto, chainId) =>
-            signTransaction(trxProto, prvKey.export().toHex(), chainId),
+            signTransaction(trxProto, prvKey.exportKey().toHex(), chainId),
     };
 };
 
