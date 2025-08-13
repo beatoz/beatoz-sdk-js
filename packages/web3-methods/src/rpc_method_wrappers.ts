@@ -28,7 +28,6 @@ import { TrxProto } from '@beatoz/web3-types';
 import { Stream } from 'xstream';
 import { Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { encodeParameters } from '@beatoz/web3-abi';
-import { atob } from 'buffer';
 
 export async function sendDeploy(
     web3Context: Web3Context<BeatozExecutionAPI>,
@@ -207,8 +206,8 @@ export async function contractAddrFromTx(
     for (const event of txResponse.result.events) {
         if (event.type !== 'evm') continue;
         for (const attribute of event.attributes) {
-            if (atob(attribute.key) !== 'contractAddress') continue;
-            contractAddress = atob(attribute.value);
+            if (globalThis.atob(attribute.key) !== 'contractAddress') continue;
+            contractAddress = globalThis.atob(attribute.value);
         }
     }
 

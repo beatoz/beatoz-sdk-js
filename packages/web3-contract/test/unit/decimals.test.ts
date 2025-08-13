@@ -16,7 +16,7 @@
 import erc20Json from '../fixtures/erc20-abi.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: devnet0 } = Providers;
+const { TESTNET0: netInfo } = Providers;
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { VmCallResponse } from '@beatoz/web3-types';
@@ -25,7 +25,7 @@ import { decodeParameter } from '@beatoz/web3-abi';
 describe('deploy test', () => {
     it('decimals function', (done) => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
-        erc20Contract.setProvider(new WebsocketProvider(devnet0.WS));
+        erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
 
         erc20Contract.methods
             .decimals()

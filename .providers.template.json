@@ -6,22 +6,7 @@
         "ACCTS": [
             {
                 "ADDR": "0x",
-                "KEY":"0x"
-            }
-        ] 
-    },
-    "DEVNET0": {
-        "CHAINID": "devnet0",
-        "HTTP": "http://13.124.218.120:26657",
-        "WS": "ws://13.124.218.120:26657/websocket",
-        "ACCTS": [
-            {
-                "ADDR": "0x",
-                "KEY":"0x"
-            },
-            {
-                "ADDR": "0x",
-                "KEY":"0x"
+                "KEY": "0x"
             }
         ]
     },
@@ -29,6 +14,21 @@
         "CHAINID": "testnet0",
         "HTTP": "http://rpc-testnet0.beatoz.io",
         "WS": "ws://rpc-testnet0.beatoz.io/websocket",
+        "ACCTS": [
+            {
+                "ADDR": "0x",
+                "KEY": "0x"
+            },
+            {
+                "ADDR": "0x",
+                "KEY": "0x"
+            }
+        ]
+    },
+    "MAINNET": {
+        "CHAINID": "devnet0",
+        "HTTP": "http://13.124.218.120:26657",
+        "WS": "ws://13.124.218.120:26657/websocket",
         "ACCTS": [
             {
                 "ADDR": "0x",

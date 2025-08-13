@@ -1,6 +1,6 @@
 {
     "name": "@beatoz/web3-types",
-    "version": "1.6.3",
+    "version": "1.6.5",
     "main": "./lib/commonjs/index.js",
     "module": "./lib/esm/index.js",
     "license": "Apache-2.0",

@@ -45,7 +45,7 @@ export class PubKey {
     y: BytesUint8Array;
 
     constructor(k: PrvKey) {
-        const decompressed = secp256k1.publicKeyCreate(k.export(), false);
+        const decompressed = secp256k1.publicKeyCreate(k.exportKey(), false);
         this.x = new BytesUint8Array(decompressed.subarray(1, 33));
         this.y = new BytesUint8Array(decompressed.subarray(33, 65));
 
@@ -115,11 +115,11 @@ export class PrvKey {
         return secp256k1.ecdsaSign(hmsg, this.d);
     }
 
-    export(): BytesUint8Array {
+    exportKey(): BytesUint8Array {
         return this.d;
     }
 
-    static import(k: string | ArrayBufferLike): PrvKey {
+    static importKey(k: string | ArrayBufferLike): PrvKey {
         const ret = new PrvKey();
         if (typeof k === 'string') {
             ret.d = BytesUint8Array.fromHex(k);

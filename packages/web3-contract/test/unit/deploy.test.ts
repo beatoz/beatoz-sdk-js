@@ -16,7 +16,7 @@
 
 import tokenJson from '../fixtures/erc20-contract.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: devnet0 } = Providers;
+const { TESTNET0: netInfo } = Providers;
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { Web3Account } from '@beatoz/web3-accounts';
@@ -25,19 +25,18 @@ import { Web3 } from '@beatoz/web3';
 import fs from 'fs';
 import path from 'path';
 describe('deploy test', () => {
-    const web3 = new Web3(devnet0.WS);
-    for(const acct of devnet0.ACCTS) {
+    const web3 = new Web3(netInfo.WS);
+    for(const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
     it('deploy function', (done) => {
         const erc20Contract = new Contract(tokenJson.abi);
-        erc20Contract.setProvider(new WebsocketProvider(devnet0.WS));
+        erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
 
-        const web3account: Web3Account = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR)!;
-        console.log(web3account);
+        const web3account: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
 
         erc20Contract
-            .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, devnet0.CHAINID, 10000000)
+            .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, netInfo.CHAINID, 10000000)
             .send()
             .then((res) => {
                 console.log(res);
@@ -46,7 +45,7 @@ describe('deploy test', () => {
                     let contAddr = BytesUint8Array.b64ToBytes(data).toHex();
                     // JSON 파일 생성
                     const contractInfo = {
-                        chainId: devnet0.CHAINID,
+                        chainId: netInfo.CHAINID,
                         address: contAddr,
                         deployer: web3account.address,
                         time: new Date().toISOString()

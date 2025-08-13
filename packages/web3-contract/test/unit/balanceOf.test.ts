@@ -14,21 +14,22 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
+import rep20Json from '../fixtures/REP20.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: devnet0 } = Providers;
+const { TESTNET0: netInfo } = Providers;
 import { VmCallResponse } from '@beatoz/web3-types';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { decodeParameter } from '@beatoz/web3-abi';
 describe('balanceOf test', () => {
     it('balanceOf function', (done) => {
-        const erc20Contract = new Contract<typeoferc20Json>(
+        const erc20Contract = new Contract(
             erc20Json,
             deployedContract.address,
         ) as any;
 
-        erc20Contract.setProvider(new WebsocketProvider(devnet0.WS));
+        erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
         erc20Contract.methods
             .balanceOf(deployedContract.deployer)
             .call()
@@ -39,16 +40,4 @@ describe('balanceOf test', () => {
                 done();
             });
     });
-
-    // it('web3 balanceOf function', (done) => {
-    //     let web3Contract = new Web3Contract(erc20Json, '4b007901049a210f8e1ce8f4d4ab8e6e1efd1b10');
-    //     web3Contract.setProvider(new WebsocketProvider(getTestWsServer()));
-    //     web3Contract.methods
-    //         .balanceOf('736A9F6FA280A88599DC7FCD24E42975DA89A5AE')
-    //         .call()
-    //         .then((balance) => {
-    //             console.log('balance', balance);
-    //             done();
-    //         });
-    // });
 });

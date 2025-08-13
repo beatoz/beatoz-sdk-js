@@ -15,7 +15,7 @@
 */
 import rep1155Json from '../fixtures/REP1155.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: netInfo } = Providers;
+const { LOCALNET0: netInfo } = Providers;
 import { BytesUint8Array } from '@beatoz/web3-types';
 import { Web3 } from '@beatoz/web3';
 import { Web3Account } from '@beatoz/web3-accounts';
@@ -41,6 +41,7 @@ describe('estimateGas test', () => {
                 process.stdout.write(`deployer address: ${deployerAcct.address}\n`);
                 return contAddr;
             } else {
+                console.error(resp?.deliver_tx?.log);
                 throw new Error(resp?.deliver_tx?.log);
             }
         }
@@ -126,7 +127,7 @@ describe('estimateGas test', () => {
             return;
         }
         
-        const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
+        const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[1].ADDR)!;
         const commitOpt = {
             from:deployerAcct.address, 
             gas:"6000000", 

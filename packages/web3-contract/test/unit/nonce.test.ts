@@ -17,20 +17,20 @@ import { Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
-const { DEVNET0: devnet0 } = Providers;
+const { TESTNET0: netInfo } = Providers;
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
 
 describe('transfer token test', () => {
-    const web3 = new Web3(devnet0.WS);
-    for(const acct of devnet0.ACCTS) {
+    const web3 = new Web3(netInfo.WS);
+    for(const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
     
     it('transfer function', (done) => {
-        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR)
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)
         const erc20Contract = new web3.beatoz.Contract(
             erc20Json,
             deployedContract.address,
@@ -56,7 +56,7 @@ describe('transfer token test', () => {
 
     it('transfer coin test (not evm)', async () => {
 
-        const fromAcct = web3.beatoz.accounts.wallet.get(devnet0.ACCTS[0].ADDR);
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
         const acctInfo = await web3.beatoz.getAccount(fromAcct!.address)
         console.log("acctInfo", acctInfo);
 
@@ -69,7 +69,7 @@ describe('transfer token test', () => {
             gasPrice: '250000000000',
         });
 
-        const { rawTransaction } = fromAcct!.signTransaction(tx, devnet0.CHAINID);
+        const { rawTransaction } = fromAcct!.signTransaction(tx, netInfo.CHAINID);
 
         // broadcast raw transaction
         const result = await web3.beatoz.broadcastRawTxCommit(rawTransaction);
