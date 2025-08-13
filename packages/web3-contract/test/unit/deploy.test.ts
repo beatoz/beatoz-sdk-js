@@ -16,7 +16,7 @@
 
 import tokenJson from '../fixtures/erc20-contract.json';
 import Providers from '../../../../.providers.json';
-const { TESTNET0: netInfo } = Providers;
+const { DEVNET0: netInfo } = Providers;
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { Web3Account } from '@beatoz/web3-accounts';
@@ -26,13 +26,11 @@ import fs from 'fs';
 import path from 'path';
 describe('deploy test', () => {
     const web3 = new Web3(netInfo.WS);
-    for(const acct of netInfo.ACCTS) {
+    for (const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
     it('deploy function', (done) => {
-        const erc20Contract = new Contract(tokenJson.abi);
-        erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
-
+        const erc20Contract = new web3.beatoz.Contract(tokenJson.abi);
         const web3account: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
 
         erc20Contract
@@ -50,10 +48,10 @@ describe('deploy test', () => {
                         deployer: web3account.address,
                         time: new Date().toISOString()
                     };
-                    
+
                     fs.writeFileSync(path.join(__dirname, '../fixtures/deployed.contract.json'), JSON.stringify(contractInfo, null, 2));
                     console.log("Contract info saved to deployed-contract.json at ../fixtures/");
-                    
+
                     done();
                 } else {
                     done(new Error('deliver_tx.data is undefined or not a string'));
