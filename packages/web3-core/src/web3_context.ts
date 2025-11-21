@@ -29,31 +29,31 @@ export type Web3ContextConstructor<T extends Web3Context, T2 extends unknown[]> 
 // To avoid circular dependencies, we need to export type from here.
 export type Web3ContextObject<API extends Web3APISpec = BeatozExecutionAPI> = {
     requestManager: Web3RequestManager<API>;
-	wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
+    wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
     accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
-    chainId?:string;
+    chainId?: string;
 };
 
 export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     public readonly providers = Web3RequestManager.providers;
     protected _requestManager: Web3RequestManager<API>;
-	protected _accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
-	protected _wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
-    protected _chainId?:string;
-    
+    protected _accountProvider?: Web3AccountProvider<Web3BaseWalletAccount>;
+    protected _wallet?: Web3BaseWallet<Web3BaseWalletAccount>;
+    protected _chainId?: string;
+
     public get requestManager() {
         return this._requestManager!;
     }
-	public get wallet() {
-		return this._wallet;
-	}
-	public get accountProvider() {
-		return this._accountProvider;
-	}
+    public get wallet() {
+        return this._wallet;
+    }
+    public get accountProvider() {
+        return this._accountProvider;
+    }
     public get chainId() {
         return this._chainId!;
     }
-    
+
     public set provider(provider: HttpProvider | WebsocketProvider | string | undefined) {
         this.requestManager.setProvider(provider);
     }
@@ -66,7 +66,7 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
         //     isNullish(providerOrContext) ||
         //     (typeof providerOrContext === 'string' && providerOrContext.trim() !== '')
         // ) {
-            this._requestManager = new Web3RequestManager(providerOrContext as undefined | string);
+        this._requestManager = new Web3RequestManager(providerOrContext as undefined | string);
         // }
     }
 
@@ -92,7 +92,7 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     }
 
     public getProvider() {
-        return this.requestManager.providers;
+        return this.requestManager.provider;
     }
 
     public setProvider(provider?: HttpProvider | WebsocketProvider | string): boolean {

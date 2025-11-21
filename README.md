@@ -1,6 +1,6 @@
-# Javascript SDK for BEATOZ
+# Javascript(Typecript) SDK for BEATOZ
 
-`beatoz-sdk-js` is Javascript SDK for BEATOZ blockhcain network.
+`beatoz-sdk-js` is Javascript(Typescript) SDK for BEATOZ blockhcain network.
 
 ## Prerequisite
 
