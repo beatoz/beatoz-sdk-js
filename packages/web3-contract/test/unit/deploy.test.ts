@@ -38,10 +38,8 @@ describe('deploy test', () => {
             .send()
             .then((res) => {
                 console.log(res);
-                const data = res?.deliver_tx?.data;
-                if (typeof data === 'string') {
-                    let contAddr = BytesUint8Array.b64ToBytes(data).toHex();
-                    // JSON 파일 생성
+
+                web3.beatoz.contractAddrFromTx(res.hash).then((contAddr) => {
                     const contractInfo = {
                         chainId: netInfo.CHAINID,
                         address: contAddr,
@@ -53,13 +51,10 @@ describe('deploy test', () => {
                     console.log("Contract info saved to deployed-contract.json at ../fixtures/");
 
                     done();
-                } else {
-                    done(new Error('deliver_tx.data is undefined or not a string'));
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                done(err);
+
+                }).catch((err) => {
+                    console.log(err);
+                    done(err);
+                });
             });
     });
-});

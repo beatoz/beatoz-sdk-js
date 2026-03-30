@@ -30,10 +30,10 @@ describe('estimateGas test', () => {
         async function deploy() {
             const contract = new web3.beatoz.Contract(rep1155Json.abi);
             contract.setProvider(new WebsocketProvider(netInfo.WS));
-        
+
             const resp = await contract
                 .deploy(rep1155Json.bytecode, ['http://myurl', deployerAcct.address], deployerAcct, netInfo.CHAINID, 10000000)
-                    .send();
+                .send();
             const data = resp?.deliver_tx?.data;
             if (typeof data === 'string') {
                 let contAddr = BytesUint8Array.b64ToBytes(data).toHex();
@@ -45,95 +45,91 @@ describe('estimateGas test', () => {
                 throw new Error(resp?.deliver_tx?.log);
             }
         }
-        
+
         async function mint() {
             const contAddr = await deploy()!;
-        
+
             const contract = new web3.beatoz.Contract(rep1155Json.abi, contAddr) as any;
             contract.setProvider(new WebsocketProvider(netInfo.WS));
-        
-        
+
+
             // create company
             const rn = Math.floor(Date.now() / 1000);
             const companyName = "Startbugs-" + rn;
             const productName = "eGiftCard-" + rn;
-            const tokenIds:Array<number> = Array.from({ length: 2000 }, (v, i) => i + 1);
-            const prices:Array<number> = Array.from({ length: 2000 }, (v, i) => 100000);
-            const amounts:Array<number> = Array.from({ length: 2000 }, (v, i) => 100);
+            const tokenIds: Array<number> = Array.from({ length: 2000 }, (v, i) => i + 1);
+            const prices: Array<number> = Array.from({ length: 2000 }, (v, i) => 100000);
+            const amounts: Array<number> = Array.from({ length: 2000 }, (v, i) => 100);
             process.stdout.write(`company: ${companyName}, product: ${productName}\n`);
-        
+
             // ===== STEP 1: createCompany =====
             process.stdout.write("\ncreateCompany: \n");
             let resp = await contract.methods.createCompany(companyName).broadcast(commitOpt);
-            if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
-                const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
-                throw new Error(`error: ${resp.deliver_tx.log}(${retData})`);
+            if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                throw new Error(`error: ${resp.check_tx.code != 0 ? resp.check_tx.log : resp.deliver_tx.log}`);
             }
             process.stdout.write("Success\n");
-        
+
             // ===== STEP 2: createProduct =====
             process.stdout.write("\ncreateProduct: \n");
             resp = await contract.methods.createProduct(
-                companyName, 
+                companyName,
                 productName,
                 "https://api.example.com/products/starbucks/ecard-20000/", // URI
                 "#RWA #giftcard",
                 "e-card"
             ).broadcast(commitOpt);
-            if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
-                const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
-                process.stdout.write(`error: ${resp.deliver_tx.log}(${retData})`);
+            if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                process.stdout.write(`error: ${resp.check_tx.code != 0 ? resp.check_tx.log : resp.deliver_tx.log}`);
                 return;
             }
             process.stdout.write("Success\n");
-        
+
             const batchCnt = 50;
-            for (let idx = 0; idx < Math.min(3, tokenIds.length/batchCnt); idx++) {
+            for (let idx = 0; idx < Math.min(3, tokenIds.length / batchCnt); idx++) {
                 // ===== STEP 3: addTokensToProductBatch =====
-                process.stdout.write(`\naddTokensToProductBatch: ${tokenIds[idx*batchCnt]} ~ ${tokenIds[idx*batchCnt+batchCnt-1]}\n`);
-                
+                process.stdout.write(`\naddTokensToProductBatch: ${tokenIds[idx * batchCnt]} ~ ${tokenIds[idx * batchCnt + batchCnt - 1]}\n`);
+
                 let tx = contract.methods.addTokensToProductBatch(
-                    companyName, 
-                    productName, 
-                    tokenIds.slice(idx*batchCnt, idx*batchCnt+batchCnt),
-                    prices.slice(idx*batchCnt, idx*batchCnt+batchCnt)
+                    companyName,
+                    productName,
+                    tokenIds.slice(idx * batchCnt, idx * batchCnt + batchCnt),
+                    prices.slice(idx * batchCnt, idx * batchCnt + batchCnt)
                 );
                 let gasEsti = await tx.estimateGas(commitOpt);
-                let resp = await tx.broadcast({...commitOpt, gas: gasEsti.value.usedGas});
+                let resp = await tx.broadcast({ ...commitOpt, gas: gasEsti.value.usedGas });
                 process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
-                if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
-                    const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
-                    throw new Error(`error:  ${resp?.deliver_tx?.log}, ${retData}`);
+                if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                    throw new Error(`error: ${resp.check_tx.code != 0 ? resp.check_tx.log : resp.deliver_tx.log}`);
                 }
-                
+
                 // ===== STEP 4: batchMint =====
-                process.stdout.write(`\nbatchMint: ${tokenIds[idx*batchCnt]} ~ ${tokenIds[idx*batchCnt+batchCnt-1]}\n`);
+                process.stdout.write(`\nbatchMint: ${tokenIds[idx * batchCnt]} ~ ${tokenIds[idx * batchCnt + batchCnt - 1]}\n`);
                 tx = await contract.methods.batchMint(
                     contAddr,
-                    tokenIds.slice(idx*batchCnt, idx*batchCnt+batchCnt),
-                    amounts.slice(idx*batchCnt, idx*batchCnt+batchCnt),
+                    tokenIds.slice(idx * batchCnt, idx * batchCnt + batchCnt),
+                    amounts.slice(idx * batchCnt, idx * batchCnt + batchCnt),
                     companyName,
                     productName,
                     "0x"
                 )
                 gasEsti = await tx.estimateGas(commitOpt);
-                resp = await tx.broadcast({...commitOpt, gas: gasEsti.value.usedGas});
+                resp = await tx.broadcast({ ...commitOpt, gas: gasEsti.value.usedGas });
                 process.stdout.write(`gas estimated:${gasEsti.toString()}, wanted:${resp.deliver_tx.gas_wanted}, used:${resp.deliver_tx.gas_used}\n`);
-                if(resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
-                    const retData = Buffer.from(resp.deliver_tx.data??"", 'base64').toString('utf-8');
-                    throw new Error(`error:  ${resp?.deliver_tx?.log}, ${retData}`);
+                if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
+                    throw new Error(`error: ${resp.check_tx.code != 0 ? resp.check_tx.log : resp.deliver_tx.log}`);
                 }
             }
             return;
         }
-        
+
         const deployerAcct: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[1].ADDR)!;
         const commitOpt = {
-            from:deployerAcct.address, 
-            gas:"6000000", 
+            from: deployerAcct.address,
+            gas: "6000000",
             sendMode: "commit"
         };
 
-        mint().then( () => done() );
-    }, 1000*20);
+        mint().then(() => done());
+    }, 1000 * 20);
 });
