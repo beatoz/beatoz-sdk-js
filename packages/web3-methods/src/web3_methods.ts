@@ -171,6 +171,10 @@ export class Web3Method extends Web3Context {
         return rpcMethodsWrappers.vmCall(this, addr, to, height, data);
     }
 
+    ethGetStorageAt(address: string, storageSlot: string, blockNumber: string | number = 'latest') {
+        return rpcMethodsWrappers.ethGetStorageAt(this, address, storageSlot, blockNumber);
+    }
+
     subscribe(query: string) {
         console.log('subscribe query', query);
         return rpcMethodsWrappers.subscribe(this, query);

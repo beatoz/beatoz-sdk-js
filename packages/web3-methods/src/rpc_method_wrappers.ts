@@ -307,6 +307,15 @@ export async function vmCall(
     return rpcMethods.vmCall(web3Context.requestManager, addr, to, height, data);
 }
 
+export async function ethGetStorageAt(
+    web3Context: Web3Context<BeatozExecutionAPI>,
+    address: string,
+    storageSlot: string,
+    blockNumber: string | number = 'latest',
+) {
+    return rpcMethods.ethGetStorageAt(web3Context.requestManager, address, storageSlot, blockNumber);
+}
+
 export async function vmEstimateGas(
     web3Context: Web3Context<BeatozExecutionAPI>,
     addr: string,

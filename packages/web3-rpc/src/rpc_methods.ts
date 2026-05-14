@@ -52,6 +52,7 @@ import {
     StakesResponse,
     AccountResponse,
     HealthResponse,
+    HexStringBytes,
 } from '@beatoz/web3-types';
 
 import { Stream } from 'xstream';
@@ -578,6 +579,44 @@ export async function vmCall(
             },
         }),
     );
+}
+
+function normalizeHexPrefix(value: string): string {
+    const trimmed = value.trim();
+    if (trimmed.startsWith('0x') || trimmed.startsWith('0X')) {
+        return `0x${trimmed.slice(2)}`;
+    }
+    return `0x${trimmed}`;
+}
+
+export async function ethGetStorageAt(
+    requestManager: Web3RequestManager,
+    address: string,
+    storageSlot: string,
+    blockNumber: string | number = 'latest',
+): Promise<HexStringBytes> {
+    address = normalizeHexPrefix(address);
+    storageSlot = normalizeHexPrefix(storageSlot);
+    if (typeof blockNumber === 'number') {
+        if (!Number.isSafeInteger(blockNumber) || blockNumber <= 0) {
+            throw new Error('blockNumber must be a positive safe integer');
+        }
+        blockNumber = '0x' + blockNumber.toString(16);
+    } else {
+        blockNumber = blockNumber.trim();
+    }
+
+    const response = await requestManager.send({
+        method: 'eth_getStorageAt',
+        params: [address, storageSlot, blockNumber],
+    });
+    if (
+        typeof response.result !== 'string' ||
+        !/^0x[0-9a-fA-F]{64}$/.test(response.result)
+    ) {
+        throw new Error('Invalid eth_getStorageAt response');
+    }
+    return response.result as HexStringBytes;
 }
 
 export async function vmEstimateGas(

@@ -21,7 +21,7 @@ import {
     Transaction2930UnsignedAPI,
     TransactionLegacyUnsignedAPI,
 } from './eth_execution_api';
-import { Address } from '../beatoz_types';
+import { Address, HexStringBytes, Uint256 } from '../beatoz_types';
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/transaction.yaml#L144
 export type TransactionUnsignedAPI =
@@ -95,6 +95,11 @@ export type BeatozExecutionAPI = {
     proposal: (txHash: string) => responses.ProposalResponse;
     stakes: (addr: string) => responses.StakesResponse;
     vmCall: (vmCall: string) => responses.VmCallResponse;
+    eth_getStorageAt: (
+        address: Address,
+        storageSlot: Uint256,
+        blockNumber: string | number,
+    ) => HexStringBytes;
     // end not tendermint apis
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
