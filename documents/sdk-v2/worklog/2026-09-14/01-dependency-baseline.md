@@ -131,19 +131,19 @@ Webpack    5.99.9
 
 이 문제는 의존성 충돌과 분리해 테스트 구조 정리 단계에서 해결합니다. 비밀 파일을 임의로 생성하거나 테스트를 무조건 제외하지 않고, unit/integration 테스트 경계를 먼저 결정해야 합니다.
 
-## 설치 시 남는 경고
+## 후속 작업에서 해결한 설치 경고
 
-빌드 실패와 직접 관련 없는 peer dependency 경고가 남아 있습니다.
+기준선 복구 직후에는 빌드 실패와 직접 관련 없는 peer dependency 경고가 남아 있었습니다.
 
 - `@cypress/webpack-preprocessor`가 `babel-loader`를 요구하지만 선언되어 있지 않음
 - 일부 workspace의 `eslint-plugin-prettier 5`가 Prettier 3을 요구하지만 루트에는 Prettier 2가 선언되어 있음
 
-이 항목은 Cypress 사용 여부와 Prettier 버전 통일 방향을 확인한 뒤 별도의 도구 의존성 정리로 처리합니다.
+후속 조사 결과 Cypress 관련 패키지는 사용되지 않아 제거했고, Prettier는 3으로 통일했습니다. 자세한 판단 근거와 검증 결과는 [개발 도구 의존성 정리](./04-tooling-dependencies.md)에 기록했습니다.
 
 ## 다음 작업
 
 1. Jest의 tsconfig 경로를 package별 상대경로로 바로잡습니다.
 2. `.secrets.json`이 필요한 테스트를 unit과 integration/e2e 중 어디에 둘지 정합니다.
 3. 전체 테스트 기준선을 정상화합니다.
-4. Cypress와 Prettier peer dependency 경고를 정리합니다.
+4. 기존 lint 오류의 기준선을 정리합니다.
 5. 기준선 커밋 이후 TypeScript 업그레이드를 시작합니다.
