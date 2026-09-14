@@ -18,7 +18,6 @@ deployed.contract.json
 
 # Unsupported lock files
 package-lock.json
-yarn.lock
 
 .npm
 .coverage
