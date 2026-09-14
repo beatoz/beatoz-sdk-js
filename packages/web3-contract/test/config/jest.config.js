@@ -13,19 +13,12 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-const path = require('path');
-
 module.exports = {
-    globals: {
-        'ts-jest': {
-            tsconfig: path.resolve(__dirname, '../tsconfig.json'),
-        },
-    },
     rootDir: '../..',
     testMatch: ['<rootDir>/test/**/?(*.)+(spec|test).+(ts|tsx|js)'],
     setupFilesAfterEnv: ['<rootDir>/test/config/setup.js'],
     transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest',
+        '^.+\\.(ts|tsx)$': '<rootDir>/../../scripts/jest/babel-transformer.js',
     },
     moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',

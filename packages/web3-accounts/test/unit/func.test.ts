@@ -28,11 +28,23 @@ describe('account.ts class test', () => {
         expect(account.privateKey).toEqual(account2.privateKey);
     });
 
-    it('ethereum compatible address test', () => {
-        const privateKey = "2926cd769094b2755d84b74b9180811adf71d9a1bfacf86f81dbfcfd4b9da163";
-        const expectedAddr:string = "334B4F940D938839c59094714A239a05dB84FdBe";
+	it('ethereum compatible address test', () => {
+		const privateKey = "2926cd769094b2755d84b74b9180811adf71d9a1bfacf86f81dbfcfd4b9da163";
+		const expectedAddr:string = "334B4F940D938839c59094714A239a05dB84FdBe";
 
-        const account: Web3Account = privateKeyToAccount(privateKey);
-        expect(expectedAddr.toUpperCase()).toEqual(account.address.toUpperCase());
-    });
+		const account: Web3Account = privateKeyToAccount(privateKey);
+		expect(expectedAddr.toUpperCase()).toEqual(account.address.toUpperCase());
+	});
+
+	it('imports private keys from typed arrays and array buffers', () => {
+		const privateKey = '2926cd769094b2755d84b74b9180811adf71d9a1bfacf86f81dbfcfd4b9da163';
+		const expectedAddress = privateKeyToAccount(privateKey).address;
+		const bytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+		const sharedBuffer = new SharedArrayBuffer(bytes.length);
+		new Uint8Array(sharedBuffer).set(bytes);
+
+		expect(privateKeyToAccount(bytes).address).toEqual(expectedAddress);
+		expect(privateKeyToAccount(bytes.buffer).address).toEqual(expectedAddress);
+		expect(privateKeyToAccount(sharedBuffer).address).toEqual(expectedAddress);
+	});
 });

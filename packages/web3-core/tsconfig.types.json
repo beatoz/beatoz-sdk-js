@@ -5,6 +5,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"emitDeclarationOnly": true,
+		"tsBuildInfoFile": "./lib/types/tsconfig.tsbuildinfo",
 		"strict": false
 	},
 	"include": ["src/**/*"]

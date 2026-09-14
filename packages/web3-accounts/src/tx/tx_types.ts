@@ -119,12 +119,14 @@ export class PrvKey {
         return this.d;
     }
 
-    static importKey(k: string | ArrayBufferLike): PrvKey {
+    static importKey(k: string | ArrayBufferLike | Uint8Array): PrvKey {
         const ret = new PrvKey();
         if (typeof k === 'string') {
             ret.d = BytesUint8Array.fromHex(k);
         } else {
-            ret.d = new BytesUint8Array(k);
+            const bytes = k instanceof Uint8Array ? k : new Uint8Array(k);
+            ret.d = new BytesUint8Array(bytes.length);
+            ret.d.set(bytes);
         }
         return ret;
     }

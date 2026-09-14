@@ -25,12 +25,16 @@ export const create = (): Web3Account => {
     return prvKeyToAccount(prvKey);
 };
 
-export const privateKeyToAccount = (privateKey: HexString | ArrayBufferLike): Web3Account => {
+export const privateKeyToAccount = (
+    privateKey: HexString | ArrayBufferLike | Uint8Array,
+): Web3Account => {
     const prvKey = PrvKey.importKey(privateKey);
     return prvKeyToAccount(prvKey);
 };
 
-export const privateKeyToPrvKey = (privateKey: HexString | ArrayBufferLike): PrvKey => {
+export const privateKeyToPrvKey = (
+    privateKey: HexString | ArrayBufferLike | Uint8Array,
+): PrvKey => {
     return PrvKey.importKey(privateKey);
 };
 
@@ -48,7 +52,10 @@ export const prvKeyToAccount = (prvKey: PrvKey): Web3Account => {
     };
 };
 
-export const sign = (msg: Uint8Array, privateKey: HexString | ArrayBufferLike): BytesUint8Array => {
+export const sign = (
+    msg: Uint8Array,
+    privateKey: HexString | ArrayBufferLike | Uint8Array,
+): BytesUint8Array => {
     const signObj = privateKeyToPrvKey(privateKey).sign(msg);
     return new BytesUint8Array([...signObj.signature, signObj.recid & 0xff]);
 };
