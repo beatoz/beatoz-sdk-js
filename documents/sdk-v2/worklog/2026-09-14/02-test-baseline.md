@@ -4,6 +4,13 @@
 
 상태: 진행 중
 
+## 결론
+
+- ts-jest 공통 설정이 `web3-contract`의 tsconfig 경로를 하드코딩하고 있어 다른 workspace에서 실행할 때도 잘못된 경로를 참조했습니다.
+- 설정 파일의 `__dirname` 기준 절대경로로 고쳐 각 package가 자신의 `test/tsconfig.json`을 사용하도록 했습니다.
+- `web3-accounts` 테스트가 통과하면서 전체 테스트 실패 package가 4개에서 3개로 줄었습니다.
+- 남은 3개(`web3-contract`, `web3-providers-ws`, `web3`)는 경로 문제가 아니라 `.secrets.json`, `.providers.json`, fixture 부재 등 별도의 환경 문제입니다.
+
 ## 첫 번째 문제: ts-jest의 잘못된 tsconfig 경로
 
 `web3-contract`와 `web3-accounts`의 공통 Jest 설정은 다음 경로를 하드코딩하고 있었습니다.

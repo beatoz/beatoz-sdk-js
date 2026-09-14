@@ -1,6 +1,6 @@
 # Node.js 지원 기준 현대화
 
-이 문서는 TypeScript 7 업그레이드에 앞서 BEATOZ SDK의 Node.js 지원 정책을 Node 22와 24 기준으로 변경한 이유와 검증 방법을 기록합니다.
+> 이 문서는 TypeScript 업그레이드에 앞서 BEATOZ SDK의 Node.js 지원 정책을 Node 22와 24 기준으로 변경한 이유와 검증 방법을 기록합니다.
 
 ## 결론
 

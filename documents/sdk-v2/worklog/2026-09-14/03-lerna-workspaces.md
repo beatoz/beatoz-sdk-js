@@ -1,6 +1,13 @@
 # Yarn workspaces와 Lerna 역할 정리
 
-이 저장소에서는 Yarn workspaces가 의존성 설치와 내부 패키지 연결을 담당하고, Lerna가 여러 패키지의 스크립트를 실행하는 역할을 담당합니다. Lerna 자체는 유지하며, Yarn과 역할이 겹치는 레거시 `lerna bootstrap` 명령만 제거했습니다.
+> 이 문서는 Yarn workspaces와 Lerna의 역할이 겹치던 레거시 `lerna bootstrap` 호출을 제거하면서 확인한 문제와 검증 결과를 기록합니다.
+
+## 결론
+
+- Yarn workspaces가 의존성 설치와 내부 패키지 연결을 담당하고, Lerna는 여러 패키지의 스크립트 실행을 담당하도록 책임을 분리했습니다. Lerna 자체는 유지합니다.
+- 역할이 중복되던 레거시 `lerna bootstrap` 호출을 `prebuild`와 `version` 스크립트에서 제거했습니다.
+- `yarn build`가 더 이상 설치를 암묵적으로 수행하지 않으므로, 의존성이 바뀌었거나 `node_modules`가 없는 환경에서는 `yarn install`을 먼저 실행해야 합니다.
+- frozen install과 전체 13개 패키지 빌드가 성공하고, 빌드 로그에서 `lerna bootstrap`이 더 이상 실행되지 않는 것을 확인했습니다.
 
 ## 변경 전 문제
 
