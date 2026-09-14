@@ -13,7 +13,8 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import {BytesUint8Array, TrxProto} from '@beatoz/web3-types';
+
+import { TrxProto } from '@beatoz/web3-types';
 import { rlp } from 'ethereumjs-util';
 import BN from 'bn.js';
 import {
@@ -34,12 +35,15 @@ export const RlpUtils = {
             case 2: // staking
                 payload = trx.Payload;
                 break;
-            case 3: // unstaking
+            case 3: {
+                // unstaking
                 const unstakingPayload: TrxPayloadUnstakingProto =
                     trxPb.TrxPayloadUnstakingProto.decode(trx.Payload);
                 payload = rlp.encode(unstakingPayload.txHash);
                 break;
-            case 4: // proposal
+            }
+            case 4: {
+                // proposal
                 const proposalPayload: TrxPayloadProposalProto =
                     trxPb.TrxPayloadProposalProto.decode(trx.Payload);
                 payload = rlp.encode([
@@ -51,28 +55,37 @@ export const RlpUtils = {
                     proposalPayload.options,
                 ]);
                 break;
-            case 5: // voting
+            }
+            case 5: {
+                // voting
                 const votingPayload: TrxPayloadVotingProto = trxPb.TrxPayloadVotingProto.decode(
                     trx.Payload,
                 );
                 payload = rlp.encode([votingPayload.txHash, votingPayload.choice]);
                 break;
-            case 6: // contract
+            }
+            case 6: {
+                // contract
                 const contractPayload: TrxPayloadContractProto =
                     trxPb.TrxPayloadContractProto.decode(trx.Payload);
                 payload = rlp.encode(contractPayload.Data);
                 break;
-            case 7: // setDoc
+            }
+            case 7: {
+                // setDoc
                 const setDocPayload: TrxPayloadSetDocProto = trxPb.TrxPayloadSetDocProto.decode(
                     trx.Payload,
                 );
                 payload = rlp.encode([setDocPayload.name, setDocPayload.url]);
                 break;
-            case 8: // withdraw
+            }
+            case 8: {
+                // withdraw
                 const withdrawPayload: TrxPayloadWithdrawProto =
                     trxPb.TrxPayloadWithdrawProto.decode(trx.Payload);
                 payload = rlp.encode(withdrawPayload.ReqAmt);
                 break;
+            }
             default:
                 payload = trx.Payload;
                 break;

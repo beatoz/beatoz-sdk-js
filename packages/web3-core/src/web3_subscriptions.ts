@@ -14,7 +14,6 @@
     limitations under the License.
 */
 
-// eslint-disable-next-line max-classes-per-file
 import {
     DEFAULT_RETURN_FORMAT,
     DataFormat,
@@ -137,17 +136,14 @@ export abstract class Web3Subscription<
         this._id = undefined;
     }
 
-    // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
     protected _processSubscriptionResult(_data: unknown) {
         // Do nothing - This should be overridden in subclass.
     }
 
-    // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
     protected _processSubscriptionError(_err: Error) {
         // Do nothing - This should be overridden in subclass.
     }
 
-    // eslint-disable-next-line class-methods-use-this
     protected _buildSubscriptionParams(): Web3APIParams<API, 'eth_subscribe'> {
         // This should be overridden in the subclass
         throw new Error('Implement in the child class');
@@ -168,6 +164,7 @@ export type Web3SubscriptionConstructor<
               | { requestManager: Web3RequestManager<API>; returnFormat?: DataFormat },
       ) => SubscriptionType)
     | (new (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스마다 생성자 인자 형태가 달라 공통 시그니처로 묶을 수 없다. 구독 타입 정리 작업에서 해소할 것.
           args: any,
           options: {
               subscriptionManager: Web3SubscriptionManager<API>;
@@ -175,6 +172,7 @@ export type Web3SubscriptionConstructor<
           },
       ) => SubscriptionType)
     | (new (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스마다 생성자 인자 형태가 달라 공통 시그니처로 묶을 수 없다. 구독 타입 정리 작업에서 해소할 것.
           args: any,
           options: { requestManager: Web3RequestManager<API>; returnFormat?: DataFormat },
       ) => SubscriptionType);

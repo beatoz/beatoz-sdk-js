@@ -23,10 +23,8 @@ import { Web3ValidatorError } from './errors.js';
 import { Validate, Json, Schema, RawValidationError } from './types.js';
 
 export class Validator {
-    // eslint-disable-next-line no-use-before-define
     private static validatorInstance?: Validator;
 
-    // eslint-disable-next-line no-useless-constructor, @typescript-eslint/no-empty-function
     private constructor() {}
 
     public static factory(): Validator {
@@ -46,9 +44,7 @@ export class Validator {
         this._schemas.set(key, this.createValidator(schema));
     }
 
-    // eslint-disable-next-line  class-methods-use-this
     private createValidator(schema: Schema): Validate {
-        // eslint-disable-next-line  @typescript-eslint/no-unsafe-call
         // @ts-expect-error validator params correction
         return validator(schema, {
             formats,
@@ -100,27 +96,25 @@ export class Validator {
 
                 const instancePath = _instancePath ? `/${_instancePath}` : '';
                 if (error?.message === 'has less items than allowed') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     const schemaData = this.getObjectValueByPath(schema, schemaPath);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
                     if (schemaData.minItems) {
                         keyword = 'minItems';
                         schemaPath = `${schemaPath}/minItems`;
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
                         params = { limit: schemaData.minItems };
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
+
                         message = `must NOT have fewer than ${schemaData.minItems} items`;
                     }
                 } else if (error?.message === 'has more items than allowed') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     const schemaData = this.getObjectValueByPath(schema, schemaPath);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
                     if (schemaData.maxItems) {
                         keyword = 'maxItems';
                         schemaPath = `${schemaPath}/maxItems`;
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
                         params = { limit: schemaData.maxItems };
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
+
                         message = `must NOT have more than ${schemaData.maxItems} items`;
                     }
                 } else if (
@@ -132,13 +126,13 @@ export class Validator {
                         message = `must pass "${formatName}" validation`;
                     }
                 }
-                // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
+
                 const dataValue = this.getObjectValueByPath(data as object, instancePath);
                 return {
                     keyword: keyword ?? error.field,
                     instancePath,
                     schemaPath: `#${schemaPath}`,
-                    // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
+
                     params: params ?? { value: dataValue },
                     message: message ?? error.message,
                 } as Web3ValidationErrorObject;
@@ -154,7 +148,7 @@ export class Validator {
             this.addSchema(key, schema);
             _validator = this.getSchema(key);
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         return _validator!;
     }
 
@@ -176,22 +170,21 @@ export class Validator {
             let curr: any = obj;
             for (const part of parts) {
                 if (typeof part !== 'string') throw new Error('Invalid JSON pointer');
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+
                 if (objpath) objpath.push(curr); // does not include target itself, but includes head
                 const prop = this.untilde(part);
                 if (typeof curr !== 'object') return undefined;
                 if (!Object.prototype.hasOwnProperty.call(curr, prop)) return undefined;
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
                 curr = curr[prop];
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
             return curr;
-        } catch (e) {
+        } catch (_e) {
             return '';
         }
     }
 
-    // eslint-disable-next-line class-methods-use-this
     private untilde(string: string) {
         if (!string.includes('~')) return string;
         return string.replace(/~[01]/g, (match) => {

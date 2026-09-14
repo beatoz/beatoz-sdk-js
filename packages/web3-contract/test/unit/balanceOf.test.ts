@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
-import rep20Json from '../fixtures/REP20.json';
+import _rep20Json from '../fixtures/REP20.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
 const { TESTNET0: netInfo } = Providers;
@@ -24,10 +24,7 @@ import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { decodeParameter } from '@beatoz/web3-abi';
 describe('balanceOf test', () => {
     it('balanceOf function', (done) => {
-        const erc20Contract = new Contract(
-            erc20Json,
-            deployedContract.address,
-        ) as any;
+        const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
 
         erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
         erc20Contract.methods

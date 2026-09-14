@@ -267,7 +267,6 @@ export interface Filter {
     readonly address?: Address | Address[];
     readonly blockHash?: Address;
     // Using "null" type intentionally to match specifications
-    // eslint-disable-next-line @typescript-eslint/ban-types
     readonly topics?: (null | Topic | Topic[])[];
     readonly filter?: FilterOption;
 }
@@ -383,7 +382,6 @@ interface TransactionBase {
 
 export interface Transaction extends TransactionBase {
     from?: Address;
-    // eslint-disable-next-line @typescript-eslint/ban-types
     to?: Address | null;
 }
 

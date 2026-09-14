@@ -33,6 +33,7 @@ export async function sendDeploy(
     web3Context: Web3Context<BeatozExecutionAPI>,
     abi: AbiFunctionFragment,
     bytecode: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 컨트랙트 인자는 ABI에서 타입을 추론해야 한다. typed API 작업에서 해소할 것.
     args: any[],
     rWeb3Account: Web3Account,
     chainId: string,
@@ -104,7 +105,10 @@ export async function blockchain(
     return rpcMethods.blockchain(web3Context.requestManager, minHeight, maxHeight);
 }
 
-export async function block(web3Context: Web3Context<BeatozExecutionAPI>, height?: string | number) {
+export async function block(
+    web3Context: Web3Context<BeatozExecutionAPI>,
+    height?: string | number,
+) {
     return rpcMethods.block(web3Context.requestManager, height);
 }
 
@@ -179,14 +183,7 @@ export async function txSearch(
     per_page?: number | string,
     order_by?: string,
 ) {
-    return rpcMethods.txSearch(
-        web3Context.requestManager,
-        query,
-        prove,
-        page,
-        per_page,
-        order_by,
-    );
+    return rpcMethods.txSearch(web3Context.requestManager, query, prove, page, per_page, order_by);
 }
 
 export async function tx(web3Context: Web3Context<BeatozExecutionAPI>, hash: string | Uint8Array) {
@@ -252,7 +249,10 @@ export async function broadcastTxAsync(web3Context: Web3Context<BeatozExecutionA
     return rpcMethods.broadcastTxAsync(web3Context.requestManager, tx);
 }
 
-export async function broadcastTxCommit(web3Context: Web3Context<BeatozExecutionAPI>, tx: TrxProto) {
+export async function broadcastTxCommit(
+    web3Context: Web3Context<BeatozExecutionAPI>,
+    tx: TrxProto,
+) {
     return rpcMethods.broadcastTxCommit(web3Context.requestManager, tx);
 }
 

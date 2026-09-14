@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { Bytes, HexString, Numbers } from './primitives_types.js';
 
 export type ValueTypes = 'address' | 'bool' | 'string' | 'int256' | 'uint256' | 'bytes' | 'bigint';
@@ -227,7 +228,6 @@ export interface Filter {
     readonly address?: Address | Address[];
     readonly blockHash?: Address;
     // Using "null" type intentionally to match specifications
-    // eslint-disable-next-line @typescript-eslint/ban-types
     readonly topics?: (null | Topic | Topic[])[];
     readonly filter?: FilterOption;
 }
@@ -345,7 +345,6 @@ interface TransactionBase {
 
 export interface Transaction extends TransactionBase {
     from?: Address;
-    // eslint-disable-next-line @typescript-eslint/ban-types
     to?: Address | null;
 }
 

@@ -13,7 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Contract } from '../../src';
+import { Contract as _Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
 import deployedContract from '../fixtures/deployed.contract.json';
 import Providers from '../../../../.providers.json';
@@ -25,40 +25,36 @@ import { Web3 } from '@beatoz/web3';
 
 describe('transfer token test', () => {
     const web3 = new Web3(netInfo.WS);
-    for(const acct of netInfo.ACCTS) {
+    for (const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
-    
+
     it('transfer function', (done) => {
-        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)
-        const erc20Contract = new web3.beatoz.Contract(
-            erc20Json,
-            deployedContract.address,
-        ) as any;
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
+        const erc20Contract = new web3.beatoz.Contract(erc20Json, deployedContract.address) as any;
 
         erc20Contract.methods
             .transfer('0x0000000000000000000000000000000000000001', '1000')
-            .broadcast({from: fromAcct!.address, gas:"250000"})
-            .then((res:BroadcastTxCommitResponse) => {
+            .broadcast({ from: fromAcct!.address, gas: '250000' })
+            .then((res: BroadcastTxCommitResponse) => {
                 console.log('response', res);
 
-                erc20Contract.methods.balanceOf('0x0000000000000000000000000000000000000001')
+                erc20Contract.methods
+                    .balanceOf('0x0000000000000000000000000000000000000001')
                     .call()
-                    .then( (resp: VmCallResponse) => {
+                    .then((resp: VmCallResponse) => {
                         console.log('response', resp);
-                        const hexBalance = `0x${resp.value.returnData ?? "00"}`;
+                        const hexBalance = `0x${resp.value.returnData ?? '00'}`;
                         console.log('balance', decodeParameter('uint', hexBalance));
                         done();
                     });
             });
-        
     });
 
     it('transfer coin test (not evm)', async () => {
-
         const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
-        const acctInfo = await web3.beatoz.getAccount(fromAcct!.address)
-        console.log("acctInfo", acctInfo);
+        const acctInfo = await web3.beatoz.getAccount(fromAcct!.address);
+        console.log('acctInfo', acctInfo);
 
         const tx: TrxProto = TrxProtoBuilder.buildTransferTrxProto({
             from: acctInfo.value.address,

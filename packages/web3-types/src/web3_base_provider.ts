@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { Socket } from 'net';
 
 import { Web3Error } from './error_types.js';
@@ -65,7 +66,6 @@ export type Web3Eip1193ProviderEventCallback<T> = (data: T) => void;
 
 export type Web3ProviderRequestCallback<ResultType = unknown> = (
     // Used "null" value to match the legacy version
-    // eslint-disable-next-line @typescript-eslint/ban-types
     err?: Error | Web3Error | null | JsonRpcResponseWithError<Error>,
     response?: JsonRpcResponseWithResult<ResultType>,
 ) => void;
@@ -74,7 +74,6 @@ export interface LegacySendProvider {
     send<R = JsonRpcResult, P = unknown>(
         payload: JsonRpcPayload<P>,
         // Used "null" value to match the legacy version
-        // eslint-disable-next-line @typescript-eslint/ban-types
         callback: (err: Error | null, response?: JsonRpcResponse<R>) => void,
     ): void;
 }
@@ -88,7 +87,6 @@ export interface LegacySendAsyncProvider {
 export interface LegacyRequestProvider {
     request<R = JsonRpcResult, P = unknown>(
         payload: JsonRpcPayload<P>,
-        // eslint-disable-next-line @typescript-eslint/ban-types
         callback: (err: Error | null, response: JsonRpcResponse<R>) => void,
     ): void;
 }
@@ -108,11 +106,7 @@ export type ProviderChainId = string;
 export type ProviderAccounts = string[];
 
 export type Eip1193EventName =
-    | 'connect'
-    | 'disconnect'
-    | 'message'
-    | 'chainChanged'
-    | 'accountsChanged';
+    'connect' | 'disconnect' | 'message' | 'chainChanged' | 'accountsChanged';
 
 export interface EIP1193Provider<API extends Web3APISpec> extends SimpleProvider<API> {
     on(event: 'connect', listener: (info: ProviderInfo) => void): void;
@@ -144,7 +138,7 @@ export abstract class Web3BaseProvider<API extends Web3APISpec = EthExecutionAPI
     // matcher class and object is using different package versions
     // to overcome this bottleneck used this approach.
     // The symbol value for one string will always remain same regardless of package versions
-    // eslint-disable-next-line class-methods-use-this
+
     public get [symbol]() {
         return true;
     }
@@ -159,14 +153,12 @@ export abstract class Web3BaseProvider<API extends Web3APISpec = EthExecutionAPI
      */
     public send<ResultType = JsonRpcResult, P = unknown>(
         payload: JsonRpcPayload<P>,
-        // eslint-disable-next-line @typescript-eslint/ban-types
         callback: (err: Error | null, response?: JsonRpcResponse<ResultType>) => void,
     ) {
         this.request<Web3APIMethod<API>, ResultType>(
             payload as Web3APIPayload<API, Web3APIMethod<API>>,
         )
             .then((response) => {
-                // eslint-disable-next-line no-null/no-null
                 callback(null, response);
             })
             .catch((err: Error | Web3Error) => {
@@ -199,15 +191,13 @@ export abstract class Web3BaseProvider<API extends Web3APISpec = EthExecutionAPI
     public abstract on<T = JsonRpcResult>(
         type: 'message' | string,
         listener:
-            | Web3Eip1193ProviderEventCallback<ProviderMessage>
-            | Web3ProviderMessageEventCallback<T>,
+            Web3Eip1193ProviderEventCallback<ProviderMessage> | Web3ProviderMessageEventCallback<T>,
     ): void;
     // for old providers
     public abstract on<T = JsonRpcResult>(
         type: 'data' | string,
         listener:
-            | Web3Eip1193ProviderEventCallback<ProviderMessage>
-            | Web3ProviderMessageEventCallback<T>,
+            Web3Eip1193ProviderEventCallback<ProviderMessage> | Web3ProviderMessageEventCallback<T>,
     ): void;
     public abstract on(
         type: 'connect',

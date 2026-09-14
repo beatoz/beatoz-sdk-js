@@ -15,11 +15,7 @@
 */
 
 import { AbiEventFragment, HexString, Topic, DataFormat } from '@beatoz/web3-types';
-import {
-    Web3RequestManager,
-    Web3Subscription,
-    Web3SubscriptionManager,
-} from '@beatoz/web3-core';
+import { Web3RequestManager, Web3Subscription, Web3SubscriptionManager } from '@beatoz/web3-core';
 import { EventLog, ContractAbiWithSignature } from './types.js';
 
 export class LogsSubscription extends Web3Subscription<
@@ -29,7 +25,6 @@ export class LogsSubscription extends Web3Subscription<
         data: EventLog;
         changed: EventLog & { removed: true };
     },
-    // eslint-disable-next-line @typescript-eslint/ban-types
     { address?: HexString; topics?: (Topic | Topic[] | null)[]; abi: AbiEventFragment }
 > {
     /**
@@ -40,7 +35,6 @@ export class LogsSubscription extends Web3Subscription<
     /**
      * The list of topics subscribed
      */
-    // eslint-disable-next-line @typescript-eslint/ban-types
     public readonly topics?: (Topic | Topic[] | null)[];
 
     /**
@@ -53,7 +47,6 @@ export class LogsSubscription extends Web3Subscription<
     public constructor(
         args: {
             address?: HexString;
-            // eslint-disable-next-line @typescript-eslint/ban-types
             topics?: (Topic | Topic[] | null)[];
             abi: AbiEventFragment & { signature: HexString };
             jsonInterface: ContractAbiWithSignature;
@@ -66,7 +59,6 @@ export class LogsSubscription extends Web3Subscription<
     public constructor(
         args: {
             address?: HexString;
-            // eslint-disable-next-line @typescript-eslint/ban-types
             topics?: (Topic | Topic[] | null)[];
             abi: AbiEventFragment & { signature: HexString };
             jsonInterface: ContractAbiWithSignature;
@@ -76,7 +68,6 @@ export class LogsSubscription extends Web3Subscription<
     public constructor(
         args: {
             address?: HexString;
-            // eslint-disable-next-line @typescript-eslint/ban-types
             topics?: (Topic | Topic[] | null)[];
             abi: AbiEventFragment & { signature: HexString };
             jsonInterface: ContractAbiWithSignature;
@@ -88,7 +79,7 @@ export class LogsSubscription extends Web3Subscription<
             returnFormat?: DataFormat;
         },
     ) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 상위 Web3Subscription의 options 제네릭이 좁아 우회한다. 구독 타입 정리 작업에서 해소할 것.
         super(args, options as any);
 
         this.address = args.address;

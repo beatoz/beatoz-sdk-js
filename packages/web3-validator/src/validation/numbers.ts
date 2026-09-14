@@ -57,7 +57,7 @@ export const isUInt = (
                 : BigInt(value as number);
 
         return valueToCheck >= 0 && valueToCheck <= maxSize;
-    } catch (error) {
+    } catch (_error) {
         // Some invalid number value given which can not be converted via BigInt
         return false;
     }
@@ -103,7 +103,7 @@ export const isInt = (
                 : BigInt(value as number);
 
         return valueToCheck >= minSize && valueToCheck <= maxSize;
-    } catch (error) {
+    } catch (_error) {
         // Some invalid number value given which can not be converted via BigInt
         return false;
     }

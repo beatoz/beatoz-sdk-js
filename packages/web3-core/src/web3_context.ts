@@ -16,12 +16,17 @@
 
 import { Web3Config } from './web3_config.js';
 import { Web3RequestManager } from './web3_request_manager.js';
-import { isNullish } from '@beatoz/web3-validator';
-import { Web3APISpec, BeatozExecutionAPI, Web3AccountProvider, Web3BaseWalletAccount, Web3BaseWallet, ResponsesDecoder } from '@beatoz/web3-types';
+import {
+    Web3APISpec,
+    BeatozExecutionAPI,
+    Web3AccountProvider,
+    Web3BaseWalletAccount,
+    Web3BaseWallet,
+    ResponsesDecoder,
+} from '@beatoz/web3-types';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 
-// eslint-disable-next-line no-use-before-define
 export type Web3ContextConstructor<T extends Web3Context, T2 extends unknown[]> = new (
     ...args: [...extras: T2, context: Web3ContextObject]
 ) => T;
@@ -87,7 +92,7 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
             requestManager: this.requestManager,
             wallet: this.wallet,
             accountProvider: this.accountProvider,
-            chainId: this._chainId
+            chainId: this._chainId,
         };
     }
 
@@ -115,7 +120,7 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
         const resp = await this.requestManager.send({
             method: 'genesis',
             params: {},
-        })
+        });
         const gen = ResponsesDecoder.decodeGenesis(resp);
         this._chainId = gen.chain_id;
         return this._chainId;

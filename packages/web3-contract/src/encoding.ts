@@ -90,7 +90,6 @@ export const encodeEventABI = (
 
                 const value = filter[input.name];
                 if (!value) {
-                    // eslint-disable-next-line no-null/no-null
                     opts.topics.push(null);
                     continue;
                 }
@@ -140,7 +139,6 @@ export const decodeEventABI = (
     }
 
     // create empty inputs if none are present (e.g. anonymous events on allEvents)
-    // @ts-ignore
     modifiedEvent.inputs = modifiedEvent.inputs ?? event.inputs ?? [];
 
     // Handle case where an event signature shadows the current ABI with non-identical
@@ -222,13 +220,12 @@ export const decodeMethodReturn = (abi: AbiFunctionFragment, returnValues?: HexS
 
     if (!returnValues) {
         // Using "null" value intentionally to match legacy behavior
-        // eslint-disable-next-line no-null/no-null
+
         return null;
     }
 
     const value = returnValues.length >= 2 ? returnValues.slice(2) : returnValues;
     if (!abi.outputs) {
-        // eslint-disable-next-line no-null/no-null
         return null;
     }
     const result = decodeParameters([...abi.outputs], value);

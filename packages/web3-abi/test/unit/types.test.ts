@@ -168,19 +168,19 @@ describe('types', () => {
             );
 
             typecheck('single outputs should result in that type', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: '',
                         type: 'string',
                     },
                 ] as const;
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>
+                    ContractMethodOutputParameters<typeof _abi>
                 >().toExtend<string>();
             });
 
             typecheck('multiple outputs should result in object indexed by numbers', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: '',
                         type: 'string',
@@ -192,12 +192,12 @@ describe('types', () => {
                 ] as const;
 
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>[0]
+                    ContractMethodOutputParameters<typeof _abi>[0]
                 >().toExtend<string>();
             });
 
             typecheck('multiple outputs should result in object indexed by numbers', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: '',
                         type: 'string',
@@ -208,12 +208,12 @@ describe('types', () => {
                     },
                 ] as const;
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>[1]
+                    ContractMethodOutputParameters<typeof _abi>[1]
                 >().toExtend<Numbers>();
             });
 
             typecheck('multiple outputs should result in object indexed by name', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: 'first',
                         type: 'string',
@@ -224,12 +224,12 @@ describe('types', () => {
                     },
                 ] as const;
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>['first']
+                    ContractMethodOutputParameters<typeof _abi>['first']
                 >().toExtend<string>();
             });
 
             typecheck('multiple outputs should result in object indexed by name', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: 'first',
                         type: 'string',
@@ -240,19 +240,19 @@ describe('types', () => {
                     },
                 ] as const;
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>['second']
+                    ContractMethodOutputParameters<typeof _abi>['second']
                 >().toExtend<Numbers>();
             });
 
             typecheck('single output should result as in exactly one type', () => {
-                const abi = [
+                const _abi = [
                     {
                         name: 'first',
                         type: 'string',
                     },
                 ] as const;
                 return expectTypeOf<
-                    ContractMethodOutputParameters<typeof abi>
+                    ContractMethodOutputParameters<typeof _abi>
                 >().toExtend<string>();
             });
         });

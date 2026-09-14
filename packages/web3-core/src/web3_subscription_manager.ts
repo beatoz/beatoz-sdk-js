@@ -19,7 +19,7 @@ import { ProviderError, SubscriptionError } from '@beatoz/web3-errors';
 import { isNullish } from '@beatoz/web3-utils';
 import { isSupportSubscriptions } from './utils.js';
 import { Web3RequestManager, Web3RequestManagerEvent } from './web3_request_manager.js';
-// eslint-disable-next-line import/no-cycle
+
 import { Web3SubscriptionConstructor } from './web3_subscriptions.js';
 
 type ShouldUnsubscribeCondition = ({
@@ -98,10 +98,10 @@ export class Web3SubscriptionManager<
             throw new SubscriptionError('Invalid subscription type');
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const subscription = new Klass(args ?? undefined, {
             subscriptionManager: this as Web3SubscriptionManager<API, RegisteredSubs>,
             returnFormat,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스별 options 형태가 달라 생성 시점에 좁힐 수 없다. 구독 타입 정리 작업에서 해소할 것.
         } as any) as InstanceType<RegisteredSubs[T]>;
 
         await this.addSubscription(subscription);

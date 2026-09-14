@@ -23,7 +23,6 @@ import { createHash } from 'crypto';
 import {
     TrxPayloadProposalProto,
     TrxPayloadSetDocProto,
-    TrxPayloadUnstakingProto,
     TrxPayloadVotingProto,
     TrxProtoUtils,
 } from './trx_pb.js';
@@ -49,14 +48,17 @@ function decodeTransaction(d: BytesUint8Array): Transaction<object> {
         case 1: // transfer
         case 2: // staking
             break;
-        case 3: // unstaking
+        case 3: {
+            // unstaking
             const unstakingPayload: trxPb.TrxPayloadUnstakingProto =
                 trxPb.TrxPayloadUnstakingProto.decode(tx.Payload);
             payload = {
                 txhash: new BytesUint8Array(unstakingPayload.txHash).toHex(),
             };
             break;
-        case 4: // proposal
+        }
+        case 4: {
+            // proposal
             const proposalPayload: trxPb.TrxPayloadProposalProto =
                 trxPb.TrxPayloadProposalProto.decode(tx.Payload);
             payload = {
@@ -68,7 +70,9 @@ function decodeTransaction(d: BytesUint8Array): Transaction<object> {
                 options: proposalPayload.options,
             };
             break;
-        case 5: // voting
+        }
+        case 5: {
+            // voting
             const votingPayload: trxPb.TrxPayloadVotingProto = trxPb.TrxPayloadVotingProto.decode(
                 tx.Payload,
             );
@@ -77,14 +81,18 @@ function decodeTransaction(d: BytesUint8Array): Transaction<object> {
                 choice: votingPayload.choice,
             };
             break;
-        case 6: // contract
+        }
+        case 6: {
+            // contract
             const contractPayload: trxPb.TrxPayloadContractProto =
                 trxPb.TrxPayloadContractProto.decode(tx.Payload);
             payload = {
                 Data: new BytesUint8Array(contractPayload.Data).toHex(),
             };
             break;
-        case 7: // setDoc
+        }
+        case 7: {
+            // setDoc
             const setDocPayload: trxPb.TrxPayloadSetDocProto = trxPb.TrxPayloadSetDocProto.decode(
                 tx.Payload,
             );
@@ -93,12 +101,16 @@ function decodeTransaction(d: BytesUint8Array): Transaction<object> {
                 url: setDocPayload.url,
             };
             break;
-        case 8: // withdraw
-            const withdrawPayload: trxPb.TrxPayloadWithdrawProto = trxPb.TrxPayloadWithdrawProto.decode(tx.Payload);
+        }
+        case 8: {
+            // withdraw
+            const withdrawPayload: trxPb.TrxPayloadWithdrawProto =
+                trxPb.TrxPayloadWithdrawProto.decode(tx.Payload);
             payload = {
                 ReqAmt: new BytesUint8Array(withdrawPayload.ReqAmt).toHex(),
             };
             break;
+        }
         default:
             break;
     }
@@ -122,7 +134,7 @@ function decodeTransaction(d: BytesUint8Array): Transaction<object> {
     };
 }
 
-function buildTransferTrxProto(transaction: Transaction<Object>): TrxProto {
+function buildTransferTrxProto(transaction: Transaction<object>): TrxProto {
     return {
         version: isSet(transaction.version) ? Number(transaction.version) : 1,
         time: getNanoSecond(),
@@ -145,7 +157,7 @@ function buildTransferTrxProto(transaction: Transaction<Object>): TrxProto {
     };
 }
 
-function buildDelegateTrxProto(transaction: Transaction<Object>): TrxProto {
+function buildDelegateTrxProto(transaction: Transaction<object>): TrxProto {
     return {
         version: isSet(transaction.version) ? Number(transaction.version) : 1,
         time: isSet(transaction.time) ? getNanoSecond(transaction.time) : getNanoSecond(),

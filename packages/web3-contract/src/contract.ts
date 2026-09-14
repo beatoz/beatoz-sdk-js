@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import {
     AbiConstructorFragment,
     AbiErrorFragment,
@@ -35,12 +36,9 @@ import {
     PayableCallOptions,
     BeatozExecutionAPI,
     Web3ValidationErrorObject,
-    AbiInput,
     BroadcastTxAsyncResponse,
-    FormatType,
-    TransactionReceipt,
 } from '@beatoz/web3-types';
-import { Web3Context, Web3ContextObject, Web3PromiEvent } from '@beatoz/web3-core';
+import { Web3Context } from '@beatoz/web3-core';
 import {
     BroadcastTxOptions,
     ContractAbiWithSignature,
@@ -58,7 +56,6 @@ import {
     isAbiErrorFragment,
     isAbiFunctionFragment,
     jsonInterfaceMethodToString,
-    encodeParameters,
 } from '@beatoz/web3-abi';
 import {
     Web3ValidatorError,
@@ -69,12 +66,20 @@ import {
 import { encodeMethodABI } from './encoding.js';
 import { ContractExecutionError, Web3ContractError } from '@beatoz/web3-errors';
 import { getEthTxCallParams, getSendTxParams } from './utils.js';
-import { broadcastTxAsync, broadcastTxCommit, broadcastTxSync, call, genesis, getAccount, rule, sendDeploy, SendTransactionEvents, vmEstimateGas } from '@beatoz/web3-methods';
+import {
+    broadcastTxAsync,
+    broadcastTxCommit,
+    broadcastTxSync,
+    call,
+    getAccount,
+    rule,
+    sendDeploy,
+    vmEstimateGas,
+} from '@beatoz/web3-methods';
 import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { LogsSubscription } from './log_subscription.js';
-import { isNull } from 'util';
 
 type ContractBoundMethod<
     Abi extends AbiFunctionFragment,
@@ -87,10 +92,12 @@ type ContractBoundMethod<
 
 // To avoid circular dependency between types and encoding, declared these types here.
 export type ContractMethodsInterface<Abi extends ContractAbi> = {
-    [MethodAbi in FilterAbis<
-        Abi,
-        AbiFunctionFragment & { type: 'function' }
-    > as MethodAbi['name']]: ContractBoundMethod<MethodAbi>;
+    [
+        MethodAbi in FilterAbis<
+            Abi,
+            AbiFunctionFragment & { type: 'function' }
+        > as MethodAbi['name']
+    ]: ContractBoundMethod<MethodAbi>;
     // To allow users to use method signatures
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } & { [key: string]: ContractBoundMethod<any> };
@@ -111,20 +118,20 @@ export type ContractOverloadedMethodInputs<AbiArr extends ReadonlyArray<unknown>
     AbiArr extends readonly []
         ? undefined
         : AbiArr extends readonly [infer A, ...infer R]
-        ? A extends AbiFunctionFragment
-            ? ContractMethodInputParameters<A['inputs']> | ContractOverloadedMethodInputs<R>
-            : undefined
-        : undefined
+          ? A extends AbiFunctionFragment
+              ? ContractMethodInputParameters<A['inputs']> | ContractOverloadedMethodInputs<R>
+              : undefined
+          : undefined
 >;
 
 export type ContractOverloadedMethodOutputs<AbiArr extends ReadonlyArray<unknown>> = NonNullable<
     AbiArr extends readonly []
         ? undefined
         : AbiArr extends readonly [infer A, ...infer R]
-        ? A extends AbiFunctionFragment
-            ? ContractMethodOutputParameters<A['outputs']> | ContractOverloadedMethodOutputs<R>
-            : undefined
-        : undefined
+          ? A extends AbiFunctionFragment
+              ? ContractMethodOutputParameters<A['outputs']> | ContractOverloadedMethodOutputs<R>
+              : undefined
+          : undefined
 >;
 
 export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecutionAPI> {
@@ -148,16 +155,16 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     private readonly _overloadedMethodAbis: Map<string, AbiFunctionFragment[]>;
 
-    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?:Address | Web3Context) {
+    public constructor(jsonInterface: Abi, addressOrOptionsOrContext?: Address | Web3Context) {
         super();
 
         this._overloadedMethodAbis = new Map<string, AbiFunctionFragment[]>();
-        
-        
+
         this._parseAndSetJsonInterface(jsonInterface);
 
         // TODO: Address CheckSum Settings
-        const address = typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
+        const address =
+            typeof addressOrOptionsOrContext === 'string' ? addressOrOptionsOrContext : undefined;
         this.options = {
             address,
             jsonInterface: this._jsonInterface,
@@ -291,20 +298,44 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
                         options,
                         height,
                     ),
-                
+
                 estimateGas: async (options?: PayableCallOptions | NonPayableTxOptions) =>
-                    this._contractMethodEstimateGas(methodAbi, abiParams, internalErrorsAbis, options),
+                    this._contractMethodEstimateGas(
+                        methodAbi,
+                        abiParams,
+                        internalErrorsAbis,
+                        options,
+                    ),
 
                 // original:
                 // send: (options?: PayableTxOptions | NonPayableTxOptions): Web3PromiEvent< FormatType<TransactionReceipt, typeof DEFAULT_RETURN_FORMAT>, SendTransactionEvents<typeof DEFAULT_RETURN_FORMAT>>
                 send: (
-                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions | BroadcastTxOptions
-                ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> =>
-                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
-                
-                broadcast: (options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions)
-                    : Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse> => 
-                    this._contractMethodBroadcast(methodAbi, abiParams, internalErrorsAbis, options),
+                    options?:
+                        | PayableTxOptions
+                        | NonPayableTxOptions
+                        | BroadcastTxOptions
+                        | BroadcastTxOptions,
+                ): Promise<
+                    BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse
+                > =>
+                    this._contractMethodBroadcast(
+                        methodAbi,
+                        abiParams,
+                        internalErrorsAbis,
+                        options,
+                    ),
+
+                broadcast: (
+                    options?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
+                ): Promise<
+                    BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse
+                > =>
+                    this._contractMethodBroadcast(
+                        methodAbi,
+                        abiParams,
+                        internalErrorsAbis,
+                        options,
+                    ),
 
                 encodeABI: () => encodeMethodABI(methodAbi, abiParams),
             };
@@ -402,7 +433,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             from: modifiedContractOptions.from ?? undefined,
         };
 
-        const tx = getSendTxParams({
+        getSendTxParams({
             abi,
             params,
             options,
@@ -416,9 +447,8 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         //     checkRevertBeforeSending: false,
         // });
 
-        // eslint-disable-next-line no-void
-        // TODO Remove ts-ignore 
-        // @ts-ignore
+        // TODO: PromiEvent 타입에 error 이벤트 시그니처가 없어 우회한다.
+        // @ts-expect-error PromiEvent 이벤트 타입 정의 보강 후 제거할 것
         void transactionToSend.on('error', (error: unknown) => {
             if (error instanceof ContractExecutionError) {
                 // this will parse the error data by trying to decode the ABI error inputs according to EIP-838
@@ -429,7 +459,9 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         return transactionToSend;
     }
 
-    private async _contractMethodBroadcast<Options extends PayableCallOptions | NonPayableCallOptions | BroadcastTxOptions>(
+    private async _contractMethodBroadcast<
+        Options extends PayableCallOptions | NonPayableCallOptions | BroadcastTxOptions,
+    >(
         abi: AbiFunctionFragment,
         params: unknown[],
         errorsAbi: AbiErrorFragment[],
@@ -446,21 +478,21 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         const _tx = getSendTxParams({
             abi,
             params,
-            options: (options && 'from' in options) ? options : undefined,
+            options: options && 'from' in options ? options : undefined,
             contractOptions: modifiedContractOptions,
         });
 
         const fromAcct = this.wallet?.get(_tx.from!);
-        if(fromAcct === undefined) {
-            throw new Web3ContractError( `not found account of ${_tx.from}` );
+        if (fromAcct === undefined) {
+            throw new Web3ContractError(`not found account of ${_tx.from}`);
         }
-        
-        const chainId = this.chainId ?? await this.decideChainId()
+
+        const chainId = this.chainId ?? (await this.decideChainId());
         const nonce = Number(_tx.nonce ?? (await getAccount(this, fromAcct.address)).value.nonce);
-        if(isNullish(_tx.gas) || isNullish(_tx.gasPrice)) {
+        if (isNullish(_tx.gas) || isNullish(_tx.gasPrice)) {
             const govParams = (await rule(this)).value;
-            if(isNullish(_tx.gas))      _tx.gas = govParams.minTrxGas;
-            if(isNullish(_tx.gasPrice)) _tx.gasPrice = govParams.gasPrice;
+            if (isNullish(_tx.gas)) _tx.gas = govParams.minTrxGas;
+            if (isNullish(_tx.gasPrice)) _tx.gasPrice = govParams.gasPrice;
         }
         const gas = Number(_tx.gas);
         const gasPrice = Number(_tx.gasPrice);
@@ -475,17 +507,16 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
             payload: { data: _tx.input },
         });
 
-        fromAcct.signTransaction(txProto, chainId);        
+        fromAcct.signTransaction(txProto, chainId);
 
-        if(!isNullish(options) && 'sendMode' in options) {
-            if(options.sendMode === 'sync') {
+        if (!isNullish(options) && 'sendMode' in options) {
+            if (options.sendMode === 'sync') {
                 return broadcastTxSync(this, txProto);
-            }
-            else if(options.sendMode === 'async') {
+            } else if (options.sendMode === 'async') {
                 return broadcastTxAsync(this, txProto);
             }
         }
-        return broadcastTxCommit(this, txProto);        
+        return broadcastTxCommit(this, txProto);
     }
 
     private _getAbiParams(abi: AbiFunctionFragment, params: unknown[]): Array<unknown> {
@@ -514,6 +545,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     public deploy(
         bytecode: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 컨트랙트 인자는 ABI에서 타입을 추론해야 한다. typed API 작업에서 해소할 것.
         args: any[],
         rWeb3Account: Web3Account,
         chainId: string,
@@ -533,7 +565,6 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
         return {
             send: (): Promise<BroadcastTxCommitResponse> => {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return sendDeploy(
                     this,
                     abi as AbiFunctionFragment,

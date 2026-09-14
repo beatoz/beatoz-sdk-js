@@ -62,7 +62,7 @@ export class ChunkResponseParser {
 
             try {
                 result = JSON.parse(chunkData) as unknown as JsonRpcResponse;
-            } catch (e) {
+            } catch (_e) {
                 this.lastChunk = chunkData;
 
                 // start timeout to cancel all requests

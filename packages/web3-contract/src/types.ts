@@ -14,16 +14,11 @@
     limitations under the License.
 */
 
-import { Web3PromiEvent } from '@beatoz/web3-core';
-import { SendTransactionEvents } from '@beatoz/web3-methods';
 import {
     BlockNumberOrTag,
     HexString,
-    TransactionReceipt,
     NonPayableCallOptions,
     PayableCallOptions,
-    DEFAULT_RETURN_FORMAT,
-    FormatType,
     AbiFragment,
     Address,
     Bytes,
@@ -38,8 +33,8 @@ import {
 export type NonPayableTxOptions = NonPayableCallOptions;
 export type PayableTxOptions = PayableCallOptions;
 export type BroadcastTxOptions = {
-    sendMode?: string // 'async' | 'sync' | 'commit'
-}
+    sendMode?: string; // 'async' | 'sync' | 'commit'
+};
 
 export type ContractAbiWithSignature = ReadonlyArray<AbiFragment & { signature: HexString }>;
 
@@ -123,12 +118,12 @@ export interface NonPayableMethodObject<Inputs = unknown[], Outputs = unknown[]>
         tx?: NonPayableTxOptions | BroadcastTxOptions,
     ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
-    broadcast (
+    broadcast(
         tx?: NonPayableTxOptions | BroadcastTxOptions,
     ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
-    estimateGas<SpecialOutput = Outputs> (
-        tx?: PayableCallOptions | NonPayableTxOptions
+    estimateGas<SpecialOutput = Outputs>(
+        tx?: PayableCallOptions | NonPayableTxOptions,
     ): Promise<SpecialOutput>;
 
     /**
@@ -159,16 +154,16 @@ export interface PayableMethodObject<Inputs = unknown[], Outputs = unknown[]> {
     // >;
     send(
         tx?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
-    ):Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
+    ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
-    broadcast (
+    broadcast(
         tx?: PayableTxOptions | NonPayableTxOptions | BroadcastTxOptions,
     ): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | BroadcastTxCommitResponse>;
 
-    estimateGas<SpecialOutput = Outputs> (
-        tx?: PayableCallOptions | NonPayableTxOptions
+    estimateGas<SpecialOutput = Outputs>(
+        tx?: PayableCallOptions | NonPayableTxOptions,
     ): Promise<SpecialOutput>;
-    
+
     /**
      * Encodes the ABI for this method. The resulting hex string is 32-bit function signature hash plus the passed parameters in Solidity tightly packed format.
      * This can be used to send a transaction, call a method, or pass it into another smart contract’s method as arguments.

@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import {
     Address,
     HexString32Bytes,
@@ -50,7 +51,6 @@ export interface TransactionCallAPI {
 }
 
 export interface BaseTransactionAPI {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     readonly to?: Address | null;
     readonly type: HexStringSingleByte;
     readonly nonce: Uint;
@@ -98,15 +98,11 @@ export interface TransactionLegacySignedAPI extends TransactionLegacyUnsignedAPI
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/transaction.yaml#L144
 export type TransactionUnsignedAPI =
-    | Transaction1559UnsignedAPI
-    | Transaction2930UnsignedAPI
-    | TransactionLegacyUnsignedAPI;
+    Transaction1559UnsignedAPI | Transaction2930UnsignedAPI | TransactionLegacyUnsignedAPI;
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/transaction.yaml#L211
 export type TransactionSignedAPI =
-    | Transaction1559SignedAPI
-    | Transaction2930SignedAPI
-    | TransactionLegacySignedAPI;
+    Transaction1559SignedAPI | Transaction2930SignedAPI | TransactionLegacySignedAPI;
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/transaction.yaml#L216
 export type TransactionInfoAPI = TransactionSignedAPI & {
@@ -148,8 +144,7 @@ export type TransactionReceiptAPI = TransactionReceiptBase<
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/client.yaml#L2
 export type SyncingStatusAPI =
-    | { startingBlock: Uint; currentBlock: Uint; highestBlock: Uint }
-    | boolean;
+    { startingBlock: Uint; currentBlock: Uint; highestBlock: Uint } | boolean;
 
 // https://github.com/ethereum/execution-apis/blob/main/src/eth/fee_market.yaml#L42
 export type FeeHistoryResultAPI = FeeHistoryBase<Uint>;
@@ -174,7 +169,6 @@ export interface CompileResultAPI {
     };
 }
 
-/* eslint-disable camelcase */
 export type EthExecutionAPI = {
     // https://github.com/ethereum/execution-apis/blob/main/src/eth/block.yaml
     eth_getBlockByHash: (blockHash: HexString32Bytes, hydrated: boolean) => BlockAPI;

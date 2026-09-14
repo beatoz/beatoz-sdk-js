@@ -17,10 +17,7 @@
 import tokenJson from '../fixtures/erc20-contract.json';
 import Providers from '../../../../.providers.json';
 const { DEVNET0: netInfo } = Providers;
-import { Contract } from '../../src';
-import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { Web3Account } from '@beatoz/web3-accounts';
-import { BytesUint8Array } from '@beatoz/web3-types';
 import { Web3 } from '@beatoz/web3';
 import fs from 'fs';
 import path from 'path';
@@ -34,27 +31,41 @@ describe('deploy test', () => {
         const web3account: Web3Account = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
 
         erc20Contract
-            .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], web3account, netInfo.CHAINID, 10000000)
+            .deploy(
+                tokenJson.bytecode,
+                ['BeatozToken', 'RGT'],
+                web3account,
+                netInfo.CHAINID,
+                10000000,
+            )
             .send()
             .then((res) => {
                 console.log(res);
 
-                web3.beatoz.contractAddrFromTx(res.hash).then((contAddr) => {
-                    const contractInfo = {
-                        chainId: netInfo.CHAINID,
-                        address: contAddr,
-                        deployer: web3account.address,
-                        time: new Date().toISOString()
-                    };
+                web3.beatoz
+                    .contractAddrFromTx(res.hash)
+                    .then((contAddr) => {
+                        const contractInfo = {
+                            chainId: netInfo.CHAINID,
+                            address: contAddr,
+                            deployer: web3account.address,
+                            time: new Date().toISOString(),
+                        };
 
-                    fs.writeFileSync(path.join(__dirname, '../fixtures/deployed.contract.json'), JSON.stringify(contractInfo, null, 2));
-                    console.log("Contract info saved to deployed-contract.json at ../fixtures/");
+                        fs.writeFileSync(
+                            path.join(__dirname, '../fixtures/deployed.contract.json'),
+                            JSON.stringify(contractInfo, null, 2),
+                        );
+                        console.log(
+                            'Contract info saved to deployed-contract.json at ../fixtures/',
+                        );
 
-                    done();
-
-                }).catch((err) => {
-                    console.log(err);
-                    done(err);
-                });
+                        done();
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        done(err);
+                    });
             });
     });
+});

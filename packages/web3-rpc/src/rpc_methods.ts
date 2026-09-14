@@ -47,7 +47,6 @@ import {
     DelegateeResponse,
     RuleResponse,
     VmCallResponse,
-    VmEstimateGasResponse,
     ProposalResponse,
     StakesResponse,
     AccountResponse,
@@ -599,10 +598,10 @@ export async function vmEstimateGas(
             params: {
                 addr: addr,
                 to: to,
-                height: "0",
+                height: '0',
                 data: Buffer.from(BytesUint8Array.fromHex(data)).toString('base64'),
             },
-        })
+        }),
     );
 }
 
