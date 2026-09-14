@@ -17,7 +17,7 @@ import secrets from '../../../../.secrets.json';
 
 export const getDevChainId = (): string => {
     return secrets.DEVNET.CHAIN_ID;
-}
+};
 
 export const getDevServer = (): string => {
     return secrets.DEVNET.HTTP;
@@ -41,7 +41,7 @@ export const getDevProposalAccountPrivateKey = (): string => {
 
 export const getTestChainId = (): string => {
     return secrets.TESTNET.CHAIN_ID;
-}
+};
 
 export const getTestServer = (): string => {
     return secrets.TESTNET.HTTP;

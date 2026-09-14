@@ -43,10 +43,8 @@ export type Web3APISpec = Record<string, (...params: any) => any> | unknown;
 export type Web3APIMethod<T extends Web3APISpec> = string & keyof Exclude<T, unknown>;
 
 // A type to extract parameter types for a given method on an API specification
-export type Web3APIParams<
-    API extends Web3APISpec,
-    Method extends Web3APIMethod<API>,
-> = API extends Exclude<Web3APISpec, unknown> ? Parameters<API[Method]> : unknown;
+export type Web3APIParams<API extends Web3APISpec, Method extends Web3APIMethod<API>> =
+    API extends Exclude<Web3APISpec, unknown> ? Parameters<API[Method]> : unknown;
 
 // An interface describing a request to the Web3 API
 export interface Web3APIRequest<API extends Web3APISpec, Method extends Web3APIMethod<API>> {
@@ -55,8 +53,10 @@ export interface Web3APIRequest<API extends Web3APISpec, Method extends Web3APIM
 }
 
 // An interface describing a payload for a request to the Web3 API
-export interface Web3APIPayload<API extends Web3APISpec, Method extends Web3APIMethod<API>>
-    extends Web3APIRequest<API, Method> {
+export interface Web3APIPayload<
+    API extends Web3APISpec,
+    Method extends Web3APIMethod<API>,
+> extends Web3APIRequest<API, Method> {
     readonly jsonrpc?: JsonRpcIdentifier; // optional JSON-RPC identifier
     readonly id?: JsonRpcId; // optional ID for the request
     readonly requestOptions?: unknown; // optional request options

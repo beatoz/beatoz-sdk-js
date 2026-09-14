@@ -34,12 +34,7 @@ export type BeatozBaseTypesWithMeta =
     | `tuple[${number}]`;
 
 export type BeatozExtendedTypes =
-    | 'hex'
-    | 'number'
-    | 'blockNumber'
-    | 'blockNumberOrTag'
-    | 'filter'
-    | 'bloom';
+    'hex' | 'number' | 'blockNumber' | 'blockNumberOrTag' | 'filter' | 'bloom';
 
 export type FullValidationSchema = ReadonlyArray<AbiParameter>;
 export type ShortValidationSchema = ReadonlyArray<

@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import * as base64js from 'base64-js';
 
 export function toBase64(data: Uint8Array): string {

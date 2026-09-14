@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { sha3Raw } from '@beatoz/web3-utils';
 import { AbiError } from '@beatoz/web3-errors';
 import { AbiEventFragment } from '@beatoz/web3-types';

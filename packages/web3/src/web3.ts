@@ -57,7 +57,7 @@ export class Web3 extends Web3Context {
                 super(jsonInterface, addressOrOptionsOrContext);
 
                 this._requestManager = self.requestManager;
-                this._wallet = self.wallet
+                this._wallet = self.wallet;
                 this._accountProvider = self.accountProvider;
                 this._chainId = self.chainId;
             }

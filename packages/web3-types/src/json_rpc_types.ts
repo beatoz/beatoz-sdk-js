@@ -75,8 +75,10 @@ export interface JsonRpcRequest<T = unknown[]> {
     readonly params?: T;
 }
 
-export interface JsonRpcOptionalRequest<ParamType = unknown[]>
-    extends Omit<JsonRpcRequest<ParamType>, 'id' | 'jsonrpc'> {
+export interface JsonRpcOptionalRequest<ParamType = unknown[]> extends Omit<
+    JsonRpcRequest<ParamType>,
+    'id' | 'jsonrpc'
+> {
     readonly id?: JsonRpcId;
     readonly jsonrpc?: JsonRpcIdentifier;
 }
@@ -86,11 +88,9 @@ export type JsonRpcBatchRequest = JsonRpcRequest[];
 export type JsonRpcPayload<Param = unknown[]> = JsonRpcRequest<Param> | JsonRpcBatchRequest;
 
 export type JsonRpcBatchResponse<Result = JsonRpcResult, Error = JsonRpcResult> = (
-    | JsonRpcResponseWithError<Error>
-    | JsonRpcResponseWithResult<Result>
+    JsonRpcResponseWithError<Error> | JsonRpcResponseWithResult<Result>
 )[];
 
 export type JsonRpcResponse<Result = JsonRpcResult, Error = JsonRpcResult> =
-    | JsonRpcResponseWithError<Error>
-    | JsonRpcResponseWithResult<Result>;
+    JsonRpcResponseWithError<Error> | JsonRpcResponseWithResult<Result>;
 // | JsonRpcBatchResponse<Result, Error>;

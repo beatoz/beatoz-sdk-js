@@ -14,7 +14,12 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import {getDevAccountPrivateKey, getDevWsServer, getTestProposalAccountPrivateKey, getTestWsServer} from '../e2e_utils';
+import {
+    getDevAccountPrivateKey,
+    getDevWsServer,
+    getTestProposalAccountPrivateKey,
+    getTestWsServer,
+} from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 
 describe('setDoc test', () => {

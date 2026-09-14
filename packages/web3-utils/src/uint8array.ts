@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 export function uint8ArrayConcat(...parts: Uint8Array[]): Uint8Array {
     const length = parts.reduce((prev, part) => {
         const agg = prev + part.length;

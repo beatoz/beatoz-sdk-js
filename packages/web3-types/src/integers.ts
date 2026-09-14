@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import BN from 'bn.js';
 
 const uint64MaxValue = new BN('18446744073709551615', 10, 'be');

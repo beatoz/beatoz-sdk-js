@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { AbiError } from '@beatoz/web3-errors';
 import { ParamType, Result } from '@ethersproject/abi';
 import { HexString, AbiInput, DecodedParams } from '@beatoz/web3-types';

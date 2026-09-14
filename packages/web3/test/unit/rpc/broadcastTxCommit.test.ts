@@ -18,7 +18,7 @@ import {
     getDevWsServer,
     getTestAccountPrivateKey,
     getTestProposalAccountPrivateKey,
-    getTestWsServer
+    getTestWsServer,
 } from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { AccountResponse, BroadcastTxCommitResponse } from '@beatoz/web3-types';

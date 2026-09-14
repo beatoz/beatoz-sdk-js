@@ -49,6 +49,6 @@ export interface Web3MethodInterface extends Beatoz {
             privateKey: HexString,
             chainId: string,
         ) => SignTransactionResult;
-        wallet: Wallet,
+        wallet: Wallet;
     };
 }

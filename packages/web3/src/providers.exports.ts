@@ -13,5 +13,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 export * as http from '@beatoz/web3-providers-http';
 export * as ws from '@beatoz/web3-providers-ws';

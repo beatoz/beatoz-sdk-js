@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { Web3Account, SignTransactionResult } from './types.js';
 import { PrvKey, PubKey } from './tx/tx_types.js';
 import { HexString, TrxProto, BytesUint8Array } from '@beatoz/web3-types';
@@ -69,7 +70,6 @@ export const signTransaction = (
     const prefix = `\x19BEATOZ(${chainId}) Signed Message:\n${encodedData.length}`;
     const prefixedData = Buffer.concat([Buffer.from(prefix), encodedData]);
     trxProto.sig = sign(new BytesUint8Array(prefixedData), privateKey);
-
 
     const sha256 = createHash('sha256');
 

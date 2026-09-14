@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import WebsocketProvider from '../../../src';
-import { getTestWsServer} from '../e2e_utils';
+import { getTestWsServer } from '../e2e_utils';
 import { createJsonRpcRequest } from './websocket_provider.test';
 import { SubscriptionEvent } from '@beatoz/web3-types';
 

@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { HexString, AbiParameter, DecodedParams } from '@beatoz/web3-types';
 import { decodeParameter, decodeParametersWith } from './parameters_api.js';
 
