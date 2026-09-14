@@ -13,10 +13,12 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+const path = require('path');
+
 module.exports = {
 	globals: {
 		'ts-jest': {
-			tsconfig: './packages/web3-contract/test/tsconfig.json',
+			tsconfig: path.resolve(__dirname, '../tsconfig.json'),
 		},
 	},
 	rootDir: '../..',
