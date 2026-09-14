@@ -60,7 +60,6 @@ export default class HttpProvider<API extends Web3APISpec = BeatozExecutionAPI> 
             body: JSON.stringify(payload),
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         if (!response.ok) throw new ResponseError(await response.json());
 
         return (await response.json()) as JsonRpcResponseWithResult<ResponseType>;

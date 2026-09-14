@@ -30,17 +30,14 @@ export class Web3EventEmitter<T extends Web3EventMap> implements Web3Emitter<T> 
     private readonly _emitter = new EventEmitter();
 
     public on<K extends Web3EventKey<T>>(eventName: K, fn: Web3EventCallback<T[K]>) {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         this._emitter.on(eventName, fn);
     }
 
     public once<K extends Web3EventKey<T>>(eventName: K, fn: Web3EventCallback<T[K]>) {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         this._emitter.once(eventName, fn);
     }
 
     public off<K extends Web3EventKey<T>>(eventName: K, fn: Web3EventCallback<T[K]>) {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         this._emitter.off(eventName, fn);
     }
 

@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { JsonRpcResponseWithResult } from './json_rpc_types.js';
 import {
     assertArray,
@@ -54,7 +55,6 @@ import assert from 'assert';
 
 export class ResponsesDecoder {
     public static decodeHealth(): responses.HealthResponse {
-        // eslint-disable-next-line no-null/no-null
         return null;
     }
 
@@ -281,7 +281,7 @@ function decodeHeader(data: RpcHeader): Header {
 
         // When there is no last block ID (i.e. this block's height is 1), we get an empty structure like this:
         // { hash: '', parts: { total: 0, hash: '' } }
-        // eslint-disable-next-line no-null/no-null
+
         last_block_id: data.last_block_id.hash ? decodeBlockId(data.last_block_id) : null,
 
         last_commit_hash: assertSet(data.last_commit_hash),
@@ -532,8 +532,7 @@ function decodeBlock(data: RpcBlock): Block {
         // { height: '0', round: 0, block_id: { hash: '', parts: [Object] }, signatures: [] }
         last_commit: data.last_commit.block_id.hash
             ? decodeCommit(assertObject(data.last_commit))
-            : // eslint-disable-next-line no-null/no-null
-              {
+            : {
                   block_id: {
                       hash: '',
                       parts: { hash: '', total: 0 },

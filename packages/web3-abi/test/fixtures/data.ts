@@ -20,7 +20,6 @@ import { encodeParameters, decodeParameters } from '../../src/api/parameters_api
 // And the following override is to convert BigInt to a string inside the Unit Tests that uses this file,
 // 	i.e when serialization is needed there (because the values in this file is in a string format).
 (BigInt.prototype as any).toJSON = function () {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return this.toString();
 };
 
@@ -215,7 +214,7 @@ export const inValidFunctionsSignatures: { input: any; output: string }[] = [
     { input: {}, output: 'Invalid parameter value in encodeFunctionSignature' },
     { input: ['mystring'], output: 'Invalid parameter value in encodeFunctionSignature' },
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+
     { input: null, output: 'Invalid parameter value in encodeFunctionSignature' },
     { input: undefined, output: 'Invalid parameter value in encodeFunctionSignature' },
 ];
@@ -248,7 +247,7 @@ export const inValidFunctionsCalls: { input: any; output: string }[] = [
     { input: {}, output: 'Invalid parameter value in encodeFunctionCall' },
     { input: ['mystring'], output: 'Invalid parameter value in encodeFunctionCall' },
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+
     { input: null, output: 'Invalid parameter value in encodeFunctionCall' },
     { input: undefined, output: 'Invalid parameter value in encodeFunctionCall' },
 ];
@@ -282,7 +281,7 @@ export const invalidEventsSignatures: { input: any; output: string }[] = [
     { input: {}, output: 'Invalid parameter value in encodeEventSignature' },
     { input: ['mystring'], output: 'Invalid parameter value in encodeEventSignature' },
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+
     { input: null, output: 'Invalid parameter value in encodeEventSignature' },
     { input: undefined, output: 'Invalid parameter value in encodeEventSignature' },
 ];
@@ -311,7 +310,7 @@ export const invalidErrorSignatures: { input: any; output: string }[] = [
     { input: {}, output: 'Invalid parameter value in encodeErrorSignature' },
     { input: ['mystring'], output: 'Invalid parameter value in encodeErrorSignature' },
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+
     { input: null, output: 'Invalid parameter value in encodeErrorSignature' },
     { input: undefined, output: 'Invalid parameter value in encodeErrorSignature' },
 ];
@@ -738,7 +737,7 @@ export const inValidEncodeParametersData: {
     },
     {
         // Using "null" value intentionally for validation
-        // eslint-disable-next-line no-null/no-null
+
         input: [null, ['2345675643', 'Hello!%']],
         output: 'Parameter encoding error',
     },
@@ -929,7 +928,7 @@ export const inValidDecodeParametersData: {
     },
     {
         // Using "null" value intentionally for validation
-        // eslint-disable-next-line no-null/no-null
+
         input: [null, '0x000000000010'],
         output: 'Parameter decoding error',
     },

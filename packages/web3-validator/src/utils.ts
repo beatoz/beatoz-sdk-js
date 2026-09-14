@@ -132,7 +132,6 @@ export const abiSchemaToJsonSchema = (
     };
 
     for (const [index, abi] of abis.entries()) {
-        // eslint-disable-next-line no-nested-ternary
         let abiType!: string;
         let abiName!: string;
         let abiComponents: ShortValidationSchema | FullValidationSchema | undefined = [];
@@ -159,7 +158,6 @@ export const abiSchemaToJsonSchema = (
                 abi[1] &&
                 Array.isArray(abi[1])
             ) {
-                // eslint-disable-next-line prefer-destructuring
                 abiType = abi[0];
                 abiName = `${level}/${index}`;
                 abiComponents = abi[1] as ReadonlyArray<ShortValidationSchema>;
@@ -260,7 +258,6 @@ export const transformJsonDataToAbiFormat = (
     const newData: Array<unknown> = [];
 
     for (const [index, abi] of abis.entries()) {
-        // eslint-disable-next-line no-nested-ternary
         let abiType!: string;
         let abiName!: string;
         let abiComponents: ShortValidationSchema | FullValidationSchema | undefined = [];
@@ -338,7 +335,7 @@ export const transformJsonDataToAbiFormat = (
     }
 
     // Have to reassign before pushing to transformedData
-    // eslint-disable-next-line no-param-reassign
+
     transformedData = transformedData ?? [];
     transformedData.push(...newData);
 

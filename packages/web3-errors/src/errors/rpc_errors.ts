@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import { JsonRpcResponseWithError, JsonRpcId, JsonRpcError } from '@beatoz/web3-types';
 import { BaseWeb3Error } from '../web3_error_base.js';
 import {

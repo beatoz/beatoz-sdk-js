@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { AbiError } from '@beatoz/web3-errors';
 import { AbiCoder, ParamType } from '@ethersproject/abi';
 import { isNullish, leftPad, rightPad, toHex } from '@beatoz/web3-utils';
@@ -156,8 +157,6 @@ export const formatOddHexstrings = (param: string): string =>
  * Handle some formatting of params for backwards compatibility with Ethers V4
  */
 export const formatParam = (type: string, _param: unknown): unknown => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-
     // clone if _param is an object
     const param = typeof _param === 'object' && !Array.isArray(_param) ? { ..._param } : _param;
     const paramTypeBytes = /^bytes([0-9]*)$/;
@@ -171,7 +170,6 @@ export const formatParam = (type: string, _param: unknown): unknown => {
     }
 
     if (paramTypeBytesArray.exec(type) || paramTypeNumberArray.exec(type)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         const paramClone = [...(param as Array<unknown>)];
         return paramClone.map((p) => formatParam(type.replace('[]', ''), p));
     }
@@ -212,29 +210,23 @@ export const formatParam = (type: string, _param: unknown): unknown => {
     return param;
 };
 
-// eslint-disable-next-line consistent-return
 export const modifyParams = (
     coder: ReturnType<AbiCoder['_getCoder']>,
     param: unknown[],
-    // eslint-disable-next-line consistent-return
 ): unknown => {
     if (coder.name === 'array') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return param.map((p) =>
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             modifyParams(ethersAbiCoder._getCoder(ParamType.from(coder.type.replace('[]', ''))), [
                 p,
             ]),
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (coder as any).coders.forEach((c: ReturnType<AbiCoder['_getCoder']>, i: number) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (c.name === 'tuple') {
             modifyParams(c, [param[i]]);
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, no-param-reassign
             param[i] = formatParam(c.name, param[i]);
         }
     });

@@ -36,7 +36,7 @@ export const bytesToHexInvalidData: [any, string][] = [
     [12, 'value "12" at "/0" must pass "bytes" validation'],
     [['string'], 'value "string" at "/0" must pass "bytes" validation'],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [null, 'value at "/0" must pass "bytes" validation'],
     [undefined, 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [{}, 'value "[object Object]" at "/0" must pass "bytes" validation'],
@@ -65,7 +65,7 @@ export const hexToBytesInvalidData: [any, string][] = [
     [12, 'value "12" at "/0" must pass "bytes" validation'],
     [['string'], 'value "string" at "/0" must pass "bytes" validation'],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [null, 'Web3 validator found 1 error[s]:\nvalue at "/0" must pass "bytes" validation'],
     [undefined, 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [{}, 'value "[object Object]" at "/0" must pass "bytes" validation'],
@@ -106,7 +106,7 @@ export const numberToHexInvalidData: [any, string][] = [
     ['0xag', 'value "0xag" at "/0" must pass "int" validation'],
     ['122g', 'value "122g" at "/0" must pass "int" validation'],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [null, 'value at "/0" must pass "int" validation'],
     [undefined, 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [{}, 'value "[object Object]" at "/0" must pass "int" validation'],
@@ -151,7 +151,7 @@ export const utf8ToHexInvalidData: [any, string][] = [
     [12, 'value "12" at "/0" must pass "string" validation'],
     [BigInt(12), 'value "12" at "/0" must pass "string" validation'],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [null, 'value at "/0" must pass "string" validation'],
     [undefined, 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [{}, 'value "[object Object]" at "/0" must pass "string" validation'],
@@ -182,7 +182,7 @@ export const hexToUtf8InvalidData: [any, string][] = [
         'value "0x4920686176652031303g0c2a3" at "/0" must pass "bytes" validation',
     ],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [null, 'value at "/0" must pass "bytes" validation'],
     [undefined, 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [{}, 'value "[object Object]" at "/0" must pass "bytes" validation'],
@@ -281,7 +281,7 @@ export const fromFonsInvalidData: [[any, any], string][] = [
     // eslint-disable-next-line no-useless-escape
     [['123.34', 'kfons'], 'Invalid value given "123.34". Error: can not parse as number data.'],
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [[null, 'kfons'], 'Invalid value given "undefined". Error: can not parse as number data.'],
     [[undefined, 'kfons'], 'Invalid value given "undefined". Error: can not parse as number data.'],
     [[{}, 'kfons'], 'Invalid value given "{}". Error: can not parse as number data'],
@@ -291,7 +291,7 @@ export const fromFonsInvalidData: [[any, any], string][] = [
 
 export const toFonsInvalidData: [[any, any], string][] = [
     // Using "null" value intentionally for validation
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     [[null, 'kfons'], 'value at "/0" must pass "number" validation'],
     [[undefined, 'kfons'], 'Web3 validator found 1 error[s]:\nvalue at "/0" is required'],
     [[{}, 'kfons'], 'value "[object Object]" at "/0" must pass "number" validation'],

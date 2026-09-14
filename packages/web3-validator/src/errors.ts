@@ -21,7 +21,6 @@ import { isNullish } from './validation/object.js';
 
 const errorFormatter = (error: Web3ValidationErrorObject): string => {
     if (error.message && error.instancePath && error.params && !isNullish(error.params.value)) {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         return `value "${(error.params as { value: unknown }).value}" at "${error.instancePath}" ${
             error.message
         }`;

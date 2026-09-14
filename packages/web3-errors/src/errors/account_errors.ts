@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import {
     ERR_PRIVATE_KEY_LENGTH,
     ERR_INVALID_PRIVATE_KEY,

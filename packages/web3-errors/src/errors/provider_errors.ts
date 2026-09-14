@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import {
     ERR_PROVIDER,
     ERR_INVALID_PROVIDER,

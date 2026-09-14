@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import { Web3Error } from '@beatoz/web3-types';
 
 export abstract class BaseWeb3Error extends Error implements Web3Error {
@@ -38,7 +36,7 @@ export abstract class BaseWeb3Error extends Error implements Web3Error {
 
     public static convertToString(value: unknown, unquotValue = false) {
         // Using "null" value intentionally for validation
-        // eslint-disable-next-line no-null/no-null
+
         if (value === null || value === undefined) return 'undefined';
 
         const result = JSON.stringify(

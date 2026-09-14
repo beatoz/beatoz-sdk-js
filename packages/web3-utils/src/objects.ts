@@ -40,7 +40,6 @@ export const mergeDeep = (
         return result;
     }
     for (const src of sources) {
-        // eslint-disable-next-line no-restricted-syntax
         for (const key in src) {
             if (isIterable(src[key])) {
                 if (!result[key]) {

@@ -24,7 +24,6 @@ import { isNullish } from '@beatoz/web3-validator';
 export function isPromise(object: unknown): boolean {
     return (
         (typeof object === 'object' || typeof object === 'function') &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         typeof (object as { then: unknown }).then === 'function'
     );
 }

@@ -35,12 +35,7 @@ import {
     SupportedProviders,
 } from '@beatoz/web3-types';
 import * as responses from '@beatoz/web3-types';
-import {
-    InvalidResponseError,
-    ResponseError,
-    RpcError,
-    rpcErrorsMap,
-} from '@beatoz/web3-errors';
+import { InvalidResponseError, ResponseError, RpcError, rpcErrorsMap } from '@beatoz/web3-errors';
 import { Stream } from 'xstream';
 import { Web3EventEmitter } from './web3_event_emitter.js';
 
@@ -97,7 +92,7 @@ export class Web3RequestManager<
     /**
      * Will return all available providers
      */
-    // eslint-disable-next-line class-methods-use-this
+
     public get providers() {
         return availableProviders;
     }
@@ -127,7 +122,6 @@ export class Web3RequestManager<
         throw new ResponseError(response);
     }
 
-    // eslint-disable-next-line class-methods-use-this
     private _processJsonRpcResponse<ResultType, ErrorType, RequestType>(
         payload: JsonRpcPayload<RequestType>,
         response: JsonRpcResponse<ResultType, ErrorType>,
@@ -137,7 +131,7 @@ export class Web3RequestManager<
             return this._buildResponse(
                 payload,
                 // Some providers uses "null" as valid empty response
-                // eslint-disable-next-line no-null/no-null
+
                 null as unknown as JsonRpcResponse<ResultType, ErrorType>,
                 error,
             );
@@ -154,7 +148,6 @@ export class Web3RequestManager<
                 const rpcErrorResponse = response as JsonRpcResponseWithError;
                 // check if rpc error flag is on and response error code match an EIP-1474 or a standard rpc error code
                 if (rpcErrorsMap.get(rpcErrorResponse.error.code)) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     const Err = rpcErrorsMap.get(rpcErrorResponse.error.code)!.error;
                     throw new Err(rpcErrorResponse);
                 } else {
@@ -187,7 +180,7 @@ export class Web3RequestManager<
     }
 
     // Need to use same types as _processJsonRpcResponse so have to declare as instance method
-    // eslint-disable-next-line class-methods-use-this
+
     private _buildResponse<ResultType, ErrorType, RequestType>(
         payload: JsonRpcPayload<RequestType>,
         response: JsonRpcResponse<ResultType, ErrorType>,
@@ -195,14 +188,14 @@ export class Web3RequestManager<
     ): JsonRpcResponse<ResultType> {
         const res = {
             jsonrpc: '2.0',
-            // eslint-disable-next-line no-nested-ternary
+
             id: jsonRpc.isBatchRequest(payload)
                 ? payload[0].id
                 : 'id' in payload
-                ? payload.id
-                : // Have to use the null here explicitly
-                  // eslint-disable-next-line no-null/no-null
-                  null,
+                  ? payload.id
+                  : // Have to use the null here explicitly
+
+                    null,
         };
 
         if (error) {

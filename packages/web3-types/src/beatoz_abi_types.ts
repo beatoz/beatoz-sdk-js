@@ -189,54 +189,52 @@ type _TypedArray<Type, Size extends string> = Size extends ''
 export type PrimitiveStringType<Type extends string> = Type extends `string${string}[${infer Size}]`
     ? _TypedArray<string, Size>
     : Type extends 'string' | `string${string}`
-    ? string
-    : never;
+      ? string
+      : never;
 
 export type PrimitiveBooleanType<Type extends string> = Type extends `bool[${infer Size}]`
     ? _TypedArray<boolean, Size>
     : Type extends 'bool'
-    ? boolean
-    : never;
+      ? boolean
+      : never;
 
 export type PrimitiveIntegerType<Type extends string> = Type extends
-    | `uint${string}[${infer Size}]`
-    | `int${string}[${infer Size}]`
+    `uint${string}[${infer Size}]` | `int${string}[${infer Size}]`
     ? _TypedArray<Numbers, Size>
     : Type extends 'uint' | 'int' | `int${string}` | `uint${string}`
-    ? Numbers
-    : never;
+      ? Numbers
+      : never;
 
 export type PrimitiveBytesType<Type extends string> = Type extends `bytes${string}[${infer Size}]`
     ? _TypedArray<Bytes, Size>
     : Type extends 'bytes' | `bytes${string}`
-    ? Bytes
-    : never;
+      ? Bytes
+      : never;
 
 export type PrimitiveTupleType<
     Type extends string,
     TypeComponents extends ReadonlyArray<AbiParameter> | undefined | unknown = [],
-> = TypeComponents extends ReadonlyArray<AbiParameter>
-    ? Type extends 'tuple'
-        ? {
-              // eslint-disable-next-line no-use-before-define
-              [Param in TypeComponents[number] as Param['name']]: MatchPrimitiveType<
-                  Param['type'],
-                  Param['components']
-              >;
-          }
-        : Type extends `tuple[${infer Size}]`
-        ? _TypedArray<
-              {
-                  // eslint-disable-next-line no-use-before-define
+> =
+    TypeComponents extends ReadonlyArray<AbiParameter>
+        ? Type extends 'tuple'
+            ? {
                   [Param in TypeComponents[number] as Param['name']]: MatchPrimitiveType<
                       Param['type'],
                       Param['components']
                   >;
-              },
-              Size
-          >
-        : never
-    : never;
+              }
+            : Type extends `tuple[${infer Size}]`
+              ? _TypedArray<
+                    {
+                        [Param in TypeComponents[number] as Param['name']]: MatchPrimitiveType<
+                            Param['type'],
+                            Param['components']
+                        >;
+                    },
+                    Size
+                >
+              : never
+        : never;
 
 type ObjectToArray<T extends unknown[]> = T extends [...infer R, infer A]
     ? Record<R['length'], A> & ObjectToArray<R>
@@ -261,13 +259,13 @@ type ContractMethodOutputParametersRecursiveArray<
     Params extends readonly []
         ? []
         : Params extends readonly [infer H, ...infer R] // check if Params is an array
-        ? H extends AbiParameter
-            ? [
-                  MatchPrimitiveType<H['type'], H['components']>,
-                  ...ContractMethodOutputParametersRecursiveArray<R>,
-              ]
-            : []
-        : [];
+          ? H extends AbiParameter
+              ? [
+                    MatchPrimitiveType<H['type'], H['components']>,
+                    ...ContractMethodOutputParametersRecursiveArray<R>,
+                ]
+              : []
+          : [];
 
 type ContractMethodOutputParametersRecursiveRecord<
     Params extends ReadonlyArray<unknown> | undefined,
@@ -276,41 +274,47 @@ type ContractMethodOutputParametersRecursiveRecord<
     Params extends readonly []
         ? []
         : Params extends readonly [infer H, ...infer R] // check if Params is an array
-        ? H extends AbiParameter
-            ? H['name'] extends '' // check if output param name is empty string
-                ? ContractMethodOutputParametersRecursiveRecord<R>
-                : Record<H['name'], MatchPrimitiveType<H['type'], H['components']>> & // sets key-value pair of output param name and type
-                      ContractMethodOutputParametersRecursiveRecord<R>
-            : ContractMethodOutputParametersRecursiveRecord<R>
-        : Params extends undefined | unknown // param is not array, check if undefined
-        ? []
-        : Params;
+          ? H extends AbiParameter
+              ? H['name'] extends '' // check if output param name is empty string
+                  ? ContractMethodOutputParametersRecursiveRecord<R>
+                  : Record<H['name'], MatchPrimitiveType<H['type'], H['components']>> & // sets key-value pair of output param name and type
+                        ContractMethodOutputParametersRecursiveRecord<R>
+              : ContractMethodOutputParametersRecursiveRecord<R>
+          : Params extends
+                  undefined | unknown // param is not array, check if undefined
+            ? []
+            : Params;
 
 export type ContractMethodOutputParameters<Params extends ReadonlyArray<unknown> | undefined> =
     // check if params are empty array
     Params extends readonly []
         ? void
         : Params extends readonly [infer H, ...infer R] // check if Params is an array
-        ? R extends readonly [] // if only one output in array
-            ? H extends AbiParameter
-                ? MatchPrimitiveType<H['type'], H['components']>
-                : []
-            : // if more than one output
-              ArrToObjectWithFunctions<[...ContractMethodOutputParametersRecursiveArray<Params>]> &
-                  ContractMethodOutputParametersRecursiveRecord<Params>
-        : [];
+          ? R extends readonly [] // if only one output in array
+              ? H extends AbiParameter
+                  ? MatchPrimitiveType<H['type'], H['components']>
+                  : []
+              : // if more than one output
+                ArrToObjectWithFunctions<
+                    [...ContractMethodOutputParametersRecursiveArray<Params>]
+                > &
+                    ContractMethodOutputParametersRecursiveRecord<Params>
+          : [];
 
 export type ContractMethodInputParameters<Params extends ReadonlyArray<unknown> | undefined> =
     Params extends readonly []
         ? []
         : Params extends readonly [infer H, ...infer R]
-        ? H extends AbiParameter
-            ? // TODO: Find a way to set name for tuple item
-              [MatchPrimitiveType<H['type'], H['components']>, ...ContractMethodInputParameters<R>]
-            : ContractMethodInputParameters<R>
-        : Params extends undefined | unknown
-        ? []
-        : Params;
+          ? H extends AbiParameter
+              ? // TODO: Find a way to set name for tuple item
+                [
+                    MatchPrimitiveType<H['type'], H['components']>,
+                    ...ContractMethodInputParameters<R>,
+                ]
+              : ContractMethodInputParameters<R>
+          : Params extends undefined | unknown
+            ? []
+            : Params;
 
 export type ContractConstructor<Abis extends ContractAbi> = {
     [Abi in FilterAbis<Abis, AbiConstructorFragment & { type: 'constructor' }> as 'constructor']: {
@@ -320,10 +324,9 @@ export type ContractConstructor<Abis extends ContractAbi> = {
 }['constructor'];
 
 export type ContractConstructorArgs<Abis extends ContractAbi> = {
-    [Abi in FilterAbis<
-        Abis,
-        AbiConstructorFragment & { type: 'constructor' }
-    > as 'constructor']: ContractMethodInputParameters<Abi['inputs']>;
+    [
+        Abi in FilterAbis<Abis, AbiConstructorFragment & { type: 'constructor' }> as 'constructor'
+    ]: ContractMethodInputParameters<Abi['inputs']>;
 }['constructor'];
 
 export type ContractMethod<Abi extends AbiFunctionFragment> = {
@@ -334,10 +337,9 @@ export type ContractMethod<Abi extends AbiFunctionFragment> = {
 };
 
 export type ContractMethods<Abis extends ContractAbi> = {
-    [Abi in FilterAbis<
-        Abis,
-        AbiFunctionFragment & { type: 'function' }
-    > as Abi['name']]: ContractMethod<Abi>;
+    [
+        Abi in FilterAbis<Abis, AbiFunctionFragment & { type: 'function' }> as Abi['name']
+    ]: ContractMethod<Abi>;
 };
 
 export type ContractEvent<Abi extends AbiEventFragment> = {
@@ -346,10 +348,9 @@ export type ContractEvent<Abi extends AbiEventFragment> = {
 };
 
 export type ContractEvents<Abis extends ContractAbi> = {
-    [Abi in FilterAbis<
-        Abis,
-        AbiEventFragment & { type: 'event' }
-    > as Abi['name']]: ContractEvent<Abi>;
+    [
+        Abi in FilterAbis<Abis, AbiEventFragment & { type: 'event' }> as Abi['name']
+    ]: ContractEvent<Abi>;
 };
 
 export interface DecodedParams extends Record<string, unknown> {

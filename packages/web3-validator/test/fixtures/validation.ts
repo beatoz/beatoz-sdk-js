@@ -28,7 +28,7 @@ export const validUintData: any[] = [
 ];
 
 // Using "null" value intentionally for validation
-// eslint-disable-next-line no-null/no-null
+// eslint-disable-next-line unicorn/no-null
 export const invalidUintData: any[] = ['-0x48', '-12', -1, true, undefined, null, ''];
 
 export const validUintDataWithSize: [any, number][] = [
@@ -77,7 +77,7 @@ export const validIntData: any[] = [
 ];
 
 // Using "null" value intentionally for validation
-// eslint-disable-next-line no-null/no-null
+// eslint-disable-next-line unicorn/no-null
 export const invalidIntData: any[] = [true, undefined, null];
 
 export const validIntDataWithSize: [any, number][] = [
@@ -228,7 +228,7 @@ export const isHexStringData: any[] = [
     { in: ['1x12345'], out: false },
     { in: ['123'], out: false },
     { in: [123], out: false },
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     { in: [null], out: false },
     { in: [false], out: false },
     { in: [{}], out: false },
@@ -251,7 +251,7 @@ export const isObjectData: any[] = [
     { in: true, out: false },
     { in: false, out: false },
     { in: {}, out: true },
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     { in: null, out: false },
     { in: undefined, out: false },
     { in: new Uint8Array([0x61, 0x73, 0x64]), out: false },
@@ -500,14 +500,14 @@ export const isTopicData: any[] = [
     { in: '0x00000000000000000000000000000000000000000000000000000000000000000', out: false },
     { in: '0x000000000000000000000000000000000000000000000000000000000000000', out: false },
     { in: 123, out: false },
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     { in: null, out: false },
     { in: false, out: false },
     { in: {}, out: false },
 ];
 export const isTopicInBloomData: any[] = [
     { in: [123, ''], out: false },
-    // eslint-disable-next-line no-null/no-null
+    // eslint-disable-next-line unicorn/no-null
     { in: [null, ''], out: false },
     { in: [false, ''], out: false },
     { in: [{}, ''], out: false },
@@ -521,7 +521,7 @@ export const isTopicInBloomData: any[] = [
     {
         in: [
             '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
         ],
         out: false,
@@ -561,7 +561,7 @@ export const validFilterObjectData: Filter[] = [
         topics: [
             '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
             // Using "null" value intentionally for validation
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
             [
                 '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
@@ -579,7 +579,7 @@ export const validFilterObjectData: Filter[] = [
         topics: [
             '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
             // Using "null" value intentionally for validation
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
             [
                 '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
@@ -604,7 +604,7 @@ export const invalidFilterObjectData: any[] = [
             '0x98afe7a8d28bbc88dcf41f8e06d97c74958a47dc',
             '0xdfd5293d8e347dfe59e90efd55b2956a1343963d',
             // Using "null" value intentionally for validation
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
         ],
     },
@@ -612,7 +612,7 @@ export const invalidFilterObjectData: any[] = [
         topics: [
             '0x00000000000000000000000',
             // Using "null" value intentionally for validation
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
             [
                 '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
@@ -631,7 +631,7 @@ export const invalidFilterObjectData: any[] = [
         topics: [
             '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',
             // Using "null" value intentionally for validation
-            // eslint-disable-next-line no-null/no-null
+            // eslint-disable-next-line unicorn/no-null
             null,
             [
                 '0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b',

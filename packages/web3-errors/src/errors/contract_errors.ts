@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import { JsonRpcError, TransactionReceipt, HexString } from '@beatoz/web3-types';
 import {
     ERR_CONTRACT,
@@ -46,7 +44,10 @@ export class Web3ContractError extends BaseWeb3Error {
 export class ResolverMethodMissingError extends BaseWeb3Error {
     public code = ERR_CONTRACT_RESOLVER_MISSING;
 
-    public constructor(public address: string, public name: string) {
+    public constructor(
+        public address: string,
+        public name: string,
+    ) {
         super(`The resolver at ${address} does not implement requested method: "${name}".`);
     }
 
@@ -126,9 +127,7 @@ export class ContractInstantiationError extends BaseWeb3Error {
 }
 
 export type ProviderErrorData =
-    | HexString
-    | { data: HexString }
-    | { originalError: { data: HexString } };
+    HexString | { data: HexString } | { originalError: { data: HexString } };
 
 /**
  * This class is expected to be set as an `innerError` inside ContractExecutionError
@@ -142,7 +141,6 @@ export class Eip838ExecutionError extends Web3ContractError {
     public errorSignature?: string;
     public errorArgs?: { [K in string]: unknown };
 
-    // eslint-disable-next-line no-use-before-define
     public innerError: Eip838ExecutionError | undefined;
 
     public constructor(error: JsonRpcError<ProviderErrorData> | Eip838ExecutionError) {

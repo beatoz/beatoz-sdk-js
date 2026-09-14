@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { AbiCoder } from '@ethersproject/abi';
 import type { BigNumber } from '@ethersproject/bignumber';
 
@@ -22,7 +23,7 @@ const ethersAbiCoder = new AbiCoder((_, value) => {
     }
 
     // Because of tye type def from @ethersproject/abi
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+
     return value;
 });
 

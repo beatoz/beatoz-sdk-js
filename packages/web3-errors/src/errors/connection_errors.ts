@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import { ConnectionEvent } from '@beatoz/web3-types';
 import {
     ERR_CONN,
@@ -49,7 +47,10 @@ export class ConnectionError extends BaseWeb3Error {
 }
 
 export class InvalidConnectionError extends ConnectionError {
-    public constructor(public host: string, event?: ConnectionEvent) {
+    public constructor(
+        public host: string,
+        event?: ConnectionEvent,
+    ) {
         super(`CONNECTION ERROR: Couldn't connect to node ${host}.`, event);
         this.code = ERR_CONN_INVALID;
     }

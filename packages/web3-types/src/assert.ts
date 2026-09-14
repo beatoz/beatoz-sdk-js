@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function assert(condition: any, msg?: string): asserts condition {
     if (!condition) {
@@ -30,7 +31,6 @@ export function assertDefinedAndNotNull<T>(
     value: T | undefined | null,
     msg?: string,
 ): asserts value is T {
-    // eslint-disable-next-line no-null/no-null
     if (value === undefined || value === null) {
         throw new Error(msg ?? 'value is undefined or null');
     }

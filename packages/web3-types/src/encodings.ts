@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 import { ReadonlyDateWithNanoseconds } from './responses.js';
 
 /**
@@ -25,7 +26,6 @@ export function assertSet<T>(value: T): T {
         throw new Error('Value must not be undefined');
     }
 
-    // eslint-disable-next-line no-null/no-null
     if ((value as unknown) === null) {
         throw new Error('Value must not be null');
     }
@@ -137,9 +137,8 @@ export function assertNotEmpty<T>(value: T): T {
 }
 
 // may will run the transform if value is defined, otherwise returns undefined
-// eslint-disable-next-line no-null/no-null
+
 export function may<T, U>(transform: (val: T) => U, value: T | null | undefined): U | undefined {
-    // eslint-disable-next-line no-null/no-null
     return value === undefined || value === null ? undefined : transform(value);
 }
 
@@ -167,10 +166,8 @@ export function encodeString(s: string): Uint8Array {
 // See https://github.com/tendermint/go-amino/blob/v0.15.0/encoder.go#L79-L87
 export function encodeUvarint(n: number): Uint8Array {
     return n >= 0x80
-        ? // eslint-disable-next-line no-bitwise
-          Uint8Array.from([(n & 0xff) | 0x80, ...encodeUvarint(n >> 7)])
-        : // eslint-disable-next-line no-bitwise
-          Uint8Array.from([n & 0xff]);
+        ? Uint8Array.from([(n & 0xff) | 0x80, ...encodeUvarint(n >> 7)])
+        : Uint8Array.from([n & 0xff]);
 }
 
 // See https://github.com/tendermint/go-amino/blob/v0.15.0/encoder.go#L134-L178

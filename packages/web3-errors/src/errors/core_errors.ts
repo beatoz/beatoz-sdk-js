@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-/* eslint-disable max-classes-per-file */
-
 import { BaseWeb3Error } from '../web3_error_base.js';
 import { ERR_CORE_HARDFORK_MISMATCH } from '../error_codes.js';
 

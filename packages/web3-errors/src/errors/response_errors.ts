@@ -14,7 +14,6 @@
     limitations under the License.
 */
 
-// eslint-disable-next-line max-classes-per-file
 import {
     JsonRpcError,
     JsonRpcPayload,
@@ -31,7 +30,6 @@ const isResponseWithError = <Error = unknown, Result = unknown>(
     !Array.isArray(response) &&
     response.jsonrpc === '2.0' &&
     !!response &&
-    // eslint-disable-next-line no-null/no-null
     (response.result === undefined || response.result === null) &&
     // JSON RPC consider "null" as valid response
     'error' in response &&
