@@ -7,6 +7,7 @@ BEATOZ SDK v2 개발 문서와 작업 기록입니다.
 - `worklog/`: 날짜별 개발 작업 기록
 - `dependency-baseline.md`: TypeScript 업그레이드 전 의존성 기준선 복구 기록
 - `test-baseline.md`: Jest 테스트 기준선 복구 기록
+- `lerna-workspaces.md`: Yarn workspaces와 Lerna의 역할 및 bootstrap 제거 기록
 - 향후 설계 문서와 문제 해결 문서는 주제별로 분리해서 이 디렉터리 아래에 추가
 
 ## 작업 기록 작성 규칙

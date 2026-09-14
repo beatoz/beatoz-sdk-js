@@ -31,9 +31,8 @@
     "npm": ">=8.19.0"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "version": "yarn run bootstrap && yarn build && git add packages/*/src/version.ts",
-    "prebuild": "yarn clean && lerna bootstrap",
+    "version": "yarn build && git add packages/*/src/version.ts",
+    "prebuild": "yarn clean",
     "build": "lerna run build --stream",
     "build:types": "lerna run build:types --stream",
     "build:cjs": "lerna run build:cjs --stream",
