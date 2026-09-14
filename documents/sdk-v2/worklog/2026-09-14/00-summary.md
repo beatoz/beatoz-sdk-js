@@ -1,6 +1,6 @@
 # 2026-09-14 작업 요약
 
-상태: 개발 도구 peer dependency 정리 완료, 최소 Node 버전 결정 필요
+상태: 개발 도구 의존성 정리 및 Node 22/24 지원 정책 반영 완료
 
 > 오늘은 TypeScript 7 업그레이드 전에 현재 SDK의 의존성 충돌을 해결했고, 전체 빌드와 타입 선언 빌드가 성공하는 재현 가능한 기준선을 만들었습니다.
 
@@ -31,6 +31,11 @@ TypeScript 버전을 올리기 전에 현재 SDK의 빌드 기준선을 확인�
 - `yarn lint`는 실행되지만 기존 소스 위반으로 11개 패키지에서 실패
 - 전체 engine 감사에서 Node 16.19와 호환되지 않는 의존성 4개 발견
 - TypeScript 7.0.2도 Node 16.20 이상을 요구하므로 현재 Node 16.19 선언과 불일치
+- SDK 최소 지원 버전을 Node 22로, 개발 기본 버전을 Node 24로 결정
+- 루트와 13개 workspace의 `engines.node`를 `>=22.0.0`으로 통일하고 `.nvmrc` 추가
+- Node 22.22.3과 24.21.0에서 frozen install, 의존성 트리 검사 및 전체 13개 패키지 빌드 성공
+- 두 Node 버전에서 `web3-accounts` 단위 테스트 2 suites, 3 tests 성공
+- 설치된 의존성 중 최소 Node 22와 engine이 충돌하는 패키지는 0개
 
 ## 결정한 사항
 
@@ -43,14 +48,14 @@ TypeScript 버전을 올리기 전에 현재 SDK의 빌드 기준선을 확인�
 - 의존성 설치와 빌드를 각각 `yarn install`과 `yarn build`로 명시적으로 분리
 - 사용되지 않는 도구의 누락된 peer dependency를 추가하지 않고 도구 자체를 제거
 - 포맷 의존성 통일과 기존 소스의 일괄 포맷은 별도 작업으로 분리
-- SDK 사용자 호환성에 영향을 주는 최소 Node 버전은 별도 결정 후 모든 workspace에 일괄 반영
+- SDK 최소 지원 버전은 Node 22로 정하고 모든 workspace에 일괄 반영
+- Node 22와 24를 지원하고, 향후 CI에서 두 버전을 함께 검증
 
 ## 다음 작업
 
 - `.secrets.json`이 필요한 테스트의 unit/integration 경계 결정
 - `web3-contract`의 외부 fixture, 모듈 해석 및 기존 테스트 코드 오류 정리
 - 기존 lint 오류를 포맷 위반과 코드 품질 위반으로 분류
-- Node 16 고정과 최소 Node 버전 상향 중 방향 결정
 - 전체 테스트 기준선 복구 후 TypeScript 업그레이드 시작
 
 ## 관련 문서
@@ -59,3 +64,4 @@ TypeScript 버전을 올리기 전에 현재 SDK의 빌드 기준선을 확인�
 - [테스트 기준선 복구](./02-test-baseline.md)
 - [Yarn workspaces와 Lerna 역할 정리](./03-lerna-workspaces.md)
 - [개발 도구 의존성 정리](./04-tooling-dependencies.md)
+- [Node.js 지원 기준 현대화](./05-node-runtime.md)

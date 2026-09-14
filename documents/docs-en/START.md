@@ -8,7 +8,7 @@ This documentation is intended for developers using @beatoz/web3 version 1.0.12 
 ## Requirements
 
 To use the @beatoz/web3 library, you will need the following requirements:
-- Node.js (version 16.19.0 or higher)
+- Node.js (version 22 or higher; version 24 recommended for development)
 - npm (version 8.19.0 or higher)
 
 ## Installation
