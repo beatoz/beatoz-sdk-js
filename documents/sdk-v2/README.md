@@ -7,6 +7,7 @@ BEATOZ SDK v2 개발 문서와 작업 기록입니다.
 - `worklog/`: 날짜별 개발 작업 디렉터리
 - `worklog/_template.md`: 날짜별 요약문서 작성 템플릿
 - [`worklog/2026-09-14/`](./worklog/2026-09-14/00-summary.md): SDK v2 기준선 복구 작업
+- [`worklog/2026-09-23/`](./worklog/2026-09-23/00-summary.md): 테스트 계층 분리
 
 ## 작업 기록 작성 규칙
 
