@@ -23,3 +23,7 @@ package-lock.json
 .coverage
 .tool-versions
 *.tsbuildinfo
+
+# Internal SDK v2 worklog. Kept outside this repository so it never reaches
+# main/develop; see ~/Desktop/docs/sdk/sdk-v2-worklog.
+documents/sdk-v2/
