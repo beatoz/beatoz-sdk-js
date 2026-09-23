@@ -14,13 +14,15 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+
+// These tests never connect. The endpoint only exists to construct a Web3 instance.
+const PLACEHOLDER_ENDPOINT = 'http://127.0.0.1:26657';
 
 describe('web3.beatoz.account check ', () => {
     let web3: Web3;
 
     beforeAll(() => {
-        web3 = new Web3(getTestWsServer());
+        web3 = new Web3(PLACEHOLDER_ENDPOINT);
     });
 
     it('should callWeb3.utils method working', async () => {

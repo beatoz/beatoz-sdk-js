@@ -15,18 +15,20 @@
 */
 import { Web3 } from '../../src';
 import Web3Method from '@beatoz/web3-methods';
-import { getTestWsServer } from './e2e_utils';
+
+// These tests never connect. The endpoint only exists to construct a Web3 instance.
+const PLACEHOLDER_ENDPOINT = 'http://127.0.0.1:26657';
 
 describe('Web3 class', () => {
     it('should initialize Web3 instance correctly', () => {
-        const rWeb3Instance = new Web3(getTestWsServer());
+        const rWeb3Instance = new Web3(PLACEHOLDER_ENDPOINT);
 
         // Check if the instance is correctly initialized
         expect(rWeb3Instance).toBeInstanceOf(Web3);
     });
 
     it('should initialize Web3Method module correctly', () => {
-        const rWeb3Instance = new Web3(getTestWsServer());
+        const rWeb3Instance = new Web3(PLACEHOLDER_ENDPOINT);
         // Check if the beatoz module is correctly initialized
         expect(rWeb3Instance.beatoz).toBeInstanceOf(Web3Method);
     });
