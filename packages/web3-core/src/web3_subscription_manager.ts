@@ -101,7 +101,7 @@ export class Web3SubscriptionManager<
         const subscription = new Klass(args ?? undefined, {
             subscriptionManager: this as Web3SubscriptionManager<API, RegisteredSubs>,
             returnFormat,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스별 options 형태가 달라 생성 시점에 좁힐 수 없다. 구독 타입 정리 작업에서 해소할 것.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- options differ per subscription class, so they cannot be narrowed at construction; to be resolved by the subscription typing work.
         } as any) as InstanceType<RegisteredSubs[T]>;
 
         await this.addSubscription(subscription);

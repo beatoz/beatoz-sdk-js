@@ -22,8 +22,8 @@ import unicorn from 'eslint-plugin-unicorn';
 import licenseHeader from 'eslint-plugin-license-header';
 
 /**
- * 모든 소스 파일 상단에 요구하는 Apache 2.0 헤더.
- * 기존 eslint-plugin-header 설정과 같은 문구를 유지한다.
+ * Apache 2.0 header required at the top of every source file.
+ * Wording is kept identical to the previous eslint-plugin-header configuration.
  */
 const APACHE_LICENSE_HEADER = [
     '/*',
@@ -44,15 +44,15 @@ const APACHE_LICENSE_HEADER = [
 ];
 
 /**
- * null을 정상 입력으로 다뤄야 하는 경계 파일들.
+ * Boundary files that legitimately handle `null`.
  *
- * 이 SDK는 JSON-RPC 클라이언트이므로 노드가 보내는 응답에는 null이 정상적으로 들어온다.
- * (JSON에는 undefined가 없고, "값 없음"을 null로 표현한다.)
- * 따라서 전선을 직접 다루는 파일에서는 null 사용을 허용하고,
- * 그 바깥 내부 코드에서는 undefined로 통일한다.
+ * This SDK is a JSON-RPC client, so `null` arrives over the wire as a normal
+ * value: JSON has no `undefined` and expresses "no value" as `null`.
+ * Files that touch the wire directly may therefore use `null`, while code
+ * inside the boundary standardises on `undefined`.
  *
- * 내부 코드가 null을 다루게 됐다면 이 목록에 추가하는 것이 아니라,
- * 경계에서 undefined로 정규화하지 못한 지점이 어디인지 먼저 확인해야 한다.
+ * If internal code starts dealing with `null`, do not add it to this list.
+ * Find the boundary that failed to normalise it to `undefined` instead.
  */
 const RPC_BOUNDARY_FILES = [
     'packages/web3-types/src/response_decoder.ts',
@@ -68,8 +68,8 @@ const RPC_BOUNDARY_FILES = [
 
 export default tseslint.config(
     // ---------------------------------------------------------------
-    // 1. 전역 무시 대상
-    //    기존 패키지별 .eslintignore를 한곳으로 모은 것이다.
+    // 1. Global ignores
+    //    Consolidated from the per-package .eslintignore files.
     // ---------------------------------------------------------------
     {
         ignores: [
@@ -82,42 +82,42 @@ export default tseslint.config(
             '**/jest.config.js',
             '**/webpack.config.js',
             '**/webpack.analyze.js',
-            // protobuf 생성 코드 — 사람이 고치는 파일이 아니다.
+            // Generated protobuf code - not hand-edited.
             'packages/web3-accounts/src/tx/trx_pb.ts',
-            // 파일 전체가 주석 처리된 죽은 코드다.
-            // license-header 규칙의 autofix가 선행 주석 덩어리를 "잘못된 헤더"로 보고
-            // 통째로 치환해 내용을 지워버리므로 반드시 제외한다.
-            // (이 파일을 살릴지 삭제할지는 별도 판단 필요)
+            // Dead code: the entire file is commented out.
+            // The license-header autofix treats the leading comment run as a
+            // malformed header and replaces it, wiping the contents. Must stay ignored.
+            // (Whether to keep or delete this file is a separate decision.)
             'packages/web3-accounts/src/transfer_test.ts',
-            // 기존 .eslintignore에서 이어온 개별 제외 대상
+            // Individual exclusions carried over from the old .eslintignore files
             'packages/web3-types/src/responses.ts',
             'packages/web3-providers-ws/src/**',
             'packages/web3-providers-ws/test/websocket_provider.test.ts',
             'packages/web3-utils/test/**',
             'packages/web3-validator/test/**',
             'packages/web3/test/**',
-            // 빌드 산출물 이외의 잡다한 스크립트
+            // Miscellaneous scripts outside the build output
             'tools/**',
             'examples/**',
         ],
     },
 
     // ---------------------------------------------------------------
-    // 2. 기본 권장 규칙
+    // 2. Recommended rule sets
     // ---------------------------------------------------------------
     js.configs.recommended,
     ...tseslint.configs.recommended,
 
     // ---------------------------------------------------------------
-    // 3. TypeScript 소스: 타입 인식 린팅 + 저장소 공통 규칙
+    // 3. TypeScript sources: type-aware linting plus repo-wide rules
     // ---------------------------------------------------------------
     {
         files: ['**/*.ts'],
         languageOptions: {
             parserOptions: {
-                // projectService는 각 파일에 맞는 tsconfig를 자동으로 찾는다.
-                // 기존에는 13개 패키지가 각자 .eslintrc.js에 project 경로를 적었는데,
-                // 그 중복이 이 설정 하나로 대체된다.
+                // projectService resolves the right tsconfig per file automatically.
+                // This single setting replaces the per-package `project` paths that
+                // all 13 workspaces used to duplicate in their own .eslintrc.js.
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
@@ -131,8 +131,8 @@ export default tseslint.config(
             '@typescript-eslint/no-explicit-any': 'error',
             'license-header/header': ['error', APACHE_LICENSE_HEADER],
 
-            // 의도적으로 쓰지 않는 식별자는 `_` 접두사로 표시한다.
-            // 주로 시그니처는 유지해야 하지만 본문에서 쓰지 않는 매개변수에 해당한다.
+            // Intentionally unused identifiers are marked with a leading `_`.
+            // Mostly parameters that must stay in the signature but are unused in the body.
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {
@@ -142,11 +142,11 @@ export default tseslint.config(
                 },
             ],
 
-            // 내부 코드는 undefined로 통일한다. 경계 파일은 아래 4번에서 예외 처리한다.
+            // Internal code standardises on `undefined`. Boundary files are excepted in section 4.
             'unicorn/no-null': 'error',
 
-            // 순환 import 차단. 기존 설정은 resolver만 있고 플러그인이 빠져 있어
-            // 규칙이 로드되지 않았다.
+            // Block circular imports. The previous config declared the resolver but
+            // never registered the plugin, so this rule was never loaded.
             'import-x/no-cycle': 'error',
         },
         settings: {
@@ -157,7 +157,7 @@ export default tseslint.config(
     },
 
     // ---------------------------------------------------------------
-    // 4. RPC 경계 파일: null 허용
+    // 4. RPC boundary files: `null` allowed
     // ---------------------------------------------------------------
     {
         files: RPC_BOUNDARY_FILES,
@@ -167,7 +167,7 @@ export default tseslint.config(
     },
 
     // ---------------------------------------------------------------
-    // 5. 테스트 코드: 제품 코드보다 완화
+    // 5. Test code: looser than production code
     // ---------------------------------------------------------------
     {
         files: ['**/test/**/*.ts', '**/test/**/*.js'],
@@ -188,8 +188,8 @@ export default tseslint.config(
             '@typescript-eslint/no-explicit-any': 'off',
             'license-header/header': 'off',
             'unicorn/no-null': 'off',
-            // 타입 수준 테스트는 값을 선언해두고 `typeof`로만 참조하는 패턴을 쓴다.
-            // 이때 값 자체는 런타임에서 쓰이지 않는 것이 정상이다.
+            // Type-level tests declare a value and reference it only via `typeof`,
+            // so the value being unused at runtime is expected.
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {
@@ -203,7 +203,7 @@ export default tseslint.config(
     },
 
     // ---------------------------------------------------------------
-    // 6. 설정·스크립트용 JavaScript: 타입 인식 린팅 대상이 아니다.
+    // 6. Config and script JavaScript: not subject to type-aware linting.
     // ---------------------------------------------------------------
     {
         files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
@@ -225,8 +225,8 @@ export default tseslint.config(
     },
 
     // ---------------------------------------------------------------
-    // 7. Prettier 연동은 반드시 마지막.
-    //    포맷과 충돌하는 규칙을 끄고, 포맷 위반을 lint 에러로 보고한다.
+    // 7. Prettier integration must come last: it disables rules that conflict
+    //    with formatting and reports formatting violations as lint errors.
     // ---------------------------------------------------------------
     prettierRecommended,
 );

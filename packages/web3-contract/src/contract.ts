@@ -447,8 +447,8 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
         //     checkRevertBeforeSending: false,
         // });
 
-        // TODO: PromiEvent 타입에 error 이벤트 시그니처가 없어 우회한다.
-        // @ts-expect-error PromiEvent 이벤트 타입 정의 보강 후 제거할 것
+        // TODO: PromiEvent has no signature for the `error` event.
+        // @ts-expect-error remove once the PromiEvent event types are filled in
         void transactionToSend.on('error', (error: unknown) => {
             if (error instanceof ContractExecutionError) {
                 // this will parse the error data by trying to decode the ABI error inputs according to EIP-838
@@ -545,7 +545,7 @@ export class Contract<Abi extends ContractAbi> extends Web3Context<BeatozExecuti
 
     public deploy(
         bytecode: string,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 컨트랙트 인자는 ABI에서 타입을 추론해야 한다. typed API 작업에서 해소할 것.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- contract arguments need ABI-derived inference; to be resolved by the typed API work.
         args: any[],
         rWeb3Account: Web3Account,
         chainId: string,

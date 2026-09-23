@@ -22,8 +22,8 @@ const packages = readdirSync(basePath).filter(name =>
 	lstatSync(path.join(basePath, name)).isDirectory(),
 );
 module.exports = {
-	// TypeScript 문법 제거는 Babel이 담당한다. 타입 검사는 `yarn build`의 tsc가 맡는다.
-	// 패키지별 test/config/jest.config.js와 같은 변환기를 사용한다.
+	// Babel strips TypeScript syntax; type checking is handled by tsc via `yarn build`.
+	// Uses the same transformer as the per-package test/config/jest.config.js files.
 	transform: {
 		'^.+\\.(ts|tsx)$': '<rootDir>/scripts/jest/babel-transformer.js',
 	},

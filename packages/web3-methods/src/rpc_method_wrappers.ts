@@ -33,7 +33,7 @@ export async function sendDeploy(
     web3Context: Web3Context<BeatozExecutionAPI>,
     abi: AbiFunctionFragment,
     bytecode: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 컨트랙트 인자는 ABI에서 타입을 추론해야 한다. typed API 작업에서 해소할 것.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- contract arguments need ABI-derived inference; to be resolved by the typed API work.
     args: any[],
     rWeb3Account: Web3Account,
     chainId: string,

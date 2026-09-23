@@ -79,7 +79,7 @@ export class LogsSubscription extends Web3Subscription<
             returnFormat?: DataFormat;
         },
     ) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 상위 Web3Subscription의 options 제네릭이 좁아 우회한다. 구독 타입 정리 작업에서 해소할 것.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the base Web3Subscription options generic is narrower than what this subclass passes; to be resolved by the subscription typing work.
         super(args, options as any);
 
         this.address = args.address;

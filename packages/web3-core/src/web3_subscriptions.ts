@@ -164,7 +164,7 @@ export type Web3SubscriptionConstructor<
               | { requestManager: Web3RequestManager<API>; returnFormat?: DataFormat },
       ) => SubscriptionType)
     | (new (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스마다 생성자 인자 형태가 달라 공통 시그니처로 묶을 수 없다. 구독 타입 정리 작업에서 해소할 것.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- constructor argument shapes differ per subscription class and cannot share one signature; to be resolved by the subscription typing work.
           args: any,
           options: {
               subscriptionManager: Web3SubscriptionManager<API>;
@@ -172,7 +172,7 @@ export type Web3SubscriptionConstructor<
           },
       ) => SubscriptionType)
     | (new (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- 구독 클래스마다 생성자 인자 형태가 달라 공통 시그니처로 묶을 수 없다. 구독 타입 정리 작업에서 해소할 것.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- constructor argument shapes differ per subscription class and cannot share one signature; to be resolved by the subscription typing work.
           args: any,
           options: { requestManager: Web3RequestManager<API>; returnFormat?: DataFormat },
       ) => SubscriptionType);
