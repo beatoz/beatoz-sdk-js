@@ -16,8 +16,7 @@
 import { Contract as _Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
 import deployedContract from '../fixtures/deployed.contract.json';
-import Providers from '../../../../.providers.json';
-const { TESTNET0: netInfo } = Providers;
+import { netInfo } from './e2e_utils';
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';

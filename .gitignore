@@ -27,3 +27,6 @@ package-lock.json
 # Internal SDK v2 worklog. Kept outside this repository so it never reaches
 # main/develop; see ~/Desktop/docs/sdk/sdk-v2-worklog.
 documents/sdk-v2/
+
+# Local environment overrides for integration tests
+.env

@@ -14,8 +14,7 @@
     limitations under the License.
 */
 import rep1155Json from '../fixtures/REP1155.json';
-import Providers from '../../../../.providers.json';
-const { LOCALNET0: netInfo } = Providers;
+import { netInfo } from './e2e_utils';
 import { BytesUint8Array } from '@beatoz/web3-types';
 import { Web3 } from '@beatoz/web3';
 import { Web3Account } from '@beatoz/web3-accounts';

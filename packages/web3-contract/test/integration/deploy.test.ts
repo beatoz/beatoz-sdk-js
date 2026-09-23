@@ -15,8 +15,7 @@
 */
 
 import tokenJson from '../fixtures/erc20-contract.json';
-import Providers from '../../../../.providers.json';
-const { DEVNET0: netInfo } = Providers;
+import { netInfo } from './e2e_utils';
 import { Web3Account } from '@beatoz/web3-accounts';
 import { Web3 } from '@beatoz/web3';
 import fs from 'fs';

@@ -14,12 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import {
-    getDevWsServer,
-    getTestAccountPrivateKey,
-    getTestProposalAccountPrivateKey,
-    getTestWsServer,
-} from '../e2e_utils';
+import { getTestAccountPrivateKey, getTestWsServer } from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { AccountResponse, BroadcastTxSyncResponse } from '@beatoz/web3-types';
 

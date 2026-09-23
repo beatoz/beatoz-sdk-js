@@ -16,8 +16,7 @@
 import erc20Json from '../fixtures/erc20-abi.json';
 import _rep20Json from '../fixtures/REP20.json';
 import deployedContract from '../fixtures/deployed.contract.json';
-import Providers from '../../../../.providers.json';
-const { TESTNET0: netInfo } = Providers;
+import { netInfo } from './e2e_utils';
 import { VmCallResponse } from '@beatoz/web3-types';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';

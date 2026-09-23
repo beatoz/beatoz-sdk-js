@@ -13,52 +13,103 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import secrets from '../../../../.secrets.json';
 
-export const getDevChainId = (): string => {
-    return secrets.DEVNET.CHAIN_ID;
+/**
+ * Network configuration for integration tests.
+ *
+ * These tests need a reachable node and funded accounts. This file makes no
+ * assumption about where either comes from: everything is read from the
+ * environment. See .env.example at the repository root.
+ *
+ * Values that cannot have a safe default are required rather than guessed.
+ * A missing one fails with the name of the variable, instead of surfacing
+ * later as a signature or balance error that says nothing about the cause.
+ *
+ * Nothing is read at import time. An earlier version did
+ * `import secrets from '../../../../.secrets.json'` at the top level, so a
+ * gitignored file that does not exist after a clone took down every test file
+ * that imported it - including tests that never contacted a node.
+ */
+
+const env = (key: string, fallback: string): string => process.env[key] ?? fallback;
+
+/** Reads a variable that has no safe default. */
+const requireEnv = (key: string): string => {
+    const value = process.env[key];
+    if (value === undefined || value === '') {
+        throw new Error(
+            `${key} is not set. Integration tests need a node and funded accounts; ` +
+                `see .env.example at the repository root.`,
+        );
+    }
+    return value;
 };
 
-export const getDevServer = (): string => {
-    return secrets.DEVNET.HTTP;
+export const getTestServer = (): string => env('BEATOZ_RPC_URL', 'http://localhost:26657');
+
+export const getTestWsServer = (): string => env('BEATOZ_WS_URL', 'ws://localhost:26657/websocket');
+
+/**
+ * The chain id that goes into the signing preimage.
+ *
+ * It must match what the node reports as `node_info.network`. If it does not,
+ * the node recomputes the preimage with its own value, gets a different hash,
+ * and rejects the transaction as `invalid signature` - which reads as a broken
+ * signer rather than a configuration mismatch.
+ */
+export const getTestChainId = (): string => requireEnv('BEATOZ_CHAIN_ID');
+
+export const getTestAccountAddress = (): string => requireEnv('BEATOZ_TEST_ADDRESS');
+
+export const getTestAccountPrivateKey = (): string => requireEnv('BEATOZ_TEST_PRIVATE_KEY');
+
+/** A second funded account, for tests that need two distinct signers. */
+export const getTestProposalAccountPrivateKey = (): string =>
+    requireEnv('BEATOZ_TEST_PROPOSAL_PRIVATE_KEY');
+
+export const getTestAccounts = (): ReadonlyArray<{ address: string; privateKey: string }> => [
+    { address: getTestAccountAddress(), privateKey: getTestAccountPrivateKey() },
+    {
+        address: requireEnv('BEATOZ_TEST_PROPOSAL_ADDRESS'),
+        privateKey: getTestProposalAccountPrivateKey(),
+    },
+];
+
+/**
+ * Whether a node is reachable. Suites call this and skip instead of failing,
+ * so running without a node reports skips rather than a wall of connection
+ * errors.
+ */
+export const isNodeReachable = async (): Promise<boolean> => {
+    try {
+        const response = await fetch(`${getTestServer()}/status`, {
+            signal: AbortSignal.timeout(3000),
+        });
+        return response.ok;
+    } catch {
+        return false;
+    }
 };
 
-export const getDevWsServer = (): string => {
-    return secrets.DEVNET.WS;
-};
-
-export const getDevAccountAddress = (): string => {
-    return secrets.DEVNET.ACCOUNT.address;
-};
-
-export const getDevAccountPrivateKey = (): string => {
-    return secrets.DEVNET.ACCOUNT.privateKey;
-};
-
-export const getDevProposalAccountPrivateKey = (): string => {
-    return secrets.DEVNET.PROPOSAL_ACCOUNT.privateKey;
-};
-
-export const getTestChainId = (): string => {
-    return secrets.TESTNET.CHAIN_ID;
-};
-
-export const getTestServer = (): string => {
-    return secrets.TESTNET.HTTP;
-};
-
-export const getTestWsServer = (): string => {
-    return secrets.TESTNET.WS;
-};
-
-export const getTestAccountAddress = (): string => {
-    return secrets.TESTNET.ACCOUNT.address;
-};
-
-export const getTestAccountPrivateKey = (): string => {
-    return secrets.TESTNET.ACCOUNT.privateKey;
-};
-
-export const getTestProposalAccountPrivateKey = (): string => {
-    return secrets.TESTNET.PROPOSAL_ACCOUNT.privateKey;
+/**
+ * Compatibility shape for tests that previously destructured a network out of
+ * `.providers.json`, e.g. `const { TESTNET0: netInfo } = Providers`.
+ *
+ * Keeps the original field names so those tests only change their import.
+ * The members are getters so each read goes through the environment; a plain
+ * object would freeze the values at import time.
+ */
+export const netInfo = {
+    get CHAINID(): string {
+        return getTestChainId();
+    },
+    get HTTP(): string {
+        return getTestServer();
+    },
+    get WS(): string {
+        return getTestWsServer();
+    },
+    get ACCTS(): ReadonlyArray<{ ADDR: string; KEY: string }> {
+        return getTestAccounts().map((a) => ({ ADDR: a.address, KEY: a.privateKey }));
+    },
 };
