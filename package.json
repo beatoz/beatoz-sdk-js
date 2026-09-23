@@ -44,6 +44,7 @@
     "format": "lerna run format --stream --parallel && prettier --write ./scripts/**/*.ts",
     "test": "lerna run test --stream --parallel",
     "test:silent": "lerna run test:silent --stream --parallel",
+    "test:integration": "lerna run test:integration --stream",
     "dev:example": "ts-node -P tsconfig.base.json --require tsconfig-paths/register examples/explorer/scanner.js"
   },
   "devDependencies": {

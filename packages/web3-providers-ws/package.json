@@ -32,7 +32,8 @@
         "lint:fix": "eslint . --fix",
         "format": "prettier --write '**/*'",
         "test": "jest --config=./test/unit/jest.config.js",
-        "test:silent": "jest --silent --config=./test/unit/jest.config.js"
+        "test:silent": "jest --silent --config=./test/unit/jest.config.js",
+        "test:integration": "jest --config=./test/integration/jest.config.js"
     },
     "devDependencies": {
         "@types/jest": "^28.1.6",
