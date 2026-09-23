@@ -95,7 +95,6 @@ export default tseslint.config(
             'packages/web3-providers-ws/test/websocket_provider.test.ts',
             'packages/web3-utils/test/**',
             'packages/web3-validator/test/**',
-            'packages/web3/test/**',
             // Miscellaneous scripts outside the build output
             'tools/**',
             'examples/**',

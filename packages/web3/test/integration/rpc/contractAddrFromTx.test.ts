@@ -14,9 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestAccountPrivateKey, getTestWsServer } from '../e2e_utils';
-import tokenJson from '../../fixtures/erc20-contract.json';
-import { Contract } from '@beatoz/web3-contract';
+import { getTestWsServer } from '../e2e_utils';
 
 describe('contractAddrFromTx check ', () => {
     let web3: Web3;

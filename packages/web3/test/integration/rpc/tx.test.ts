@@ -16,7 +16,6 @@
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
 import { TxResponse } from '@beatoz/web3-types';
-import { BytesUint8Array } from '@beatoz/web3-types';
 
 describe('txSearch check ', () => {
     let testWebsocketWeb3Instance: Web3;

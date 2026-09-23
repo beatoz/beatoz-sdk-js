@@ -25,7 +25,7 @@ describe('health check ', () => {
 
     it('should call web3 with testServerWeb3Instance.getHealth method success return', async () => {
         const healthResponse = await testServerWeb3Instance.beatoz.health();
-        // eslint-disable-next-line unicorn/no-null
+
         expect(healthResponse).toEqual(null);
     });
 });
