@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getSampleHeight } from '../chain_fixtures';
 import { CommitResponse } from '@beatoz/web3-types';
 
 describe('commit check ', () => {
@@ -25,8 +26,9 @@ describe('commit check ', () => {
     });
 
     it('should call web3 with testWebsocketWeb3Instance.commit method success return', async () => {
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
         const testCommitResponse: CommitResponse =
-            await testWebsocketWeb3Instance.beatoz.commit(10000);
-        expect(testCommitResponse.signed_header.header.height).toEqual(10000);
+            await testWebsocketWeb3Instance.beatoz.commit(height);
+        expect(testCommitResponse.signed_header.header.height).toEqual(height);
     });
 });

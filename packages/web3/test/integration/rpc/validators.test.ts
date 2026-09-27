@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getSampleHeight } from '../chain_fixtures';
 import { ValidatorsResponse } from '@beatoz/web3-types';
 
 describe('validators check ', () => {
@@ -25,9 +26,10 @@ describe('validators check ', () => {
     });
 
     it('should call web3 with testWebsocketWeb3Instance.validators method success return', async () => {
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
         const testValidatorsResponse: ValidatorsResponse =
-            await testWebsocketWeb3Instance.beatoz.validators(10000);
-        expect(testValidatorsResponse.block_height).toEqual(10000);
+            await testWebsocketWeb3Instance.beatoz.validators(height);
+        expect(testValidatorsResponse.block_height).toEqual(height);
         expect(testValidatorsResponse.total).toBeDefined();
         expect(testValidatorsResponse.count).toBeDefined();
         expect(testValidatorsResponse.validators).toBeDefined();

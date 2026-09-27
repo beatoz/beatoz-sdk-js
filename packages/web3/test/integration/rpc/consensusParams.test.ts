@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getSampleHeight } from '../chain_fixtures';
 import { ConsensusParamsResponse } from '@beatoz/web3-types';
 
 describe('consensusParams check ', () => {
@@ -31,10 +32,11 @@ describe('consensusParams check ', () => {
         expect(testConsensusParamsResponse.consensus_params).toBeDefined();
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.consensusParams(10000) method success return', async () => {
+    it('should call web3 with testWebsocketWeb3Instance.consensusParams(height) method success return', async () => {
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
         const testConsensusParamsResponse2: ConsensusParamsResponse =
-            await testWebsocketWeb3Instance.beatoz.consensusParams(10000);
-        expect(testConsensusParamsResponse2.block_height).toBeDefined();
+            await testWebsocketWeb3Instance.beatoz.consensusParams(height);
+        expect(testConsensusParamsResponse2.block_height).toEqual(height);
         expect(testConsensusParamsResponse2.consensus_params).toBeDefined();
     });
 });

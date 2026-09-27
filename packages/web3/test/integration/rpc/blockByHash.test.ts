@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getBlockHashAt, getSampleHeight } from '../chain_fixtures';
 import { BlockResponse } from '@beatoz/web3-types';
 
 describe('blockByHash check ', () => {
@@ -24,10 +25,14 @@ describe('blockByHash check ', () => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.blockByHash(faa65d261087ff3cf3cbb530dad7d7cb8c2a60bad968bc0c6d4e6b8632efbc3e) method success return', async () => {
-        const testBlockResponse: BlockResponse = await testWebsocketWeb3Instance.beatoz.blockByHash(
-            'faa65d261087ff3cf3cbb530dad7d7cb8c2a60bad968bc0c6d4e6b8632efbc3e',
-        );
-        expect(testBlockResponse.block.header.height == 82367).toBe(true);
+    it('should call web3 with testWebsocketWeb3Instance.blockByHash(hash) method success return', async () => {
+        // Look the hash up by height first, so the lookup is checked against a
+        // block we already know the height of.
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
+        const hash = await getBlockHashAt(testWebsocketWeb3Instance, height);
+
+        const testBlockResponse: BlockResponse =
+            await testWebsocketWeb3Instance.beatoz.blockByHash(hash);
+        expect(testBlockResponse.block.header.height).toEqual(height);
     });
 });

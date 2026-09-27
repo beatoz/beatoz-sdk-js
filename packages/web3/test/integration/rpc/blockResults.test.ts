@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getSampleHeight } from '../chain_fixtures';
 import { BlockResultsResponse } from '@beatoz/web3-types';
 
 describe('blockResults check ', () => {
@@ -24,10 +25,11 @@ describe('blockResults check ', () => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.blockResults(10000) method success return', async () => {
+    it('should call web3 with testWebsocketWeb3Instance.blockResults(height) method success return', async () => {
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
         const testBlockResultsResponse: BlockResultsResponse =
-            await testWebsocketWeb3Instance.beatoz.blockResults(10000);
-        expect(testBlockResultsResponse.height).toBeDefined();
+            await testWebsocketWeb3Instance.beatoz.blockResults(height);
+        expect(testBlockResultsResponse.height).toEqual(height);
         expect(testBlockResultsResponse.txs_results).toBeDefined();
     });
 });

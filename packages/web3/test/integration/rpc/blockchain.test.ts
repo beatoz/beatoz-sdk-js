@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getLatestHeight } from '../chain_fixtures';
 import { BlockchainResponse } from '@beatoz/web3-types';
 
 describe('blockchain check ', () => {
@@ -30,9 +31,11 @@ describe('blockchain check ', () => {
         expect(testWebsocketBlockchainResponse.last_height > 0).toBe(true);
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.blockchain(10000, 10001) method success return', async () => {
+    it('should call web3 with testWebsocketWeb3Instance.blockchain(min, max) method success return', async () => {
+        const latest = await getLatestHeight(testWebsocketWeb3Instance);
+        const min = Math.max(1, latest - 1);
         const testWebsocketBlockchainResponse: BlockchainResponse =
-            await testWebsocketWeb3Instance.beatoz.blockchain(10000, 10001);
+            await testWebsocketWeb3Instance.beatoz.blockchain(min, latest);
         expect(testWebsocketBlockchainResponse.last_height > 0).toBe(true);
     });
 });

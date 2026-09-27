@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { getSampleHeight } from '../chain_fixtures';
 import { BlockResponse } from '@beatoz/web3-types';
 
 describe('blockchain check ', () => {
@@ -31,11 +32,12 @@ describe('blockchain check ', () => {
         expect(testBlockResponse.block.header.height > 0).toBe(true);
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.block(10000) method success return', async () => {
-        const test100BlockResponse: BlockResponse =
-            await testWebsocketWeb3Instance.beatoz.block(10000);
-        expect(test100BlockResponse.block_id.hash).toBeDefined();
-        expect(test100BlockResponse.block_id.parts.total > 0).toBe(true);
-        expect(test100BlockResponse.block.header.height == 10000).toBe(true);
+    it('should call web3 with testWebsocketWeb3Instance.block(height) method success return', async () => {
+        const height = await getSampleHeight(testWebsocketWeb3Instance);
+        const sampleBlockResponse: BlockResponse =
+            await testWebsocketWeb3Instance.beatoz.block(height);
+        expect(sampleBlockResponse.block_id.hash).toBeDefined();
+        expect(sampleBlockResponse.block_id.parts.total > 0).toBe(true);
+        expect(sampleBlockResponse.block.header.height).toEqual(height);
     });
 });
