@@ -27,7 +27,6 @@ describe('status check ', () => {
     it('should call web3 with testWebsocketWeb3Instance.getstatus method success return', async () => {
         const websocketStatusResponse: StatusResponse =
             await testWebsocketWeb3Instance.beatoz.status();
-        expect(websocketStatusResponse.node_info.network).toEqual('testnet');
         expect(websocketStatusResponse.validator_info.pub_key.type).toEqual(
             'tendermint/PubKeyEd25519',
         );

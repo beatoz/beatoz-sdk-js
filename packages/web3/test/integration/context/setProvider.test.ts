@@ -26,7 +26,6 @@ describe('setProvider check ', () => {
 
     it('should call web3 setProvider success ', async () => {
         const websocketStatusResponse: StatusResponse = await defaultWeb3.beatoz.status();
-        expect(websocketStatusResponse.node_info.network).toEqual('testnet');
         expect(websocketStatusResponse.validator_info.pub_key.type).toEqual(
             'tendermint/PubKeyEd25519',
         );

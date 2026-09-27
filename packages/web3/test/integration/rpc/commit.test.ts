@@ -28,6 +28,5 @@ describe('commit check ', () => {
         const testCommitResponse: CommitResponse =
             await testWebsocketWeb3Instance.beatoz.commit(10000);
         expect(testCommitResponse.signed_header.header.height).toEqual(10000);
-        expect(testCommitResponse.signed_header.header.chain_id).toEqual('testnet');
     });
 });

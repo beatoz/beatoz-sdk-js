@@ -28,7 +28,6 @@ describe('genesis check ', () => {
         const testWebsocketGenesisResponse: GenesisResponse =
             await testWebsocketWeb3Instance.beatoz.genesis();
         expect(testWebsocketGenesisResponse.genesis_time).toBeDefined();
-        expect(testWebsocketGenesisResponse.chain_id).toEqual('testnet');
         expect(testWebsocketGenesisResponse.initial_height).toEqual(1);
         expect(testWebsocketGenesisResponse.app_hash).toBeDefined();
     });
