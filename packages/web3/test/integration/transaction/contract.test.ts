@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
+import { getTestChainId, getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
 import { privateKeyToAccount, Web3Account } from '@beatoz/web3-accounts';
 import tokenJson from '../../fixtures/erc20-contract.json';
 
@@ -30,7 +30,7 @@ describe('contract test', () => {
         const _nonce = (await web3.beatoz.getAccount(account.address)).value.nonce;
         const contract = new web3.beatoz.Contract(tokenJson.abi);
         const result = await contract
-            .deploy(tokenJson.bytecode, ['TEST', 'TST'], account, 'testnet0', 10000000)
+            .deploy(tokenJson.bytecode, ['TEST', 'TST'], account, getTestChainId(), 10000000)
             .send();
         console.log(result);
     });

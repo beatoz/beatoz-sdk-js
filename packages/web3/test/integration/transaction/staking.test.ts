@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
+import { getTestChainId, getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 
 describe('staking test', () => {
@@ -35,7 +35,7 @@ describe('staking test', () => {
             gas: 1000000,
             gasPrice: '250000000000',
         });
-        TrxProtoBuilder.signTrxProto(tx, account, 'testnet0');
+        TrxProtoBuilder.signTrxProto(tx, account, getTestChainId());
         const result = await web3.beatoz.broadcastTxCommit(tx);
         console.log(result);
     });

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestAccountPrivateKey, getTestWsServer } from '../e2e_utils';
+import { getTestAccountPrivateKey, getTestChainId, getTestWsServer } from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { AccountResponse, BroadcastTxCommitResponse } from '@beatoz/web3-types';
 
@@ -41,7 +41,7 @@ describe('broadcastTxCommit check ', () => {
             gas: 4000,
             gasPrice: '250000000000',
         });
-        const { rawTransaction } = web3Account.signTransaction(tx, 'testnet');
+        const { rawTransaction } = web3Account.signTransaction(tx, getTestChainId());
         const broadcastTxCommitResponse: BroadcastTxCommitResponse =
             await testWebsocketWeb3Instance.beatoz.broadcastRawTxCommit(rawTransaction);
         expect(broadcastTxCommitResponse.height).toBeDefined();
