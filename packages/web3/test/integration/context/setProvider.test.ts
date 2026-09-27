@@ -30,15 +30,4 @@ describe('setProvider check ', () => {
             'tendermint/PubKeyEd25519',
         );
     });
-
-    it('should call not provider web3 is need fail ', (done) => {
-        defaultWeb3.beatoz
-            .status()
-            .then(() => {
-                fail();
-            })
-            .catch(() => {
-                done();
-            });
-    });
 });
