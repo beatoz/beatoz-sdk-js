@@ -145,3 +145,26 @@ Only the current major gets fixes.
 The previous major stays on npm and keeps working: published versions are not
 removed, and a caret range does not cross a major, so existing installs are
 untouched. We do not backport to it, and we do not promise to.
+
+## Reviewing this policy
+
+Treating a type change as breaking is strict, and the cost lands on us: every
+input we narrow is a major. Libraries that exempt types from semver do so to
+avoid exactly that.
+
+Two things make the strict rule right here, and neither is settled by shipping
+2.0. Our own packages depend on each other through caret ranges, so a type
+change released as a patch reaches this repository before it reaches anyone
+else. And asking consumers to pin an exact version, which is what the lenient
+policy requires of them, is not something this SDK is in a position to ask.
+
+Revisit when one of these holds, not on a date:
+
+- Majors have become frequent enough that the number stops carrying a warning.
+  Four majors in a year means the rule does not match how the code actually
+  changes.
+- The download figures settle somewhere that changes the calculation. At the
+  time of writing the packages see about fifty installs a week, most of it
+  automation, which makes a looser policy cheap to try.
+- Internal dependencies stop using caret ranges. That removes the first
+  constraint, and the lenient policy becomes available in a way it is not now.
