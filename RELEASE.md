@@ -127,11 +127,16 @@ Breaking entries start with `**BREAKING:**` and say what the consumer has to do.
    override it where this document disagrees. It cannot see whether a type
    widened or narrowed.
 4. Publish to the `next` dist-tag. `latest` keeps pointing at the previous
-   release.
+   release. A plain `npm publish` moves `latest` itself, so the tag is not
+   optional either.
 5. Install from `next` in the projects inside this organization and check them.
 6. Move `latest` with `npm dist-tag add`.
 
-Step 5 is not optional for a major release.
+Step 5 is not optional for a major release. Moving `latest` is the point that
+cannot be undone: reverting the tag does not reach anyone who installed while it
+was moved, and their lockfile now pins the release. A major is a breaking change
+by definition, so what step 5 checks is not whether it breaks anything but
+whether it breaks only what was intended.
 
 ## Support
 
