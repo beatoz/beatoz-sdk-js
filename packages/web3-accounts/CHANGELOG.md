@@ -19,3 +19,5 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 - `privateKeyToAccount`, `privateKeyToPrvKey` and `sign` accept a `Uint8Array`
   private key. They previously declared `HexString | ArrayBufferLike`, which
   excluded the most common way to hold key bytes.
+- Declares `typescript: ">=5.4"` as an optional peer dependency. No
+  supported compiler range was declared before.

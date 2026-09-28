@@ -47,5 +47,13 @@
         "@beatoz/web3-utils": "^1.6.5",
         "@ethersproject/abi": "^5.7.0",
         "@ethersproject/bignumber": "^5.7.0"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

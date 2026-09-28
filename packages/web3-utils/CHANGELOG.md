@@ -18,3 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 - `formatter` no longer relies on an implicit `this` binding inside an
   `Array.prototype.find` callback.
+
+### Added
+
+- Declares `typescript: ">=5.4"` as an optional peer dependency. No supported
+  compiler range was declared before.

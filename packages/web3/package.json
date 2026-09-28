@@ -52,5 +52,13 @@
         "@beatoz/web3-methods": "^1.6.5",
         "@beatoz/web3-providers-http": "^1.6.5",
         "@beatoz/web3-validator": "^1.6.5"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

@@ -47,5 +47,13 @@
         "@beatoz/web3-types": "^1.6.5",
         "@beatoz/web3-utils": "^1.6.5",
         "@beatoz/web3-validator": "^1.6.5"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

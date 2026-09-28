@@ -48,5 +48,13 @@
         "@beatoz/web3-utils": "^1.6.5",
         "@beatoz/web3-validator": "^1.6.5",
         "xstream": "^11.14.0"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

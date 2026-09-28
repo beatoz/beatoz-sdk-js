@@ -27,6 +27,10 @@ entries below name the packages they apply to.
 
 ### Added
 
+- Every package now declares `typescript: ">=5.4"` as an optional peer
+  dependency. Nothing declared a supported compiler range before. It is
+  optional so a JavaScript consumer is not asked to install TypeScript.
+
 - `@beatoz/web3-accounts`: `privateKeyToAccount`, `privateKeyToPrvKey` and
   `sign` accept a `Uint8Array` private key. They previously declared
   `HexString | ArrayBufferLike`, which excluded the most common way to hold key

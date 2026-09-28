@@ -57,6 +57,23 @@ Two cases are easy to misread:
 | Bump a dependency major, where its types appear in our public API | **major** |
 | Bump a dependency within its own major | patch |
 
+The supported ranges are declared in every package:
+
+```json
+"engines": { "node": ">=22.0.0" },
+"peerDependencies": { "typescript": ">=5.4" },
+"peerDependenciesMeta": { "typescript": { "optional": true } }
+```
+
+TypeScript is an optional peer so that a JavaScript consumer is not asked to
+install it. The floor is what we support, not what the declarations happen to
+parse under: the emitted `.d.ts` currently loads under TypeScript 4.7, and that
+is an accident of the syntax we have used so far, not a promise.
+
+Nothing checks the floor yet. Until something does, a change that needs a newer
+compiler will pass review and reach a consumer before anyone notices, so treat
+the number as a claim we have not yet made good on.
+
 ## Removing
 
 Removals go in a major release. We do not add compatibility layers or fallbacks

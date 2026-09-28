@@ -43,5 +43,13 @@
     },
     "dependencies": {
         "@beatoz/web3-types": "^1.6.5"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

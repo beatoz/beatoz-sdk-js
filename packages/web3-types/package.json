@@ -44,5 +44,13 @@
         "crypto-js": "^4.1.1",
         "long": "5.2.3",
         "readonly-date": "^1.0.0"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }

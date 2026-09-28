@@ -13,3 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 - **BREAKING:** The minimum supported Node.js version is now 22. It was 16.19,
   which had not been accurate for some time: several dependencies already
   required Node 18 or later.
+
+### Added
+
+- Declares `typescript: ">=5.4"` as an optional peer dependency. No supported
+  compiler range was declared before.

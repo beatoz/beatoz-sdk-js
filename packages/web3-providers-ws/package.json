@@ -50,5 +50,13 @@
         "isomorphic-ws": "^4.0.1",
         "ws": "^7",
         "xstream": "^11.14.0"
+    },
+    "peerDependencies": {
+        "typescript": ">=5.4"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     }
 }
