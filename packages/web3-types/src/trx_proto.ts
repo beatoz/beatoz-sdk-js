@@ -28,4 +28,8 @@ export interface TrxProto {
     type: number;
     Payload: Uint8Array;
     sig: Uint8Array;
+    /** Account paying the fee on behalf of `from`. Empty when unused. */
+    payer: Uint8Array;
+    /** Signature of `payer` over the same preimage. Empty when unused. */
+    payerSig: Uint8Array;
 }

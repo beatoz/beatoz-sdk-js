@@ -154,6 +154,11 @@ function buildTransferTrxProto(transaction: Transaction<object>): TrxProto {
         type: 1, // transfer type
         Payload: new Uint8Array(),
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -176,6 +181,11 @@ function buildDelegateTrxProto(transaction: Transaction<object>): TrxProto {
         type: 2, // staking type
         Payload: new Uint8Array(),
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -209,6 +219,11 @@ function buildUnDelegateTrxProto(
         type: 3, // unstaking type
         Payload: payloadBytes,
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -241,6 +256,11 @@ function buildProposalTrx(transaction: Transaction<TrxPayloadProposalProto>): Tr
         type: 4, // proposal type
         Payload: payloadBytes,
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -269,6 +289,11 @@ function buildVotingTrx(transaction: Transaction<TrxPayloadVotingProto>): TrxPro
         type: 5, // voting type
         Payload: payloadBytes,
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -299,6 +324,11 @@ function buildContractTrxProto(transaction: Transaction<TrxPayloadCreateContract
         type: 6, // contract type
         Payload: payloadBytes,
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
@@ -327,6 +357,11 @@ function buildSetDocTrx(transaction: Transaction<object>): TrxProto {
         type: 7, // voting type
         Payload: payloadBytes,
         sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
     };
 }
 
