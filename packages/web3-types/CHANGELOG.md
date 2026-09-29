@@ -18,3 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 - Declares `typescript: ">=5.4"` as an optional peer dependency. No supported
   compiler range was declared before.
+
+### Changed
+
+- **BREAKING:** `TrxProto` gains `payer` and `payerSig`, the fee delegation
+  fields the chain added in June 2025. Code that builds a `TrxProto` literal
+  must set them; empty `Uint8Array`s mean "sender pays" and are omitted from
+  the wire, so encoded bytes are unchanged.

@@ -20,6 +20,16 @@ entries below name the packages they apply to.
   dependencies already required Node 18 or later, so installs on Node 16 were
   already failing in ways the declared range did not explain.
 
+- **BREAKING:** `@beatoz/web3-types`: `TrxProto` gains `payer` and `payerSig`,
+  the fee delegation fields the chain added in June 2025. Code that builds a
+  `TrxProto` literal must set them; empty values mean "sender pays" and are
+  omitted from the wire, so encoded bytes are unchanged.
+
+- `@beatoz/web3-accounts`: `src/tx/trx_pb.proto` is now a verbatim copy of the
+  chain's `protos/trx.proto`. The copy here had been edited after generation -
+  proposal field numbers renumbered, fee delegation fields missing - while the
+  generated code carried the chain's numbers.
+
 - **BREAKING:** Package versions are no longer released in lockstep. Each
   package now carries its own version. Under the previous scheme every package
   was republished whenever any package changed, so a version number did not
@@ -37,6 +47,10 @@ entries below name the packages they apply to.
   bytes.
 
 ### Fixed
+
+- `@beatoz/web3-accounts`: the ESM build could not be imported. The generated
+  protobuf code imported `protobufjs/minimal` without an extension, which
+  `require()` resolves and ESM does not.
 
 - `@beatoz/web3-utils`: `formatter` no longer relies on an implicit `this`
   binding inside an `Array.prototype.find` callback.
