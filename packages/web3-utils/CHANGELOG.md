@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- **BREAKING:** The CommonJS build is gone. `lib/commonjs` is no longer built
+  or published, and the package ships ESM only.
+
+  Node 22.12 and later can `require()` an ES module, and the minimum supported
+  Node is now 22.12 for that reason, raised from 22.0. A CommonJS consumer on a
+  supported Node keeps working without source changes:
+
+  ```js
+  require('@beatoz/web3-utils')   // still resolves, via require(esm)
+  ```
+
+  The `exports` map uses a `default` condition rather than `import`, so the
+  `require` condition matches it too. A bundler or a TypeScript setup pinned to
+  an older Node resolution mode may still need updating.
+
+- **BREAKING:** `main` now points at the ESM entry and the `module` field is
+  gone; both described the same build before.
+
 ### Changed
 
 - **BREAKING:** Adds an `exports` map, so only the package root and its

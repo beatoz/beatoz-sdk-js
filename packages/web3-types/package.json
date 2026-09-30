@@ -1,14 +1,12 @@
 {
     "name": "@beatoz/web3-types",
     "version": "1.6.5",
-    "main": "./lib/commonjs/index.js",
-    "module": "./lib/esm/index.js",
+    "main": "./lib/esm/index.js",
     "types": "./lib/types/index.d.ts",
     "exports": {
         ".": {
             "types": "./lib/types/index.d.ts",
-            "import": "./lib/esm/index.js",
-            "require": "./lib/commonjs/index.js"
+            "default": "./lib/esm/index.js"
         },
         "./package.json": "./package.json"
     },
@@ -26,16 +24,15 @@
         "url": "https://github.com/beatoz"
     },
     "engines": {
-        "node": ">=22.0.0",
+        "node": ">=22.12.0",
         "npm": ">=8.19.0"
     },
     "scripts": {
         "clean": "rimraf dist && rimraf lib",
         "prebuild": "yarn clean",
-        "build": "yarn version:output && yarn build:cjs && yarn build:esm && yarn build:types",
+        "build": "yarn version:output && yarn build:esm && yarn build:types",
         "version:output": "[ -z $npm_package_version ] && rm ./src/version.ts || echo \"/* eslint-disable license-header/header */ export const Web3PkgInfo = { version: '$npm_package_version' };\" > ./src/version.ts",
-        "build:cjs": "tsc --build tsconfig.json && echo '{\"type\": \"commonjs\"}' > ./lib/commonjs/package.json",
-        "build:esm": "tsc --build tsconfig.esm.json && echo '{\"type\": \"module\"}' > ./lib/esm/package.json",
+        "build:esm": "tsc --build tsconfig.json && echo '{\"type\": \"module\"}' > ./lib/esm/package.json",
         "build:types": "tsc --build tsconfig.types.json",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",

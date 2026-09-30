@@ -13,12 +13,42 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 Work towards v2. Package versions become independent with this release, so the
 entries below name the packages they apply to.
 
+### Removed
+
+- **BREAKING:** The CommonJS build is gone. `lib/commonjs` is no longer built
+  or published, and every package ships ESM only. This halves what is
+  published: `@beatoz/web3-types` goes from 214 files and 588 kB unpacked to
+  124 files and 347 kB.
+
+  Node 22.12 and later can `require()` an ES module, which is why the minimum
+  supported Node moves from 22.0 to 22.12. A CommonJS consumer on a supported
+  Node keeps working without source changes:
+
+  ```js
+  require('@beatoz/web3')   // still resolves, via require(esm)
+  ```
+
+  The `exports` map uses a `default` condition rather than `import`, so the
+  `require` condition matches it too. Pointing `exports` at `import` alone
+  would reject `require()` outright rather than fall through to it.
+
+  Every comparable SDK still ships both builds - ethers, viem, `@cosmjs/*`,
+  `@solana/web3.js` - because they support Node 18 and 20, where `require(esm)`
+  does not exist. Having already set the floor at Node 22, we do not.
+
+  A bundler or a TypeScript setup pinned to an older Node resolution mode may
+  still need updating.
+
+- **BREAKING:** The `module` field is gone and `main` now points at the ESM
+  entry. Both described the same build.
+
 ### Changed
 
-- **BREAKING:** The minimum supported Node.js version is now 22, across all
+- **BREAKING:** The minimum supported Node.js version is now 22.12, across all
   packages. It was 16.19, which had not been accurate for some time: several
   dependencies already required Node 18 or later, so installs on Node 16 were
-  already failing in ways the declared range did not explain.
+  already failing in ways the declared range did not explain. The 22.12 floor
+  in particular is what makes `require()` of this ESM-only build work.
 
 - **BREAKING:** `@beatoz/web3-types`: `TrxProto` gains `payer` and `payerSig`,
   the fee delegation fields the chain added in June 2025. Code that builds a
