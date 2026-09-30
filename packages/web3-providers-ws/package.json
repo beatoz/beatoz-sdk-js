@@ -3,6 +3,15 @@
     "version": "1.6.5",
     "main": "./lib/commonjs/index.js",
     "module": "./lib/esm/index.js",
+    "types": "./lib/types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./lib/types/index.d.ts",
+            "import": "./lib/esm/index.js",
+            "require": "./lib/commonjs/index.js"
+        },
+        "./package.json": "./package.json"
+    },
     "license": "Apache-2.0",
     "keywords": [
         "beatoz",

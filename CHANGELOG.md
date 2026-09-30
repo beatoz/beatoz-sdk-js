@@ -30,6 +30,19 @@ entries below name the packages they apply to.
   proposal field numbers renumbered, fee delegation fields missing - while the
   generated code carried the chain's numbers.
 
+- **BREAKING:** Every package now has an `exports` map, so only the package
+  root and its `package.json` can be imported. Deep paths such as
+  `@beatoz/web3-types/lib/commonjs/integers` now fail with
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`. Everything under `lib/` used to be
+  reachable, which meant the whole build output was public API and no internal
+  file could be moved or renamed without risk. Nothing in this repository or in
+  the four internal consumers imported a deep path.
+
+  `./package.json` stays reachable because build tools read it.
+
+- Every package now declares `types`. Type resolution previously relied on
+  `index.d.ts` happening to sit next to the file named by `main`.
+
 - **BREAKING:** Package versions are no longer released in lockstep. Each
   package now carries its own version. Under the previous scheme every package
   was republished whenever any package changed, so a version number did not

@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** Adds an `exports` map, so only the package root and its
+  `package.json` can be imported. Deep paths such as
+  `@beatoz/web3/lib/commonjs/index` now fail with
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`. Everything under `lib/` used to be
+  reachable, which meant the whole build output was public API.
+
+- Adds a `types` field. Type resolution previously relied on `index.d.ts`
+  happening to sit next to the file named by `main`.
+
 ### Fixed
 
 - Declares `@beatoz/web3-abi`, `@beatoz/web3-accounts`, `@beatoz/web3-errors`,
