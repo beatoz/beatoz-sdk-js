@@ -167,3 +167,13 @@ the version jump.
 - Tests split into `test/unit` and `test/integration`. The unit layer runs
   without a node. Integration configuration moved to environment variables;
   the two gitignored JSON files it used to import are gone.
+- `typescript`, `jest`, `@types/jest`, `jest-extended` and `prettier` are
+  declared once at the repository root instead of in all thirteen packages.
+  That was 60 lines pinning versions that decided nothing: Yarn hoists a single
+  copy of each to the root `node_modules`, and every package already resolved
+  that one. The declarations were inert only because all thirteen happened to
+  agree - the moment one differed, Yarn would install a nested copy and that
+  package really would build with a different compiler, which is what
+  `crypto-browserify` is doing in `web3-accounts` and `web3-utils` today.
+  Package-specific tools such as `@bufbuild/buf` and the `@types/*` packages
+  stay where they are, since they record what that package needs.

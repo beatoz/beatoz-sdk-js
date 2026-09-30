@@ -47,9 +47,7 @@
         "test:silent": "jest --silent --config=./test/unit/jest.config.js"
     },
     "devDependencies": {
-        "@types/bn.js": "^5.1.1",
-        "prettier": "^3.0.0",
-        "typescript": "6.0.3"
+        "@types/bn.js": "^5.1.1"
     },
     "dependencies": {
         "@types/crypto-js": "^4.1.1",
