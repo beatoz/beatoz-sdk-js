@@ -133,10 +133,18 @@ entries below name the packages they apply to.
 - Every package now declares `types`. Type resolution previously relied on
   `index.d.ts` happening to sit next to the file named by `main`.
 
-- **BREAKING:** Package versions are no longer released in lockstep. Each
-  package now carries its own version. Under the previous scheme every package
-  was republished whenever any package changed, so a version number did not
-  indicate whether that package had changed.
+- **BREAKING:** Package versions are no longer locked to a single number.
+  `lerna.json` is set to `independent`, so each package can carry its own
+  version. Under the previous scheme every package was republished whenever any
+  package changed, so a version number did not indicate whether that package had
+  changed.
+
+  This release still moves all thirteen packages to the same number, because
+  every one of them has a breaking change in it. What changes is what happens
+  afterwards: a fix to `@beatoz/web3-utils` moves that package alone, and the
+  other twelve keep the number they were released at. Internal dependencies use
+  caret ranges, so a dependent accepts the new patch without being republished.
+  See [RELEASE.md](./RELEASE.md) for the operating rule.
 
 ### Added
 

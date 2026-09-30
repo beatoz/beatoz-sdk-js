@@ -99,13 +99,42 @@ that the SDK does not support it, not that the call was wrong.
 
 ## Package versions
 
-Each package carries its own version. A change to `web3-utils` does not move
-`web3-accounts`.
+`lerna.json` is set to `independent`, so each package can carry its own version.
+It was locked to a single number until v2, and under that scheme every package
+moved whenever any package moved - a version number said nothing about whether
+that package had changed.
 
-Versions were locked together until v2. Under that scheme every package moved
-whenever any package moved, so the number said nothing about whether that
-package had changed. The facade and the leaf packages now sit at different
-numbers.
+Independent configuration is not an instruction to release separately. It is
+what makes releasing separately possible. **The default is still to release all
+thirteen packages together under the same number.**
+
+- v2 moves every package to `2.0.0` at once. Every package has a breaking
+  change in it, so there is nothing to separate.
+- After that, a release moves only the packages that changed. Fixing
+  `web3-utils` takes it to `2.0.1` and leaves the other twelve at `2.0.0`.
+- Internal dependencies are declared with caret ranges, so `web3-core` at
+  `"@beatoz/web3-utils": "^2.0.0"` accepts `2.0.1` without being republished. A
+  minor or patch release of a base package does not cascade.
+- A package that has not changed stays where it is, however far behind that
+  leaves it.
+
+A consumer can therefore read something from the number: a package still at
+`2.0.0` has not changed since v2.
+
+### Where this comes from
+
+[ethereumjs-monorepo](https://github.com/ethereumjs/ethereumjs-monorepo) runs
+exactly this way. On 2026-08-21 it published `@ethereumjs/util`, `rlp`,
+`common`, `tx`, `block` and `vm` all at `10.1.3` within eleven minutes, while
+`@ethereumjs/trie` has sat at `6.2.1` since 2024. The second fact is only
+possible under independent versioning; the first is the operating rule above.
+
+We do not take release practice from [web3.js](https://github.com/web3/web3.js),
+which this SDK is forked from. Its last stable release was `4.16.0` on
+2024-12-03. Its layout still tells us what our own code was meant to look like,
+and the `exports` and `files` fields here were restored from it, but a
+repository that has not shipped in two years is not evidence of how to run
+releases.
 
 ## Changelogs
 
@@ -126,6 +155,10 @@ Breaking entries start with `**BREAKING:**` and say what the consumer has to do.
 3. Run `lerna version`. It proposes a bump per package from the commit messages;
    override it where this document disagrees. It cannot see whether a type
    widened or narrowed.
+
+   For a release where every package changed, give them all the same number -
+   `lerna version 2.0.0` rather than the per-package prompt. Leave a package out
+   only when it genuinely did not change.
 4. Publish to the `next` dist-tag. `latest` keeps pointing at the previous
    release. A plain `npm publish` moves `latest` itself, so the tag is not
    optional either.
