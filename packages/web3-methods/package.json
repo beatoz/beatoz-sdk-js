@@ -43,10 +43,13 @@
     },
     "dependencies": {
         "@beatoz/web3-abi": "^1.6.5",
+        "@beatoz/web3-accounts": "^1.6.5",
         "@beatoz/web3-core": "^1.6.5",
+        "@beatoz/web3-errors": "^1.6.5",
         "@beatoz/web3-rpc": "^1.6.5",
         "@beatoz/web3-types": "^1.6.5",
-        "@beatoz/web3-utils": "^1.6.5"
+        "@beatoz/web3-utils": "^1.6.5",
+        "xstream": "^11.14.0"
     },
     "peerDependencies": {
         "typescript": ">=5.4"

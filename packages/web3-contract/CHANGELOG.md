@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- Declares `@beatoz/web3-abi`, `@beatoz/web3-errors`,
+  `@beatoz/web3-providers-http`, `@beatoz/web3-providers-ws` and
+  `@beatoz/web3-validator`, which it imports but did not list. Installing this
+  package on its own could fail at load.
+
+  This was hidden by the monorepo: every dependency was hoisted to one
+  `node_modules`, so these imports resolved here and only here.
+
 ### Changed
 
 - **BREAKING:** The minimum supported Node.js version is now 22. It was 16.19,

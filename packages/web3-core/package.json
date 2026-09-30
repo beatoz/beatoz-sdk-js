@@ -42,11 +42,13 @@
         "typescript": "6.0.3"
     },
     "dependencies": {
+        "@beatoz/web3-errors": "^1.6.5",
         "@beatoz/web3-providers-http": "^1.6.5",
         "@beatoz/web3-providers-ws": "^1.6.5",
         "@beatoz/web3-types": "^1.6.5",
         "@beatoz/web3-utils": "^1.6.5",
-        "@beatoz/web3-validator": "^1.6.5"
+        "@beatoz/web3-validator": "^1.6.5",
+        "xstream": "^11.14.0"
     },
     "peerDependencies": {
         "typescript": ">=5.4"

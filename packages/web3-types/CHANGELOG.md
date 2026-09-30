@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- Declares `bn.js`, which it imports but did not list. Installing this package
+  into an empty project and requiring it raised `Cannot find module 'bn.js'`.
+
+- Now resolves `bn.js` 5.x, the version its sibling packages already declared.
+  While the dependency was undeclared it resolved to the hoisted 4.12.5 that
+  `ethereumjs-util` pulls in. `BN` does not appear in this package's public
+  declarations, so no API changes.
+
+  This was hidden by the monorepo: every dependency was hoisted to one
+  `node_modules`, so these imports resolved here and only here.
+
 ### Changed
 
 - **BREAKING:** The minimum supported Node.js version is now 22. It was 16.19,

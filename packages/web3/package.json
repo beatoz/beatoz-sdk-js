@@ -47,10 +47,17 @@
         "typescript": "6.0.3"
     },
     "dependencies": {
+        "@beatoz/web3-abi": "^1.6.5",
+        "@beatoz/web3-accounts": "^1.6.5",
         "@beatoz/web3-contract": "^1.6.5",
         "@beatoz/web3-core": "^1.6.5",
+        "@beatoz/web3-errors": "^1.6.5",
         "@beatoz/web3-methods": "^1.6.5",
         "@beatoz/web3-providers-http": "^1.6.5",
+        "@beatoz/web3-providers-ws": "^1.6.5",
+        "@beatoz/web3-rpc": "^1.6.5",
+        "@beatoz/web3-types": "^1.6.5",
+        "@beatoz/web3-utils": "^1.6.5",
         "@beatoz/web3-validator": "^1.6.5"
     },
     "peerDependencies": {

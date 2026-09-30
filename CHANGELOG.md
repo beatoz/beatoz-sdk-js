@@ -48,6 +48,31 @@ entries below name the packages they apply to.
 
 ### Fixed
 
+- Five packages did not declare dependencies they import, so installing any one
+  of them on its own failed at load. Installing `@beatoz/web3-types` into an
+  empty project and requiring it raised `Cannot find module 'bn.js'`. The
+  monorepo hid this: every dependency was hoisted to one `node_modules`, so the
+  imports resolved here and only here. Now declared:
+
+  | Package | Now declares |
+  | --- | --- |
+  | `@beatoz/web3` | `web3-abi`, `web3-accounts`, `web3-errors`, `web3-providers-ws`, `web3-rpc`, `web3-types`, `web3-utils` |
+  | `@beatoz/web3-contract` | `web3-abi`, `web3-errors`, `web3-providers-http`, `web3-providers-ws`, `web3-validator` |
+  | `@beatoz/web3-methods` | `web3-accounts`, `web3-errors`, `xstream` |
+  | `@beatoz/web3-core` | `web3-errors`, `xstream` |
+  | `@beatoz/web3-types` | `bn.js` |
+
+  `xstream` appears only in emitted `.d.ts` files, but a consumer type-checking
+  those declarations has to resolve it, so it is a runtime dependency rather
+  than a development one.
+
+- `@beatoz/web3-types`: now resolves `bn.js` 5.x, the version its sibling
+  packages already declared. Because the dependency was undeclared it had been
+  resolving to the hoisted 4.12.5 that `ethereumjs-util` pulls in, a different
+  major version from the one `@beatoz/web3-utils` and `@beatoz/web3-accounts`
+  use. `BN` does not appear in this package's public declarations, so no API
+  changes.
+
 - `@beatoz/web3-accounts`: the ESM build could not be imported. The generated
   protobuf code imported `protobufjs/minimal` without an extension, which
   `require()` resolves and ESM does not.
