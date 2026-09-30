@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Removed
 
+- **BREAKING:** `LogsSubscription`, `ContractBoundEvent` and
+  `ContractEventsInterface` are gone. `LogsSubscription` extended the
+  `Web3Subscription` class removed from `@beatoz/web3-core`, and the chain above
+  it was unreachable: `Contract` has no `events` property, so nothing produced a
+  `ContractBoundEvent` and nothing consumed `ContractEventsInterface`.
+
+### Removed
+
 - **No longer depends on `web3` (the upstream web3.js package).** It was declared
   but never imported - the only mention was a `require('web3-eth-contract')` line
   inside a JSDoc example. Installing this package into an empty project drops from

@@ -35,6 +35,24 @@ entries below name the packages they apply to.
 
 ### Removed
 
+- **BREAKING:** The `eth_subscribe` subscription subsystem is gone - 509 lines
+  that could not run. `@beatoz/web3-core` loses `Web3Subscription`,
+  `Web3SubscriptionManager`, `Web3SubscriptionConstructor` and
+  `isSupportSubscriptions`; `@beatoz/web3-contract` loses `LogsSubscription`,
+  `ContractBoundEvent` and `ContractEventsInterface`.
+
+  It is web3.js's machinery, ported without `sendSubscriptionRequest()` - the
+  method that assigns a subscription its id from the `eth_subscribe` response.
+  `_id` was never set to anything but `undefined`, and `addSubscription()` opens
+  with `if (isNullish(sub.id)) throw`, so every call threw. Nothing ever
+  populated `registeredSubscriptions`, and `Contract` has no `events` property,
+  so the contract half was unreachable too.
+
+  **Subscriptions still work.** `web3.beatoz.subscribe()`,
+  `subscribeNewBlock()`, `subscribeNewBlockHeader()` and `subscribeTx()` return
+  an xstream `Stream` over the websocket provider, and that path is untouched.
+  This release removes the half that never did.
+
 - **BREAKING:** 22 declared dependencies that no package imported are gone. The
   largest is `web3` itself: `@beatoz/web3-contract` depended on the upstream
   web3.js package while the only mention of it in the source was a

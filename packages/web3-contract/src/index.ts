@@ -44,7 +44,6 @@ import { Contract } from './contract.js';
 export * from './encoding.js';
 
 export * from './contract.js';
-export * from './log_subscription.js';
 export * from './types.js';
 
 export default Contract;

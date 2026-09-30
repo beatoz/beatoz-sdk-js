@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Removed
 
+- **BREAKING:** `Web3Subscription`, `Web3SubscriptionManager`,
+  `Web3SubscriptionConstructor` and `isSupportSubscriptions` are gone, 394 lines
+  that could not run. They are web3.js's `eth_subscribe` machinery, ported
+  without `sendSubscriptionRequest()` - the method that assigns a subscription
+  its id. `_id` was therefore never set, and `addSubscription()` starts with
+  `if (isNullish(sub.id)) throw`, so every call threw. Nothing ever populated
+  `registeredSubscriptions` either.
+
+  Subscriptions on this chain go through `web3.beatoz.subscribe()` and its
+  siblings, which return an xstream `Stream` over the websocket provider. That
+  path is untouched.
+
+### Removed
+
 - No longer depends on `@beatoz/web3-validator`, which it never imported.
 
 ### Added

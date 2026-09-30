@@ -23,7 +23,6 @@ import {
     BroadcastTxSyncResponse,
     BroadcastTxCommitResponse,
     ContractAbi,
-    ContractEvents,
     ContractMethod,
     ContractMethodInputParameters,
     ContractMethodOutputParameters,
@@ -42,7 +41,6 @@ import { Web3Context } from '@beatoz/web3-core';
 import {
     BroadcastTxOptions,
     ContractAbiWithSignature,
-    ContractEventOptions,
     ContractOptions,
     NonPayableMethodObject,
     NonPayableTxOptions,
@@ -79,7 +77,6 @@ import {
 import { TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
 import HttpProvider from '@beatoz/web3-providers-http';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
-import { LogsSubscription } from './log_subscription.js';
 
 type ContractBoundMethod<
     Abi extends AbiFunctionFragment,
@@ -101,18 +98,6 @@ export type ContractMethodsInterface<Abi extends ContractAbi> = {
     // To allow users to use method signatures
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } & { [key: string]: ContractBoundMethod<any> };
-
-export type ContractBoundEvent = (options?: ContractEventOptions) => LogsSubscription;
-
-// To avoid circular dependency between types and encoding, declared these types here.
-export type ContractEventsInterface<
-    Abi extends ContractAbi,
-    Events extends ContractEvents<Abi> = ContractEvents<Abi>,
-> = {
-    [Name in keyof Events | 'allEvents']: ContractBoundEvent;
-} & {
-    [key: string]: ContractBoundEvent;
-};
 
 export type ContractOverloadedMethodInputs<AbiArr extends ReadonlyArray<unknown>> = NonNullable<
     AbiArr extends readonly []

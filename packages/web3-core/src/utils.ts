@@ -58,17 +58,3 @@ export const isSupportedProvider = <API extends Web3APISpec>(
     isLegacyRequestProvider(provider) ||
     isLegacySendAsyncProvider(provider) ||
     isLegacySendProvider(provider);
-
-export const isSupportSubscriptions = <API extends Web3APISpec>(
-    provider: SupportedProviders<API>,
-): boolean => {
-    if (isWeb3Provider<API>(provider)) {
-        return provider.supportsSubscriptions();
-    }
-
-    if (typeof provider !== 'string' && 'on' in provider) {
-        return true;
-    }
-
-    return false;
-};
