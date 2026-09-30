@@ -13,7 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 Work towards v2. Package versions become independent with this release, so the
 entries below name the packages they apply to.
 
+### Added
+
+- Every package now has a `files` field, so a published package carries
+  `lib/`, `src/`, `CHANGELOG.md`, `README.md`, `LICENSE` and `package.json`,
+  and nothing else. Build leftovers no longer ship: `tsconfig.types.json`,
+  `tsdoc.json` - which extended a file that was never published, so it could
+  not be read where it landed - and the `.tsbuildinfo` incremental build
+  caches, which record absolute paths from the machine that built them.
+
+- Every package now ships `src/`. The source maps have always pointed at
+  `../../src/*.ts`, but those files were not published, so a debugger could not
+  open the line a stack trace named. A stack trace already reported the right
+  `.ts` file and line without this, under `--enable-source-maps`; what `src/`
+  adds is being able to read that line, and having "Go to Definition" land on
+  the implementation instead of stopping at the `.d.ts`. v2 is still moving
+  quickly and reading the source is part of using it.
+
+- Every package now ships `LICENSE`. All thirteen declared `Apache-2.0` while
+  publishing no copy of the license text.
+
 ### Removed
+
+- `.npmignore` is gone, from every package and from the repository root.
+  `files` takes precedence over it, so keeping both would leave fourteen files
+  that look like they decide what ships but no longer do. The root one had also
+  been reaching into the workspace packages: it listed `src/`, which is why no
+  package published its sources even though no package's own `.npmignore`
+  excluded them.
 
 - **BREAKING:** The CommonJS build is gone. `lib/commonjs` is no longer built
   or published, and every package ships ESM only. This halves what is

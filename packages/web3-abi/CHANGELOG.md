@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Added
+
+- Adds a `files` field, so the published package carries `lib/`, `src/`,
+  `CHANGELOG.md`, `README.md`, `LICENSE` and `package.json`, and nothing else.
+  Build leftovers no longer ship: `tsconfig.types.json`, `tsdoc.json` (which
+  extended a file that was never published) and the `.tsbuildinfo` incremental
+  build caches.
+
+- Ships `src/`. The source maps have always pointed at `../../src/*.ts`, but
+  those files were not published, so a debugger could not open the line a stack
+  trace named. v2 is still moving quickly, and reading the source is part of
+  using it.
+
+- Ships `LICENSE`. Every package declared `Apache-2.0` while publishing no copy
+  of the license text.
+
+### Removed
+
+- `.npmignore` is gone, from this package and from the repository root. `files`
+  takes precedence over it, so keeping both would leave a file that looks like
+  it decides what ships but does not. The root one had been reaching into the
+  workspace packages and excluding `src/` from all of them.
+
 ### Removed
 
 - **BREAKING:** The CommonJS build is gone. `lib/commonjs` is no longer built

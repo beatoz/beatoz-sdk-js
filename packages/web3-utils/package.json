@@ -27,6 +27,12 @@
         "node": ">=22.12.0",
         "npm": ">=8.19.0"
     },
+    "files": [
+        "lib/**/*",
+        "src/**/*",
+        "CHANGELOG.md",
+        "!**/*.tsbuildinfo"
+    ],
     "scripts": {
         "clean": "rimraf dist && rimraf lib",
         "prebuild": "yarn clean",
