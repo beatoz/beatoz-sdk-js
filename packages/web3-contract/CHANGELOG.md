@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- **No longer depends on `web3` (the upstream web3.js package).** It was declared
+  but never imported - the only mention was a `require('web3-eth-contract')` line
+  inside a JSDoc example. Installing this package into an empty project drops from
+  138 packages and 86 MB to 105 and 32 MB.
+
+- No longer depends on `@beatoz/web3-abi`, `@beatoz/web3-errors`,
+  `@beatoz/web3-providers-http`, `@beatoz/web3-providers-ws` or
+  `@beatoz/web3-validator` beyond what it imports; the unused ones are gone.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

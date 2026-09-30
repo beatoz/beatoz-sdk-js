@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- No longer depends on `@beatoz/web3-errors`, which it never imported. `ws` stays:
+  `isomorphic-ws` declares it as a peer dependency, so it is required even though
+  no file names it.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

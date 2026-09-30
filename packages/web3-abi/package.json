@@ -50,7 +50,6 @@
     },
     "dependencies": {
         "@beatoz/web3-errors": "^1.6.5",
-        "@beatoz/web3-rpc": "^1.6.5",
         "@beatoz/web3-types": "^1.6.5",
         "@beatoz/web3-utils": "^1.6.5",
         "@ethersproject/abi": "^5.7.0",

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- No longer depends on `bn.js`, `crypto-js`, `@types/crypto-js`, `protobufjs`,
+  `ts-proto`, `constants-browserify`, `crypto-browserify` or `path-browserify`.
+  None of them were imported. Installing this package drops from 8 of these to 0.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

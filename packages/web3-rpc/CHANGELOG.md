@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- No longer depends on `@beatoz/web3-utils` or `@beatoz/web3-validator`,
+  neither of which it imported.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- No longer depends on `util`, the npm polyfill for the Node builtin, which it
+  never imported.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

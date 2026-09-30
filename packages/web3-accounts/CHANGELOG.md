@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Removed
+
+- No longer depends on `crypto-js`, `@types/crypto-js`, `constants-browserify`,
+  `crypto-browserify` or `path-browserify`, none of which it imported. The three
+  `*-browserify` packages are webpack polyfills used by this repository's browser
+  build; they are declared at the root, where that build runs.
+
+- `ts-proto` moved from `dependencies` to `devDependencies`. It provides the
+  `protoc-gen-ts_proto` binary used to regenerate `trx_pb.ts`; consumers never
+  regenerate protobuf code.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

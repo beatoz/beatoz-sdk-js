@@ -35,6 +35,39 @@ entries below name the packages they apply to.
 
 ### Removed
 
+- **BREAKING:** 22 declared dependencies that no package imported are gone. The
+  largest is `web3` itself: `@beatoz/web3-contract` depended on the upstream
+  web3.js package while the only mention of it in the source was a
+  `require('web3-eth-contract')` line inside a JSDoc example. Installing
+  `@beatoz/web3-contract` into an empty project drops from 138 packages and
+  86 MB to 105 and 32 MB.
+
+  | Package | No longer depends on |
+  | --- | --- |
+  | `@beatoz/web3-contract` | `web3` |
+  | `@beatoz/web3-utils` | `bn.js`, `crypto-js`, `@types/crypto-js`, `protobufjs`, `ts-proto`, `constants-browserify`, `crypto-browserify`, `path-browserify` |
+  | `@beatoz/web3-accounts` | `crypto-js`, `@types/crypto-js`, `constants-browserify`, `crypto-browserify`, `path-browserify` |
+  | `@beatoz/web3-rpc` | `@beatoz/web3-utils`, `@beatoz/web3-validator` |
+  | `@beatoz/web3-abi` | `@beatoz/web3-rpc` |
+  | `@beatoz/web3-core` | `@beatoz/web3-validator` |
+  | `@beatoz/web3-methods` | `@beatoz/web3-utils` |
+  | `@beatoz/web3-providers-ws` | `@beatoz/web3-errors` |
+  | `@beatoz/web3-validator` | `util` |
+
+  Removing a dependency is breaking because a consumer may have been reaching it
+  through us rather than declaring it themselves.
+
+  Three declarations that look unused are kept, because a text search is not
+  what decides: `ws` in `@beatoz/web3-providers-ws` is a peer dependency of
+  `isomorphic-ws`; `@types/crypto-js` in `@beatoz/web3-types` is needed because
+  that package's public `.d.ts` imports `crypto-js`, which ships no types of its
+  own; and the `*-browserify` packages are webpack polyfills resolved by this
+  repository's browser build, so they move to the root rather than disappearing.
+
+- `ts-proto` moved from `dependencies` to `devDependencies` in
+  `@beatoz/web3-accounts`. It provides the `protoc-gen-ts_proto` binary that
+  regenerates `trx_pb.ts`; consumers never regenerate protobuf code.
+
 - `.npmignore` is gone, from every package and from the repository root.
   `files` takes precedence over it, so keeping both would leave fourteen files
   that look like they decide what ships but no longer do. The root one had also
