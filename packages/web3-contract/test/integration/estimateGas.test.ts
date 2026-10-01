@@ -15,12 +15,34 @@
 */
 import rep1155Json from '../fixtures/REP1155.json';
 import { netInfo } from './e2e_utils';
-import { BytesUint8Array } from '@beatoz/web3-types';
 import { Web3 } from '@beatoz/web3';
 import { Web3Account } from '@beatoz/web3-accounts';
 import { WebsocketProvider } from '@beatoz/web3-providers-ws';
 
 describe('estimateGas test', () => {
+    /**
+     * Waits until the node can answer for a transaction hash.
+     *
+     * Deploying returns once the transaction is accepted, not once it is in a
+     * block, so a query that follows immediately gets `tx (...) not found`.
+     */
+    async function waitForTx(hash: string, timeoutMs = 20000): Promise<void> {
+        const deadline = Date.now() + timeoutMs;
+        for (;;) {
+            try {
+                await web3.beatoz.tx(hash);
+                return;
+            } catch (err) {
+                if (Date.now() > deadline) {
+                    throw new Error(`the node did not report ${hash} within ${timeoutMs}ms`, {
+                        cause: err,
+                    });
+                }
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+        }
+    }
+
     const web3 = new Web3(netInfo.HTTP);
     for (const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
@@ -41,16 +63,20 @@ describe('estimateGas test', () => {
                         10000000,
                     )
                     .send();
-                const data = resp?.deliver_tx?.data;
-                if (typeof data === 'string') {
-                    const contAddr = BytesUint8Array.b64ToBytes(data).toHex();
-                    process.stdout.write(`contract address: ${contAddr}\n`);
-                    process.stdout.write(`deployer address: ${deployerAcct.address}\n`);
-                    return contAddr;
-                } else {
+                if (resp?.deliver_tx?.code !== 0) {
                     console.error(resp?.deliver_tx?.log);
                     throw new Error(resp?.deliver_tx?.log);
                 }
+
+                // `deliver_tx.data` is the merkle root of this transaction's
+                // event log - a 32 byte digest, not the 20 byte address this
+                // used to read out of it. The address is an attribute on the
+                // events themselves, which is what contractAddrFromTx reads.
+                await waitForTx(resp.hash);
+                const contAddr = await web3.beatoz.contractAddrFromTx(resp.hash);
+                process.stdout.write(`contract address: ${contAddr}\n`);
+                process.stdout.write(`deployer address: ${deployerAcct.address}\n`);
+                return contAddr;
             }
 
             async function mint() {
@@ -63,7 +89,7 @@ describe('estimateGas test', () => {
                 const rn = Math.floor(Date.now() / 1000);
                 const companyName = 'Startbugs-' + rn;
                 const productName = 'eGiftCard-' + rn;
-                const tokenIds: Array<number> = Array.from({ length: 2000 }, () => i + 1);
+                const tokenIds: Array<number> = Array.from({ length: 2000 }, (_, i) => i + 1);
                 const prices: Array<number> = Array.from({ length: 2000 }, () => 100000);
                 const amounts: Array<number> = Array.from({ length: 2000 }, () => 100);
                 process.stdout.write(`company: ${companyName}, product: ${productName}\n`);
@@ -158,6 +184,6 @@ describe('estimateGas test', () => {
 
             mint().then(() => done());
         },
-        1000 * 20,
+        1000 * 60,
     );
 });

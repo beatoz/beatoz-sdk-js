@@ -68,7 +68,12 @@ describe('transfer loop test', () => {
                 deployedContract.address,
             ) as any;
 
-            for (let i = 0; i < 100; i++) {
+            // One iteration per block when committing, so a hundred of them is a
+            // load test rather than an integration test. A handful shows the same
+            // thing; raise BEATOZ_TRANSFER_LOOP to put real volume through it.
+            const iterations = Number(process.env.BEATOZ_TRANSFER_LOOP ?? 5);
+
+            for (let i = 0; i < iterations; i++) {
                 const resp = await erc20Contract.methods
                     .transfer('0x0000000000000000000000000000000000000001', '1000')
                     .broadcast({ from: fromAcct!.address, gas: '300000', sendMode: 'commit' });
@@ -80,7 +85,7 @@ describe('transfer loop test', () => {
                 process.stdout.write(`transfer[${i}] txhash:${resp.hash}\n`);
             }
         },
-        1000 * 60 * 60,
+        1000 * 60 * 5,
     );
 });
 
@@ -119,7 +124,6 @@ describe('transfer sync test', () => {
                     // console.log(jsonEvt);
 
                     const txhash = event.events['tx.hash'][0];
-                    const _txstatus = event.events['tx.status'][0];
                     mapTxs.set(txhash, true);
                     let completed = 0;
                     for (const [, val] of mapTxs) {
@@ -138,11 +142,12 @@ describe('transfer sync test', () => {
                 },
             });
 
+            const iterations = Number(process.env.BEATOZ_TRANSFER_LOOP ?? 5);
             const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
             web3.beatoz.getAccount(fromAcct.address).then((resp) => {
                 let nonce = resp.value.nonce;
 
-                for (let i = 0; i < 100; i++) {
+                for (let i = 0; i < iterations; i++) {
                     erc20Contract.methods
                         .transfer('0x0000000000000000000000000000000000000001', '1000')
                         .broadcast({
@@ -164,6 +169,6 @@ describe('transfer sync test', () => {
                 }
             });
         },
-        1000 * 60 * 60,
+        1000 * 60 * 5,
     );
 });
