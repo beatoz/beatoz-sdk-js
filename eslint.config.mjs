@@ -20,6 +20,7 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import importX from 'eslint-plugin-import-x';
 import unicorn from 'eslint-plugin-unicorn';
 import licenseHeader from 'eslint-plugin-license-header';
+import globals from 'globals';
 
 /**
  * Apache 2.0 header required at the top of every source file.
@@ -205,17 +206,11 @@ export default tseslint.config(
     // 6. Config and script JavaScript: not subject to type-aware linting.
     // ---------------------------------------------------------------
     {
-        files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
+        files: ['**/*.js', '**/*.cjs'],
         ...tseslint.configs.disableTypeChecked,
         languageOptions: {
             sourceType: 'commonjs',
-            globals: {
-                module: 'writable',
-                require: 'readonly',
-                __dirname: 'readonly',
-                process: 'readonly',
-                console: 'readonly',
-            },
+            globals: globals.node,
         },
         rules: {
             'license-header/header': 'off',
@@ -224,7 +219,22 @@ export default tseslint.config(
     },
 
     // ---------------------------------------------------------------
-    // 7. Prettier integration must come last: it disables rules that conflict
+    // 7. ESM scripts: modules rather than CommonJS, so no `require`.
+    // ---------------------------------------------------------------
+    {
+        files: ['**/*.mjs'],
+        ...tseslint.configs.disableTypeChecked,
+        languageOptions: {
+            sourceType: 'module',
+            globals: globals.node,
+        },
+        rules: {
+            'license-header/header': 'off',
+        },
+    },
+
+    // ---------------------------------------------------------------
+    // 8. Prettier integration must come last: it disables rules that conflict
     //    with formatting and reports formatting violations as lint errors.
     // ---------------------------------------------------------------
     prettierRecommended,

@@ -4,6 +4,8 @@ const base = require('../config/jest.config');
 
 module.exports = {
 	...base,
+	// Load .env before the test framework starts, so e2e_utils sees it.
+	setupFiles: ['<rootDir>/../../scripts/jest/load-env.js'],
 	setupFilesAfterEnv: ['<rootDir>/test/integration/setup.js'],
 	testMatch: ['<rootDir>/test/integration/**/*.(spec|test).(js|ts)'],
 	/**

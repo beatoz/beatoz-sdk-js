@@ -17,6 +17,8 @@ const base = require('../config/jest.config');
 
 module.exports = {
     ...base,
+    // Load .env before the test framework starts, so e2e_utils sees it.
+    setupFiles: ['<rootDir>/../../scripts/jest/load-env.js'],
     // These tests talk to a running node and mutate chain state, so they must
     // not run concurrently: they share nonces and deployed-contract fixtures.
     maxWorkers: 1,
