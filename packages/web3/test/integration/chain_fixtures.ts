@@ -32,6 +32,9 @@
  */
 
 import { Web3 } from '../../src';
+import erc20Contract from '../fixtures/erc20-contract.json';
+import { privateKeyToAccount, TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
+import { getTestAccountAddress, getTestChainId, getTestProposalAccountPrivateKey } from './e2e_utils';
 
 /** Height of the latest committed block on the target chain. */
 export const getLatestHeight = async (web3: Web3): Promise<number> => {
@@ -55,4 +58,104 @@ export const getSampleHeight = async (web3: Web3): Promise<number> => {
 export const getBlockHashAt = async (web3: Web3, height: number): Promise<string> => {
     const block = await web3.beatoz.block(height);
     return block.block_id.hash;
+};
+
+/**
+ * The node returns addresses as bare uppercase hex, with no `0x`. It accepts
+ * either form on the way in, so a round trip is only comparable once both sides
+ * are reduced to what the node itself uses.
+ */
+export const asNodeAddress = (address: string): string => address.replace(/^0x/i, '').toLowerCase();
+
+/**
+ * Heights come back from the node as strings, the way Tendermint reports them.
+ * A height computed on this side is a number, so comparisons have to pick one.
+ */
+export const asNodeHeight = (height: number | string): string => String(height);
+
+/**
+ * A validator address taken from the chain under test. Delegation queries need
+ * one that actually exists, and which that is depends on the chain.
+ */
+export const getValidatorAddress = async (web3: Web3): Promise<string> => {
+    const { validators } = await web3.beatoz.validators();
+    if (!validators?.length) {
+        throw new Error('the chain reports no validators, so delegation cannot be queried');
+    }
+    return validators[0].address;
+};
+
+/**
+ * Sends a transfer and returns the hash the node assigned it.
+ *
+ * Several tests need a transaction that exists on the chain they are talking
+ * to - to look up by hash, or to make the chain produce a block. Tendermint
+ * only produces empty blocks on a timer (60s on this image), so a test that
+ * waits for blocks without causing any will sit there until it times out.
+ *
+ * Gas comes from the chain's own rule rather than a constant, for the same
+ * reason the chain id does: it is the node that decides.
+ */
+export const sendSampleTransfer = async (web3: Web3): Promise<string> => {
+    const account = privateKeyToAccount(getTestProposalAccountPrivateKey()) as Web3Account;
+    const { value: rule } = await web3.beatoz.rule();
+    const { value: sender } = await web3.beatoz.getAccount(account.address);
+
+    const tx = TrxProtoBuilder.buildTransferTrxProto({
+        nonce: sender.nonce,
+        from: account.address,
+        to: asNodeAddress(getTestAccountAddress()),
+        amount: '10',
+        gas: Number(rule.minTrxGas),
+        gasPrice: String(rule.gasPrice),
+    });
+    TrxProtoBuilder.signTrxProto(tx, account, getTestChainId());
+
+    const result = await web3.beatoz.broadcastTxCommit(tx);
+    if (result.check_tx?.code !== 0 || result.deliver_tx?.code !== 0) {
+        throw new Error(`the node rejected the sample transfer: ${JSON.stringify(result)}`);
+    }
+    return result.hash;
+};
+
+/**
+ * Deploys the ERC20 fixture and returns the hash of the deploying transaction.
+ *
+ * `contractAddrFromTx` reads the contract address out of that transaction's
+ * events, so it needs one that actually deployed something on the chain under
+ * test - a hash recorded from somewhere else resolves to nothing here.
+ */
+export const deploySampleContract = async (web3: Web3): Promise<string> => {
+    const account = privateKeyToAccount(getTestProposalAccountPrivateKey()) as Web3Account;
+    web3.beatoz.accounts.wallet.add(account.privateKey);
+
+    const contract = new web3.beatoz.Contract(erc20Contract.abi);
+    const result = await contract
+        .deploy(erc20Contract.bytecode, ['BeatozToken', 'RGT'], account, getTestChainId(), 10000000)
+        .send();
+
+    await waitForTx(web3, result.hash);
+    return result.hash;
+};
+
+/**
+ * Waits until the node can answer for a transaction hash.
+ *
+ * Deploying returns as soon as the transaction is accepted, not once it is in a
+ * block, so a query that follows immediately gets `tx (...) not found`. How long
+ * that takes depends on when the next block is produced.
+ */
+export const waitForTx = async (web3: Web3, hash: string, timeoutMs = 20000): Promise<void> => {
+    const deadline = Date.now() + timeoutMs;
+    for (;;) {
+        try {
+            await web3.beatoz.tx(hash);
+            return;
+        } catch (err) {
+            if (Date.now() > deadline) {
+                throw new Error(`the node did not report ${hash} within ${timeoutMs}ms: ${err}`);
+            }
+            await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+    }
 };

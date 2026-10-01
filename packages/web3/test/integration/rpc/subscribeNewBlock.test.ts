@@ -15,35 +15,51 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { sendSampleTransfer } from '../chain_fixtures';
 import { SubscriptionEvent } from '@beatoz/web3-types';
 
-describe('subscribeTx check ', () => {
-    const blockTime = 1000;
-    let testWebsocketWeb3Instance: Web3;
+describe('subscribeNewBlock check', () => {
+    let web3: Web3;
 
     beforeAll(() => {
-        testWebsocketWeb3Instance = new Web3(getTestWsServer());
+        web3 = new Web3(getTestWsServer());
     });
 
-    it('can listen to subscribeTx', (done) => {
-        const headers = testWebsocketWeb3Instance.beatoz.subscribeNewBlock();
+    it('delivers block events until the subscription is cancelled', async () => {
         const events: SubscriptionEvent[] = [];
-        const subscription = headers.subscribe({
-            error: done.fail,
-            complete: () => done.fail('subscription should not complete'),
+        let failure: Error | undefined;
+
+        const stream = web3.beatoz.subscribeNewBlock();
+        const subscription = stream.subscribe({
+            error: (err: Error) => {
+                failure = err;
+            },
+            complete: () => {
+                failure = new Error('the subscription completed on its own');
+            },
             next: (event: SubscriptionEvent) => {
                 events.push(event);
-                if (events.length === 2) {
-                    // make sure they are consecutive heights
-                    subscription.unsubscribe();
-
-                    // wait 1.5 * blockTime and check we did not get more events
-                    setTimeout(() => {
-                        expect(events.length).toEqual(2);
-                        done();
-                    }, 1.5 * blockTime);
-                }
             },
         });
+
+        // This chain only produces empty blocks on a 60s timer, so a test that
+        // waits for blocks without causing any just times out. Each transfer is
+        // broadcast with commit, so it returns once its block exists.
+        await sendSampleTransfer(web3);
+        await sendSampleTransfer(web3);
+
+        expect(failure).toBeUndefined();
+        expect(events.length).toBeGreaterThanOrEqual(2);
+
+        const seenBeforeCancel = events.length;
+        subscription.unsubscribe();
+
+        // Cause another block. Nothing should reach a cancelled subscription -
+        // which is the part a plain wait cannot show, because on this chain
+        // nothing would have arrived anyway.
+        await sendSampleTransfer(web3);
+
+        expect(events.length).toEqual(seenBeforeCancel);
+        expect(failure).toBeUndefined();
     });
 });

@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestAccountAddress, getTestWsServer } from '../e2e_utils';
+import { asNodeAddress } from '../chain_fixtures';
 import { AccountResponse } from '@beatoz/web3-types';
 
 describe('account check ', () => {
@@ -29,9 +30,9 @@ describe('account check ', () => {
         const testAccountResponse: AccountResponse =
             await web3.beatoz.getAccount(testAccountAddress);
 
-        expect(testAccountResponse.key.toLowerCase()).toEqual(testAccountAddress.toLowerCase());
-        expect(testAccountResponse.value.address.toLowerCase()).toEqual(
-            testAccountAddress.toLowerCase(),
+        expect(asNodeAddress(testAccountResponse.key)).toEqual(asNodeAddress(testAccountAddress));
+        expect(asNodeAddress(testAccountResponse.value.address)).toEqual(
+            asNodeAddress(testAccountAddress),
         );
         expect(testAccountResponse.value.nonce).toBeDefined();
         expect(testAccountResponse.value.balance).toBeDefined();

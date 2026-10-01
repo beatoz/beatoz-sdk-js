@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { sendSampleTransfer } from '../chain_fixtures';
 import { TxResponse } from '@beatoz/web3-types';
 
 describe('txSearch check ', () => {
@@ -24,10 +25,11 @@ describe('txSearch check ', () => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.txSearch method success return', async () => {
-        const testTxResponse: TxResponse = await testWebsocketWeb3Instance.beatoz.tx(
-            '8612E355C72FBC4034708C1A42CEEE92BB3A0B6D1F5A08D33A393A3D31FE5A08',
-        );
+    it('returns a transaction this chain has actually seen', async () => {
+        const hash = await sendSampleTransfer(testWebsocketWeb3Instance);
+
+        const testTxResponse: TxResponse = await testWebsocketWeb3Instance.beatoz.tx(hash);
+
         expect(testTxResponse.height).toBeDefined();
         expect(testTxResponse.result.code).toEqual(0);
     });

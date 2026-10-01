@@ -15,6 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { asNodeAddress, getValidatorAddress } from '../chain_fixtures';
 import { DelegateeResponse } from '@beatoz/web3-types';
 
 describe('health check ', () => {
@@ -24,11 +25,12 @@ describe('health check ', () => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
 
-    it('should call web3 with testWebsocketWeb3Instance.delegatee(736a9f6fa280a88599dc7fcd24e42975da89a5ae) method success return', async () => {
+    it('returns the delegatee record for a validator on this chain', async () => {
+        const validator = await getValidatorAddress(testWebsocketWeb3Instance);
         const testDelegateeResponse: DelegateeResponse =
-            await testWebsocketWeb3Instance.beatoz.delegatee(
-                '1594b3a79f75a81f0181dd6d113a95dca419e7ec',
-            );
+            await testWebsocketWeb3Instance.beatoz.delegatee(validator);
+
+        expect(asNodeAddress(testDelegateeResponse.key)).toEqual(asNodeAddress(validator));
         expect(testDelegateeResponse.value).toBeDefined();
     });
 });

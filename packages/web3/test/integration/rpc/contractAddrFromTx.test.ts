@@ -15,18 +15,20 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
+import { deploySampleContract } from '../chain_fixtures';
 
-describe('contractAddrFromTx check ', () => {
+describe('contractAddrFromTx check', () => {
     let web3: Web3;
 
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
 
-    it('Check return value of contractAddrFromTx call', async () => {
-        const contractAddr: string = await web3.beatoz.contractAddrFromTx(
-            '8612E355C72FBC4034708C1A42CEEE92BB3A0B6D1F5A08D33A393A3D31FE5A08',
-        );
-        expect(contractAddr).toBe('0xed2701da7141b9ebf456a98cf5d16aa6c9585fe1');
+    it('reads the address out of a deployment this chain performed', async () => {
+        const hash = await deploySampleContract(web3);
+
+        const contractAddr: string = await web3.beatoz.contractAddrFromTx(hash);
+
+        expect(contractAddr).toMatch(/^0x[0-9a-fA-F]{40}$/);
     });
 });
