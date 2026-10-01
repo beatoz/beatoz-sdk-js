@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import * as base64js from 'base64-js';
+import base64js from 'base64-js';
 
 export function toBase64(data: Uint8Array): string {
     return base64js.fromByteArray(data);

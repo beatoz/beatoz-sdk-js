@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import * as cryptojs from 'crypto-js';
+import cryptojs from 'crypto-js';
 
 export class BytesUint8Array extends Uint8Array {
     static fromHex(hex: string): BytesUint8Array {

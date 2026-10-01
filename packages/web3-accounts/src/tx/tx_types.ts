@@ -17,7 +17,7 @@
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { BytesUint8Array } from '@beatoz/web3-types';
 import { createHash, randomBytes } from 'crypto';
-import * as secp256k1 from 'secp256k1';
+import secp256k1 from 'secp256k1';
 
 export interface Transaction<T> {
     hash?: string;

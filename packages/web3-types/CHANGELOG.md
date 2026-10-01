@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- `crypto-js` and `base64-js` are imported as default rather than as
+  namespaces. Both are CommonJS with no `exports` map, so `import * as` gave a
+  namespace holding nothing but `default` and every member access returned
+  `undefined` in the ESM build.
+
 ### Changed
 
 - **BREAKING:** The minimum Node version is 22.13, raised from 22.12. Two things

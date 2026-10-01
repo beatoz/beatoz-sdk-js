@@ -207,6 +207,28 @@ entries below name the packages they apply to.
 
 ### Fixed
 
+- **Signing works in the ESM build.** `privateKeyToAccount`, and so every path
+  that signs a transaction, threw `TypeError: secp256k1.privateKeyVerify is not
+  a function`. An ESM consumer could not sign at all.
+
+  Three modules imported a CommonJS package as a namespace:
+
+  | Package | Module |
+  | --- | --- |
+  | `@beatoz/web3-accounts` | `secp256k1` |
+  | `@beatoz/web3-types` | `crypto-js`, `base64-js` |
+
+  None of the three publishes an `exports` map, so `import * as x from 'pkg'`
+  gives a namespace whose only key is `default`, and every member access through
+  it returns `undefined`. A default import gets the module itself. This is how
+  ES modules consume CommonJS, and it only started to matter when the CommonJS
+  build - where `require()` erases the distinction - was removed.
+
+  Nothing caught it. `yarn test` runs the sources through Babel, the integration
+  tests import from `src/`, and the ESM check added alongside the CommonJS
+  removal imports each package without calling into it. Loading succeeded; using
+  it did not.
+
 - No published declaration refers to a Node-only type any more, so consumers do
   not need `@types/node` to read them. Three places leaked one:
 

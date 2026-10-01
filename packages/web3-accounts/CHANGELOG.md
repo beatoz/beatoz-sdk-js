@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- **Signing works in the ESM build.** `privateKeyToAccount` and everything
+  downstream of it threw `TypeError: secp256k1.privateKeyVerify is not a
+  function`, so an ESM consumer could not sign a transaction at all.
+
+  `secp256k1` is CommonJS and publishes no `exports` map. Importing it as
+  `import * as secp256k1` gives a namespace whose only key is `default`, so
+  every call through it was a call on `undefined`. A default import gets the
+  module itself, which is how ES modules are meant to consume CommonJS.
+
 ### Changed
 
 - **BREAKING:** The minimum Node version is 22.13, raised from 22.12. Two things
