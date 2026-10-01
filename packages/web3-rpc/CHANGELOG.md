@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Changed
 
+- **BREAKING:** The minimum Node version is 22.13, raised from 22.12. Two things
+  set the floor and the higher one now wins: `require(esm)` - the reason these
+  packages can ship ESM only - landed in 22.12, while ESLint 10, which this
+  repository is linted with, declares `^20.19.0 || ^22.13.0 || >=24`. Holding the
+  packages to 22.12 left the repository unable to satisfy its own toolchain at
+  its own floor. The window given up, 22.12.0 through 22.12.x, ran from December
+  2024 to January 2025.
+
+- The `npm` range is gone from `engines`. These packages are installed with
+  whatever the consumer uses, and a constraint on one package manager says
+  nothing about the others.
+
+### Changed
+
 - **BREAKING:** The declared TypeScript floor is now 5.7, raised from 5.4. 5.4
   was never true: this package is built with TypeScript 6.0.3, and the emitted
   declarations use `Uint8Array<ArrayBufferLike>`, a generic form that only exists

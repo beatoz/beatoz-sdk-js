@@ -130,11 +130,22 @@ entries below name the packages they apply to.
 
 ### Changed
 
-- **BREAKING:** The minimum supported Node.js version is now 22.12, across all
-  packages. It was 16.19, which had not been accurate for some time: several
-  dependencies already required Node 18 or later, so installs on Node 16 were
-  already failing in ways the declared range did not explain. The 22.12 floor
-  in particular is what makes `require()` of this ESM-only build work.
+- **BREAKING:** The minimum supported Node.js version is now 22.13, across all
+  packages and the repository root. It was 16.19, which had not been accurate for
+  some time: several dependencies already required Node 18 or later, so installs
+  on Node 16 were already failing in ways the declared range did not explain.
+
+  Two things set the floor and the higher one wins. `require(esm)` - the reason
+  these packages can ship ESM only - landed in **22.12**. ESLint 10, which this
+  repository is linted with, declares `^20.19.0 || ^22.13.0 || >=24` and so
+  starts at **22.13**. Holding the packages to 22.12 left the repository unable
+  to satisfy its own toolchain at its own floor; the window that resolves it,
+  22.12.0 through 22.12.x, ran from December 2024 to January 2025.
+
+- The `npm` range is gone from `engines` in the published packages. They are
+  installed with whatever the consumer uses, and a constraint on one package
+  manager says nothing about the others. The root keeps its `npm` range, since
+  it describes the machine that builds this repository.
 
 - **BREAKING:** `@beatoz/web3-types`: `TrxProto` gains `payer` and `payerSig`,
   the fee delegation fields the chain added in June 2025. Code that builds a

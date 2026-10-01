@@ -60,13 +60,31 @@ Two cases are easy to misread:
 The supported ranges are declared in every package:
 
 ```json
-"engines": { "node": ">=22.12.0" },
+"engines": { "node": ">=22.13.0" },
 "peerDependencies": { "typescript": ">=5.7" },
 "peerDependenciesMeta": { "typescript": { "optional": true } }
 ```
 
 TypeScript is an optional peer so that a JavaScript consumer is not asked to
-install it.
+install it. No `npm` range is declared: these packages are installed with
+whatever the consumer uses, and a constraint on one package manager says nothing
+about the others.
+
+The root `package.json` carries the same Node floor. It is `private`, so it is
+describing the machine that builds this repository rather than one that consumes
+it, and the two could legitimately differ - but one number is easier to keep
+true than two, and nothing is lost by holding the repository to what it ships.
+
+Two things set that number, and the higher one wins:
+
+- `require(esm)`, which is why these packages can ship ESM only, landed in
+  **22.12**.
+- ESLint 10 declares `^20.19.0 || ^22.13.0 || >=24`, so it starts at **22.13**.
+
+22.13 is one patch line above what the runtime needs. The window it gives up -
+22.12.0 through 22.12.x, December 2024 to January 2025 - was superseded before
+this was written, and taking it keeps the repository from having to explain why
+its own floor does not satisfy its own toolchain.
 
 The floor is measured, not chosen. It started at 5.4, picked as a round number
 below where the declarations happened to parse. That was wrong: these packages
