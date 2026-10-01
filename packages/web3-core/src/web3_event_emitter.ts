@@ -57,8 +57,8 @@ export class Web3EventEmitter<T extends Web3EventMap> implements Web3Emitter<T> 
         return this._emitter.eventNames();
     }
 
-    public removeAllListeners() {
-        return this._emitter.removeAllListeners();
+    public removeAllListeners(): void {
+        this._emitter.removeAllListeners();
     }
     public setMaxListenerWarningThreshold(maxListenersWarningThreshold: number) {
         this._emitter.setMaxListeners(maxListenersWarningThreshold);

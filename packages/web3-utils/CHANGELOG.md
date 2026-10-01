@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Changed
+
+- `rejectIfTimeout` and `rejectIfConditionAtInterval` return
+  `ReturnType<typeof setTimeout>` instead of `NodeJS.Timer`. The value is the
+  same; `NodeJS.Timer` is a name from `@types/node`, while this one resolves to
+  whatever the running environment returns - an object on Node, a number in a
+  browser. The old code cast through `as unknown as NodeJS.Timer`, which was
+  the signal that the declared type did not match.
+
+- `ChunkResponseParser`'s constructor accepts `ChunkEventSink` - anything with
+  an `emit` method - rather than Node's `EventEmitter`. `emit` is the only
+  member it ever called. An `EventEmitter` still satisfies it, so no existing
+  call breaks.
+
 ### Fixed
 
 - The published type declarations now follow ES module rules. `lib/types/` gets

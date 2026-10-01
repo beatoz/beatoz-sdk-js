@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** `Web3EventEmitter.removeAllListeners()` returns `void`. It had
+  no declared return type, so TypeScript inferred one from the body and the
+  emitted declaration became `removeAllListeners(): EventEmitter<[never]>` -
+  handing callers the private `EventEmitter` this class wraps, and putting a
+  Node-only type in the public API. Nothing used the return value.
+
 ### Fixed
 
 - The published type declarations now follow ES module rules. `lib/types/` gets

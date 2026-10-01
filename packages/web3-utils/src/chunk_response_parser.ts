@@ -16,16 +16,20 @@
 
 import { JsonRpcResponse } from '@beatoz/web3-types';
 import { InvalidResponseError } from '@beatoz/web3-errors';
-import { EventEmitter } from 'events';
+
+/** Anything that can emit; `ChunkResponseParser` only ever calls `emit`. */
+export interface ChunkEventSink {
+    emit(eventName: string, ...args: unknown[]): unknown;
+}
 
 export class ChunkResponseParser {
     private lastChunk: string | undefined;
     private lastChunkTimeout: NodeJS.Timeout | undefined;
     private _clearQueues: (() => void) | undefined;
-    private readonly eventEmitter: EventEmitter;
+    private readonly eventEmitter: ChunkEventSink;
     private readonly autoReconnect: boolean;
 
-    public constructor(eventEmitter: EventEmitter, autoReconnect: boolean) {
+    public constructor(eventEmitter: ChunkEventSink, autoReconnect: boolean) {
         this.eventEmitter = eventEmitter;
         this.autoReconnect = autoReconnect;
     }

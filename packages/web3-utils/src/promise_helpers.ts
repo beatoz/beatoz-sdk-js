@@ -122,14 +122,17 @@ export async function pollTillDefined<T>(
  * const [timerId, promise] = web3.utils.rejectIfTimeout(100, new Error('time out'));
  * ```
  */
-export function rejectIfTimeout(timeout: number, error: Error): [NodeJS.Timer, Promise<never>] {
-    let timeoutId: NodeJS.Timer | undefined;
+export function rejectIfTimeout(
+    timeout: number,
+    error: Error,
+): [ReturnType<typeof setTimeout>, Promise<never>] {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const rejectOnTimeout = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => {
             reject(error);
         }, timeout);
     });
-    return [timeoutId as unknown as NodeJS.Timer, rejectOnTimeout];
+    return [timeoutId as unknown as ReturnType<typeof setTimeout>, rejectOnTimeout];
 }
 
 /**
@@ -142,7 +145,7 @@ export function rejectIfTimeout(timeout: number, error: Error): [NodeJS.Timer, P
 export function rejectIfConditionAtInterval<T>(
     cond: AsyncFunction<T | undefined>,
     interval: number,
-): [NodeJS.Timer, Promise<never>] {
+): [ReturnType<typeof setTimeout>, Promise<never>] {
     let intervalId: NodeJS.Timeout | undefined;
     const rejectIfCondition = new Promise<never>((_, reject) => {
         intervalId = setInterval(() => {
@@ -155,5 +158,5 @@ export function rejectIfConditionAtInterval<T>(
             })() as unknown;
         }, interval);
     });
-    return [intervalId as unknown as NodeJS.Timer, rejectIfCondition];
+    return [intervalId as unknown as ReturnType<typeof setTimeout>, rejectIfCondition];
 }

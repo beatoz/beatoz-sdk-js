@@ -185,6 +185,25 @@ entries below name the packages they apply to.
 
 ### Fixed
 
+- No published declaration refers to a Node-only type any more, so consumers do
+  not need `@types/node` to read them. Three places leaked one:
+
+  | Package | Was | Now |
+  | --- | --- | --- |
+  | `@beatoz/web3-core` | `removeAllListeners(): EventEmitter<[never]>` | `removeAllListeners(): void` |
+  | `@beatoz/web3-utils` | `[NodeJS.Timer, …]` | `[ReturnType<typeof setTimeout>, …]` |
+  | `@beatoz/web3-utils` | `constructor(eventEmitter: EventEmitter, …)` | `constructor(eventEmitter: ChunkEventSink, …)` |
+
+  The first was not written by anyone: `removeAllListeners()` had no declared
+  return type, so TypeScript inferred one from the body and published it. That
+  is why this class of problem cannot be caught by reading the sources - it only
+  appears in the emitted `.d.ts`.
+
+  A browser consumer was carrying Node's type definitions because of these three
+  lines, and on TypeScript 6 - which no longer includes `@types/*` packages
+  automatically - had to add `"types": ["node"]` to their own `tsconfig.json`.
+  Neither is needed now.
+
 - The published type declarations now follow ES module rules, finishing the move
   to ESM. Two things were wrong, and both were invisible at runtime:
 
