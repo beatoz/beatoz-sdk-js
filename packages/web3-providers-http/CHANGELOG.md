@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- The published type declarations now follow ES module rules. `lib/types/` gets
+  a `package.json` marking it as ESM, so a consumer's compiler reads the `.d.ts`
+  files as ES modules rather than CommonJS. Without it the runtime half of the
+  package was ESM while its types were interpreted as CommonJS, which made a
+  default import ambiguous.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

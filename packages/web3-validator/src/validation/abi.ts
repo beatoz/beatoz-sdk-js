@@ -15,7 +15,7 @@
 */
 
 import { AbiParameter } from '@beatoz/web3-types';
-import { ShortValidationSchema } from '../types';
+import { ShortValidationSchema } from '../types.js';
 
 export const isAbiParameterSchema = (
     schema: string | ShortValidationSchema | AbiParameter,

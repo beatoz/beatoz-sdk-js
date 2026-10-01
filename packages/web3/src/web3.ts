@@ -18,7 +18,7 @@ import { Web3PkgInfo } from './version.js';
 import { Web3Context } from '@beatoz/web3-core';
 import Web3Method from '@beatoz/web3-methods';
 import { isNullish } from '@beatoz/web3-validator';
-import { Web3MethodInterface } from './types';
+import { Web3MethodInterface } from './types.js';
 import { initAccountsForContext } from './accounts.js';
 import abi from './abi.js';
 import { Address, ContractAbi } from '@beatoz/web3-types';

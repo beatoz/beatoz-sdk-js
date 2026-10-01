@@ -15,7 +15,7 @@
 */
 
 import { KeyStore, Web3BaseWallet } from '@beatoz/web3-types';
-import { Web3Account } from './types';
+import { Web3Account } from './types.js';
 import { isNullish } from '@beatoz/web3-utils';
 
 export class Wallet extends Web3BaseWallet<Web3Account> {

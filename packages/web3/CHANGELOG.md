@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- The published type declarations now follow ES module rules. `lib/types/` gets
+  a `package.json` marking it as ESM, so a consumer's compiler reads the `.d.ts`
+  files as ES modules rather than CommonJS. Without it the runtime half of the
+  package was ESM while its types were interpreted as CommonJS, which made a
+  default import ambiguous.
+
+- Relative imports in the sources now carry their `.js` extension. ES modules do
+  not guess extensions, and 9 of 245 relative imports were missing theirs. They
+  were type-only imports, so `tsc` erased them from the emitted `.js` and the
+  runtime never noticed - but they survive in the emitted `.d.ts`, where a
+  consumer using `moduleResolution: node16` or `nodenext` hit
+  `error TS2834: Relative import paths need explicit file extensions`.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

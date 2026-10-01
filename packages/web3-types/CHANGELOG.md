@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Fixed
+
+- The published type declarations now follow ES module rules. `lib/types/` gets
+  a `package.json` marking it as ESM, so a consumer's compiler reads the `.d.ts`
+  files as ES modules rather than CommonJS. Without it the runtime half of the
+  package was ESM while its types were interpreted as CommonJS, which made a
+  default import ambiguous.
+
+- Relative imports in the sources now carry their `.js` extension. ES modules do
+  not guess extensions, and 9 of 245 relative imports were missing theirs. They
+  were type-only imports, so `tsc` erased them from the emitted `.js` and the
+  runtime never noticed - but they survive in the emitted `.d.ts`, where a
+  consumer using `moduleResolution: node16` or `nodenext` hit
+  `error TS2834: Relative import paths need explicit file extensions`.
+
+### Removed
+
+- **BREAKING:** `Web3BaseProviderConstructor` is gone. Its `net?: Socket`
+  parameter was the only reason this package's declarations imported Node's
+  `net` module, which forced every consumer - browser ones included - to
+  install `@types/node` or hit `error TS2307: Cannot find module 'net'`. It is
+  the signature of web3.js's IPC provider, and this SDK has no IPC provider.
+  Nothing in this repository or in the four internal consumers referenced it.
+
 ### Added
 
 - Adds a `files` field, so the published package carries `lib/`, `src/`,

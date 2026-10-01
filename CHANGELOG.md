@@ -35,6 +35,14 @@ entries below name the packages they apply to.
 
 ### Removed
 
+- **BREAKING:** `@beatoz/web3-types` no longer exports
+  `Web3BaseProviderConstructor`. Its `net?: Socket` parameter was the only reason
+  this package's declarations imported Node's `net` module, which forced every
+  consumer - browser ones included - to install `@types/node` or hit
+  `error TS2307: Cannot find module 'net'`. It is the signature of web3.js's IPC
+  provider, and this SDK has no IPC provider. Nothing in this repository or in
+  the four internal consumers referenced it.
+
 - **BREAKING:** The `eth_subscribe` subscription subsystem is gone - 509 lines
   that could not run. `@beatoz/web3-core` loses `Web3Subscription`,
   `Web3SubscriptionManager`, `Web3SubscriptionConstructor` and
@@ -176,6 +184,18 @@ entries below name the packages they apply to.
   bytes.
 
 ### Fixed
+
+- The published type declarations now follow ES module rules, finishing the move
+  to ESM. Two things were wrong, and both were invisible at runtime:
+
+  `lib/types/` had no `package.json` marking it as ESM, so a consumer's compiler
+  read the `.d.ts` files as CommonJS while the `.js` beside them was ESM. The
+  build now writes that marker, the same way it already did for `lib/esm/`.
+
+  9 of 245 relative imports in the sources were missing their `.js` extension.
+  All nine were type-only, so `tsc` erased them from the emitted `.js` and every
+  runtime check passed - but they survive in the emitted `.d.ts`, where a
+  consumer on `moduleResolution: node16` or `nodenext` hit `error TS2834`.
 
 - Five packages did not declare dependencies they import, so installing any one
   of them on its own failed at load. Installing `@beatoz/web3-types` into an

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { ReadonlyDate } from 'readonly-date';
-import { HexString } from './primitives_types';
+import { HexString } from './primitives_types.js';
 
 /**
  * Represents a date object with additional nanoseconds precision.

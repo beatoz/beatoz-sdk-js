@@ -14,14 +14,14 @@
     limitations under the License.
 */
 
-import * as responses from '../responses';
-import { JsonRpcId } from '../json_rpc_types';
+import * as responses from '../responses.js';
+import { JsonRpcId } from '../json_rpc_types.js';
 import {
     Transaction1559UnsignedAPI,
     Transaction2930UnsignedAPI,
     TransactionLegacyUnsignedAPI,
-} from './eth_execution_api';
-import { Address } from '../beatoz_types';
+} from './eth_execution_api.js';
+import { Address } from '../beatoz_types.js';
 
 // https://github.com/ethereum/execution-apis/blob/main/src/schemas/transaction.yaml#L144
 export type TransactionUnsignedAPI =

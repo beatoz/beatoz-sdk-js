@@ -14,8 +14,6 @@
     limitations under the License.
 */
 
-import { Socket } from 'net';
-
 import { Web3Error } from './error_types.js';
 import { EthExecutionAPI } from './apis/eth_execution_api.js';
 import {
@@ -264,8 +262,3 @@ export type SupportedProviders<API extends Web3APISpec = BeatozExecutionAPI> =
     | LegacySendProvider
     | LegacySendAsyncProvider
     | SimpleProvider<API>;
-
-export type Web3BaseProviderConstructor = new <API extends Web3APISpec>(
-    url: string,
-    net?: Socket,
-) => Web3BaseProvider<API>;
