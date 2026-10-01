@@ -174,9 +174,20 @@ entries below name the packages they apply to.
 
 ### Added
 
-- Every package now declares `typescript: ">=5.4"` as an optional peer
+- Every package now declares `typescript: ">=5.7"` as an optional peer
   dependency. Nothing declared a supported compiler range before. It is
   optional so a JavaScript consumer is not asked to install TypeScript.
+
+  The number started at 5.4 and was raised once it was measured. These packages
+  are built with TypeScript 6.0.3, and the emitted declarations use
+  `Uint8Array<ArrayBufferLike>` - a generic form that only exists from 5.7 - so a
+  consumer on 5.4 hit `error TS2315: Type 'Uint8Array' is not generic`. 5.4 was
+  a claim nothing had checked.
+
+  It went unnoticed because `skipLibCheck: true` - the setting most projects
+  carry, and all four of ours - skips type-checking declarations in
+  `node_modules` entirely. The floor only mattered to consumers who check them,
+  and npm now refuses to install an older compiler against these packages.
 
 - `@beatoz/web3-accounts`: `privateKeyToAccount`, `privateKeyToPrvKey` and
   `sign` accept a `Uint8Array` private key. They previously declared

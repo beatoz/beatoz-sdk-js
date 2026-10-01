@@ -60,19 +60,56 @@ Two cases are easy to misread:
 The supported ranges are declared in every package:
 
 ```json
-"engines": { "node": ">=22.0.0" },
-"peerDependencies": { "typescript": ">=5.4" },
+"engines": { "node": ">=22.12.0" },
+"peerDependencies": { "typescript": ">=5.7" },
 "peerDependenciesMeta": { "typescript": { "optional": true } }
 ```
 
 TypeScript is an optional peer so that a JavaScript consumer is not asked to
-install it. The floor is what we support, not what the declarations happen to
-parse under: the emitted `.d.ts` currently loads under TypeScript 4.7, and that
-is an accident of the syntax we have used so far, not a promise.
+install it.
 
-Nothing checks the floor yet. Until something does, a change that needs a newer
-compiler will pass review and reach a consumer before anyone notices, so treat
-the number as a claim we have not yet made good on.
+The floor is measured, not chosen. It started at 5.4, picked as a round number
+below where the declarations happened to parse. That was wrong: these packages
+are built with TypeScript 6.0.3 and the emitted `.d.ts` uses
+`Uint8Array<ArrayBufferLike>`, which only exists from 5.7, so a consumer on 5.4
+hit `error TS2315: Type 'Uint8Array' is not generic`. Raising the number was
+not a decision to support less - it was correcting a claim that had never been
+checked.
+
+Measure it the way a consumer meets it: pack the packages, install them into an
+empty project, and type-check an import of each under the candidate compiler
+with `skipLibCheck: false`. That last setting is the point. With it on - the
+default most projects carry, including all four of ours - TypeScript skips
+declarations in `node_modules` entirely and the floor appears to hold at any
+version.
+
+Nothing checks this automatically yet. Until CI does, a change that needs a
+newer compiler will pass review and reach a consumer before anyone notices.
+
+### Node types stay out of the published declarations
+
+No `.d.ts` we publish may refer to `NodeJS.*`, or import from `events`, `net`,
+`fs`, `stream` or any other Node built-in. A consumer running in a browser
+should not have to install `@types/node` to read our types, and on TypeScript 6
+- which no longer includes `@types/*` packages automatically - they would also
+have to add `"types": ["node"]` to their own `tsconfig.json`.
+
+Writing Node types in the sources is fine; `tsconfig.base.json` sets
+`"types": ["node"]` for exactly that. The rule is about what reaches `lib/types`.
+Private fields and local variables are erased on the way out and do not count.
+
+This cannot be enforced by reading the sources. `removeAllListeners()` was
+declared with no return type, TypeScript inferred one from the body, and
+`EventEmitter<[never]>` appeared in the published declaration without anyone
+writing it. Check the emitted files:
+
+```console
+$ grep -rn "NodeJS\.\|from 'events'" packages/*/lib/types
+```
+
+A package that genuinely needs Node - an IPC provider, say - declares
+`@types/node` in its own `dependencies` and is exempt. The point is that the
+packages which do not need it are not carrying it for everyone else.
 
 ## Removing
 

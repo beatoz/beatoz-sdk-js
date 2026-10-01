@@ -52,7 +52,7 @@
         "@beatoz/web3-types": "^1.6.5"
     },
     "peerDependencies": {
-        "typescript": ">=5.4"
+        "typescript": ">=5.7"
     },
     "peerDependenciesMeta": {
         "typescript": {

@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Changed
 
+- **BREAKING:** The declared TypeScript floor is now 5.7, raised from 5.4. 5.4
+  was never true: this package is built with TypeScript 6.0.3, and the emitted
+  declarations use `Uint8Array<ArrayBufferLike>`, a generic form that only exists
+  from 5.7. A consumer on 5.4 reading these declarations hit
+  `error TS2315: Type 'Uint8Array' is not generic`.
+
+  It went unnoticed because `skipLibCheck: true` - the setting most projects
+  carry, and all four of ours - skips type-checking declarations in
+  `node_modules` entirely. The claim only failed for consumers who check them.
+
+### Changed
+
 - **BREAKING:** `Web3EventEmitter.removeAllListeners()` returns `void`. It had
   no declared return type, so TypeScript inferred one from the body and the
   emitted declaration became `removeAllListeners(): EventEmitter<[never]>` -
