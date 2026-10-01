@@ -34,7 +34,11 @@
 import { Web3 } from '../../src';
 import erc20Contract from '../fixtures/erc20-contract.json';
 import { privateKeyToAccount, TrxProtoBuilder, Web3Account } from '@beatoz/web3-accounts';
-import { getTestAccountAddress, getTestChainId, getTestProposalAccountPrivateKey } from './e2e_utils';
+import {
+    getTestAccountAddress,
+    getTestChainId,
+    getTestProposalAccountPrivateKey,
+} from './e2e_utils';
 
 /** Height of the latest committed block on the target chain. */
 export const getLatestHeight = async (web3: Web3): Promise<number> => {
@@ -153,9 +157,65 @@ export const waitForTx = async (web3: Web3, hash: string, timeoutMs = 20000): Pr
             return;
         } catch (err) {
             if (Date.now() > deadline) {
-                throw new Error(`the node did not report ${hash} within ${timeoutMs}ms: ${err}`);
+                throw new Error(`the node did not report ${hash} within ${timeoutMs}ms`, {
+                    cause: err,
+                });
             }
             await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+    }
+};
+
+/** Polls `check` until it passes, or gives up with `what` in the message. */
+export const waitUntil = async (
+    check: () => boolean,
+    what: string,
+    timeoutMs = 20000,
+): Promise<void> => {
+    const deadline = Date.now() + timeoutMs;
+    while (!check()) {
+        if (Date.now() > deadline) {
+            throw new Error(`${what} within ${timeoutMs}ms`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+};
+
+/**
+ * Sends `count` transfers and returns their hashes, in the order sent.
+ */
+export const sendTransfers = async (web3: Web3, count: number): Promise<string[]> => {
+    const hashes: string[] = [];
+    for (let i = 0; i < count; i++) {
+        hashes.push(await sendSampleTransfer(web3));
+    }
+    return hashes;
+};
+
+/**
+ * Makes the chain produce blocks and reports the height it reached.
+ *
+ * Each transfer is broadcast with commit, so it returns once its block exists -
+ * but two sent in quick succession can share one block, so the number of blocks
+ * is not the number of transfers. The height the chain reports afterwards is,
+ * which is why it is read rather than assumed.
+ */
+export const produceBlocks = async (web3: Web3, transfers: number): Promise<number> => {
+    await sendTransfers(web3, transfers);
+    return getLatestHeight(web3);
+};
+
+/**
+ * Fails unless `heights` is an unbroken ascending run.
+ *
+ * This is what a subscription promises: not that some events arrive, but that
+ * none are missed. A gap means the stream dropped a block.
+ */
+export const assertUnbroken = (heights: number[]): void => {
+    expect(heights.length).toBeGreaterThan(0);
+    for (let i = 1; i < heights.length; i++) {
+        if (heights[i] !== heights[i - 1] + 1) {
+            throw new Error(`the subscription skipped a block: received ${heights.join(', ')}`);
         }
     }
 };

@@ -75,4 +75,49 @@ export const produceBlock = async (): Promise<void> => {
     }
 };
 
+/** Polls `check` until it passes, or gives up with `what` in the message. */
+export const waitUntil = async (
+    check: () => boolean,
+    what: string,
+    timeoutMs = 20000,
+): Promise<void> => {
+    const deadline = Date.now() + timeoutMs;
+    while (!check()) {
+        if (Date.now() > deadline) {
+            throw new Error(`${what} within ${timeoutMs}ms`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+};
+
+/** The height the chain reports right now. */
+export const latestHeight = async (): Promise<number> =>
+    Number((await rpc('status', {})).sync_info.latest_block_height);
+
+/**
+ * Makes the chain produce blocks and reports the height it reached.
+ *
+ * Two transfers sent in quick succession can share a block, so the number of
+ * blocks is not the number of transfers. The height the chain reports is.
+ */
+export const produceBlocks = async (transfers: number): Promise<number> => {
+    for (let i = 0; i < transfers; i++) {
+        await produceBlock();
+    }
+    return latestHeight();
+};
+
+/**
+ * Fails unless `heights` is an unbroken ascending run. A gap means the stream
+ * dropped a block, which is the one thing a subscription must not do.
+ */
+export const assertUnbroken = (heights: number[]): void => {
+    expect(heights.length).toBeGreaterThan(0);
+    for (let i = 1; i < heights.length; i++) {
+        if (heights[i] !== heights[i - 1] + 1) {
+            throw new Error(`the subscription skipped a block: received ${heights.join(', ')}`);
+        }
+    }
+};
+
 export type { WebsocketProvider };

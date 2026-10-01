@@ -15,7 +15,7 @@
 */
 import { Web3 } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
-import { sendSampleTransfer } from '../chain_fixtures';
+import { assertUnbroken, produceBlocks, sendSampleTransfer, waitUntil } from '../chain_fixtures';
 import { SubscriptionEvent } from '@beatoz/web3-types';
 
 describe('subscribe check', () => {
@@ -25,13 +25,12 @@ describe('subscribe check', () => {
         web3 = new Web3(getTestWsServer());
     });
 
-    it('delivers block events until the subscription is cancelled', async () => {
+    it('delivers every block until the subscription is cancelled', async () => {
         const query = "tm.event='NewBlockHeader'";
-        const events: SubscriptionEvent[] = [];
+        const heights: number[] = [];
         let failure: Error | undefined;
 
-        const stream = web3.beatoz.subscribe(query);
-        const subscription = stream.subscribe({
+        const subscription = web3.beatoz.subscribe(query).subscribe({
             error: (err: Error) => {
                 failure = err;
             },
@@ -39,29 +38,32 @@ describe('subscribe check', () => {
                 failure = new Error('the subscription completed on its own');
             },
             next: (event: SubscriptionEvent) => {
-                events.push(event);
                 expect(event.query).toEqual(query);
+                heights.push(Number(event.data.value.header.height));
             },
         });
 
-        // This chain only produces empty blocks on a 60s timer, so a test that
-        // waits for blocks without causing any just times out. Each transfer is
-        // broadcast with commit, so it returns once its block exists.
-        await sendSampleTransfer(web3);
-        await sendSampleTransfer(web3);
+        // Empty blocks only come on a 60s timer here, so the chain has to be
+        // given something to do. How many blocks that makes is up to the chain,
+        // which is why the height it reaches is read rather than assumed.
+        const reached = await produceBlocks(web3, 3);
+        await waitUntil(
+            () => heights.length > 0 && heights[heights.length - 1] >= reached,
+            `the subscription did not reach height ${reached}`,
+        );
 
         expect(failure).toBeUndefined();
-        expect(events.length).toBeGreaterThanOrEqual(2);
+        assertUnbroken(heights);
 
-        const seenBeforeCancel = events.length;
+        const seenBeforeCancel = heights.length;
         subscription.unsubscribe();
 
-        // Cause another block. Nothing should reach a cancelled subscription -
-        // which is the part a plain wait cannot show, because on this chain
-        // nothing would have arrived anyway.
+        // Produce another block and give it time to arrive. Asserting straight
+        // away would not separate "never arrives" from "has not arrived yet".
         await sendSampleTransfer(web3);
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        expect(events.length).toEqual(seenBeforeCancel);
+        expect(heights.length).toEqual(seenBeforeCancel);
         expect(failure).toBeUndefined();
     });
 });

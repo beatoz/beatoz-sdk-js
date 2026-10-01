@@ -15,15 +15,15 @@
 */
 import { WebsocketProvider } from '../../../src';
 import { getTestWsServer } from '../e2e_utils';
-import { produceBlock } from '../block_fixtures';
+import { assertUnbroken, produceBlock, produceBlocks, waitUntil } from '../block_fixtures';
 import { createJsonRpcRequest } from './websocket_provider.test';
 import { SubscriptionEvent } from '@beatoz/web3-types';
 
 describe('WebsocketClient', () => {
-    it('delivers block headers until the subscription is cancelled', async () => {
+    it('delivers every block header until the subscription is cancelled', async () => {
         const client = new WebsocketProvider(getTestWsServer());
         const query = "tm.event='NewBlockHeader'";
-        const events: SubscriptionEvent[] = [];
+        const heights: number[] = [];
         let failure: Error | undefined;
 
         const subscription = client.listen(createJsonRpcRequest('subscribe', { query })).subscribe({
@@ -34,27 +34,31 @@ describe('WebsocketClient', () => {
                 failure = new Error('the subscription completed on its own');
             },
             next: (event: SubscriptionEvent) => {
-                events.push(event);
                 expect(event.query).toEqual(query);
+                heights.push(Number(event.data.value.header.height));
             },
         });
 
-        // This node only produces empty blocks on a 60s timer, so waiting for
-        // headers without causing a block just times out.
-        await produceBlock();
-        await produceBlock();
+        // Empty blocks only come on a 60s timer here, so the chain has to be
+        // given something to do.
+        const reached = await produceBlocks(3);
+        await waitUntil(
+            () => heights.length > 0 && heights[heights.length - 1] >= reached,
+            `the subscription did not reach height ${reached}`,
+        );
 
         expect(failure).toBeUndefined();
-        expect(events.length).toBeGreaterThanOrEqual(2);
+        assertUnbroken(heights);
 
-        const seenBeforeCancel = events.length;
+        const seenBeforeCancel = heights.length;
         subscription.unsubscribe();
 
-        // Nothing should reach a cancelled subscription. A plain wait cannot
-        // show that here, because on this chain nothing would arrive anyway.
+        // Produce another block and give it time to arrive. Asserting straight
+        // away would not separate "never arrives" from "has not arrived yet".
         await produceBlock();
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        expect(events.length).toEqual(seenBeforeCancel);
+        expect(heights.length).toEqual(seenBeforeCancel);
         expect(failure).toBeUndefined();
 
         client.disconnect();
