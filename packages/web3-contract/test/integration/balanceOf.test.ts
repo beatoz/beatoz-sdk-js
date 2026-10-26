@@ -15,13 +15,21 @@
 */
 import erc20Json from '../fixtures/erc20-abi.json';
 import _rep20Json from '../fixtures/REP20.json';
-import deployedContract from '../fixtures/deployed.contract.json';
-import { netInfo } from './e2e_utils';
+import { deployTestToken, netInfo } from './e2e_utils';
 import { VmCallResponse } from '@beatoz/web3-types';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { decodeParameter } from '@beatoz/web3-abi';
+import { Web3 } from '@beatoz/web3';
+
 describe('balanceOf test', () => {
+    let deployedContract: { address: string; deployer: string };
+    beforeAll(async () => {
+        const web3 = new Web3(netInfo.WS);
+        web3.beatoz.accounts.wallet.add(netInfo.ACCTS[0].KEY);
+        deployedContract = await deployTestToken(web3);
+    });
+
     it('balanceOf function', (done) => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
 

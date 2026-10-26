@@ -31,6 +31,9 @@
  * that imported it - including tests that never contacted a node.
  */
 
+import type { Web3 } from '@beatoz/web3';
+import tokenJson from '../fixtures/erc20-contract.json';
+
 const env = (key: string, fallback: string): string => process.env[key] ?? fallback;
 
 /** Reads a variable that has no safe default. */
@@ -112,4 +115,37 @@ export const netInfo = {
     get ACCTS(): ReadonlyArray<{ ADDR: string; KEY: string }> {
         return getTestAccounts().map((a) => ({ ADDR: a.address, KEY: a.privateKey }));
     },
+};
+
+/**
+ * Deploys a fresh ERC20 test token from the first test account and returns
+ * where it lives.
+ *
+ * Each suite calls this in its own `beforeAll` instead of reading an address
+ * another suite wrote to disk. Jest does not order suites, so a shared file
+ * could hold an address from an earlier run - one that does not exist on a
+ * freshly started node, which made calls hang until the timeout instead of
+ * failing. Deploying per suite also lets any suite run on its own.
+ *
+ * The caller's wallet must already hold the first test account.
+ */
+export const deployTestToken = async (
+    web3: Web3,
+): Promise<{ address: string; deployer: string }> => {
+    const deployer = web3.beatoz.accounts.wallet.get(getTestAccountAddress());
+    if (deployer === undefined) {
+        throw new Error('deployTestToken: the first test account is not in the wallet');
+    }
+
+    const res = await new web3.beatoz.Contract(tokenJson.abi)
+        .deploy(tokenJson.bytecode, ['BeatozToken', 'RGT'], deployer, getTestChainId(), 10000000)
+        .send();
+    if (res.check_tx.code !== 0 || res.deliver_tx?.code !== 0) {
+        throw new Error(
+            `deployTestToken: deploy failed: ${res.check_tx.log || res.deliver_tx?.log}`,
+        );
+    }
+
+    const address = await web3.beatoz.contractAddrFromTx(res.hash);
+    return { address, deployer: deployer.address };
 };

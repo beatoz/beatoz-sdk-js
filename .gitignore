@@ -14,7 +14,6 @@ lerna-debug.log
 
 .secrets.json
 .providers.json
-deployed.contract.json
 
 # Unsupported lock files
 package-lock.json

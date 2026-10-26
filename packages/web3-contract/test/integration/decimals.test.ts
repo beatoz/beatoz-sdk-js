@@ -14,14 +14,21 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
-import deployedContract from '../fixtures/deployed.contract.json';
-import { netInfo } from './e2e_utils';
+import { deployTestToken, netInfo } from './e2e_utils';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
 import { VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
+import { Web3 } from '@beatoz/web3';
 
 describe('deploy test', () => {
+    let deployedContract: { address: string; deployer: string };
+    beforeAll(async () => {
+        const web3 = new Web3(netInfo.WS);
+        web3.beatoz.accounts.wallet.add(netInfo.ACCTS[0].KEY);
+        deployedContract = await deployTestToken(web3);
+    });
+
     it('decimals function', (done) => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
         erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));

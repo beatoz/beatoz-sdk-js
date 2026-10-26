@@ -14,8 +14,7 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
-import deployedContract from '../fixtures/deployed.contract.json';
-import { netInfo } from './e2e_utils';
+import { deployTestToken, netInfo } from './e2e_utils';
 import {
     BroadcastTxCommitResponse,
     VmCallResponse,
@@ -30,6 +29,12 @@ const web3 = new Web3(netInfo.WS);
 for (const acct of netInfo.ACCTS) {
     web3.beatoz.accounts.wallet.add(acct.KEY);
 }
+
+let deployedContract: { address: string; deployer: string };
+beforeAll(async () => {
+    deployedContract = await deployTestToken(web3);
+});
+
 describe('transfer test', () => {
     it('transfer function', (done) => {
         const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
