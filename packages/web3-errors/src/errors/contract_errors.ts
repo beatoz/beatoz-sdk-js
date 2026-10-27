@@ -15,21 +15,8 @@
 */
 
 import { JsonRpcError, TransactionReceipt, HexString } from '@beatoz/web3-types';
-import {
-    ERR_CONTRACT,
-    ERR_CONTRACT_ABI_MISSING,
-    ERR_CONTRACT_EXECUTION_REVERTED,
-    ERR_CONTRACT_EVENT_NOT_EXISTS,
-    ERR_CONTRACT_INSTANTIATION,
-    ERR_CONTRACT_MISSING_ADDRESS,
-    ERR_CONTRACT_MISSING_DEPLOY_DATA,
-    ERR_CONTRACT_MISSING_FROM_ADDRESS,
-    ERR_CONTRACT_REQUIRED_CALLBACK,
-    ERR_CONTRACT_RESERVED_EVENT,
-    ERR_CONTRACT_RESOLVER_MISSING,
-    ERR_CONTRACT_TX_DATA_AND_INPUT,
-} from '../error_codes.js';
-import { BaseWeb3Error, InvalidValueError } from '../web3_error_base.js';
+import { ERR_CONTRACT, ERR_CONTRACT_EXECUTION_REVERTED } from '../error_codes.js';
+import { BaseWeb3Error } from '../web3_error_base.js';
 
 export class Web3ContractError extends BaseWeb3Error {
     public code = ERR_CONTRACT;
@@ -41,91 +28,6 @@ export class Web3ContractError extends BaseWeb3Error {
         this.receipt = receipt;
     }
 }
-export class ResolverMethodMissingError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_RESOLVER_MISSING;
-
-    public constructor(
-        public address: string,
-        public name: string,
-    ) {
-        super(`The resolver at ${address} does not implement requested method: "${name}".`);
-    }
-
-    public toJSON() {
-        return { ...super.toJSON(), address: this.address, name: this.name };
-    }
-}
-
-export class ContractMissingABIError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_ABI_MISSING;
-
-    public constructor() {
-        super(
-            'You must provide the json interface of the contract when instantiating a contract object.',
-        );
-    }
-}
-
-export class ContractOnceRequiresCallbackError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_REQUIRED_CALLBACK;
-
-    public constructor() {
-        super('Once requires a callback as the second parameter.');
-    }
-}
-
-export class ContractEventDoesNotExistError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_EVENT_NOT_EXISTS;
-
-    public constructor(public eventName: string) {
-        super(`Event "${eventName}" doesn't exist in this contract.`);
-    }
-
-    public toJSON() {
-        return { ...super.toJSON(), eventName: this.eventName };
-    }
-}
-
-export class ContractReservedEventError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_RESERVED_EVENT;
-
-    public constructor(public type: string) {
-        super(`Event "${type}" doesn't exist in this contract.`);
-    }
-
-    public toJSON() {
-        return { ...super.toJSON(), type: this.type };
-    }
-}
-
-export class ContractMissingDeployDataError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_MISSING_DEPLOY_DATA;
-
-    public constructor() {
-        super(`No "data" specified in neither the given options, nor the default options.`);
-    }
-}
-
-export class ContractNoAddressDefinedError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_MISSING_ADDRESS;
-
-    public constructor() {
-        super("This contract object doesn't have address set yet, please set an address first.");
-    }
-}
-
-export class ContractNoFromAddressDefinedError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_MISSING_FROM_ADDRESS;
-
-    public constructor() {
-        super('No "from" address specified in neither the given options, nor the default options.');
-    }
-}
-
-export class ContractInstantiationError extends BaseWeb3Error {
-    public code = ERR_CONTRACT_INSTANTIATION;
-}
-
 export type ProviderErrorData =
     HexString | { data: HexString } | { originalError: { data: HexString } };
 
@@ -219,16 +121,5 @@ export class ContractExecutionError extends Web3ContractError {
         super('Error happened while trying to execute a function inside a smart contract');
         this.code = ERR_CONTRACT_EXECUTION_REVERTED;
         this.innerError = new Eip838ExecutionError(rpcError as JsonRpcError<ProviderErrorData>);
-    }
-}
-
-export class ContractTransactionDataAndInputError extends InvalidValueError {
-    public code = ERR_CONTRACT_TX_DATA_AND_INPUT;
-
-    public constructor(value: { data: HexString | undefined; input: HexString | undefined }) {
-        super(
-            `data: ${value.data ?? 'undefined'}, input: ${value.input ?? 'undefined'}`,
-            'You can\'t have "data" and "input" as properties of a contract at the same time, please use either "data" or "input" instead.',
-        );
     }
 }

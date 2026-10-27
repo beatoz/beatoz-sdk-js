@@ -18,15 +18,12 @@ import {
     ERR_INVALID_BYTES,
     ERR_INVALID_NUMBER,
     ERR_INVALID_ADDRESS,
-    ERR_INVALID_BLOCK,
     ERR_INVALID_BOOLEAN,
     ERR_INVALID_HEX,
     ERR_INVALID_LARGE_VALUE,
     ERR_INVALID_NIBBLE_WIDTH,
     ERR_INVALID_SIZE,
     ERR_INVALID_STRING,
-    ERR_INVALID_TYPE,
-    ERR_INVALID_TYPE_ABI,
     ERR_INVALID_UNIT,
     ERR_INVALID_UNSIGNED_INTEGER,
 } from '../error_codes.js';
@@ -88,14 +85,6 @@ export class NibbleWidthError extends InvalidValueError {
     }
 }
 
-export class InvalidTypeError extends InvalidValueError {
-    public code = ERR_INVALID_TYPE;
-
-    public constructor(value: unknown) {
-        super(value, 'invalid type, type not supported');
-    }
-}
-
 export class InvalidBooleanError extends InvalidValueError {
     public code = ERR_INVALID_BOOLEAN;
 
@@ -125,21 +114,5 @@ export class InvalidLargeValueError extends InvalidValueError {
 
     public constructor(value: unknown) {
         super(value, 'value is larger than size.');
-    }
-}
-
-export class InvalidBlockError extends InvalidValueError {
-    public code = ERR_INVALID_BLOCK;
-
-    public constructor(value: string) {
-        super(value, 'invalid string given');
-    }
-}
-
-export class InvalidTypeAbiInputError extends InvalidValueError {
-    public code = ERR_INVALID_TYPE_ABI;
-
-    public constructor(value: string) {
-        super(value, 'components found but type is not tuple');
     }
 }

@@ -55,6 +55,45 @@ entries below name the packages they apply to.
 
 ### Removed
 
+- `@beatoz/web3-errors`: **BREAKING:** 43 error classes and 93 error code
+  constants are gone - every one that no package in this repository constructs,
+  extends or reads. They came with the web3.js fork and describe Ethereum
+  machinery this chain does not have (ENS, hardforks, EIP-1559 fee markets,
+  keystores, plugin namespaces, the EIP-1193 provider events) or code paths
+  removed earlier, such as the WebSocket reconnect and subscription errors. None
+  was ever thrown, so code that caught them never saw one.
+
+  Kept: the 18 classes the packages throw, the two they only check for
+  (`ContractExecutionError` with `instanceof`, `Eip838ExecutionError` as a
+  type), their base classes, and all of `rpc_errors.ts`, whose classes
+  `Web3RequestManager` picks by error code through `rpcErrorsMap` rather than
+  naming them. The four internal consumers import nothing from this package.
+
+  Removed classes: `ConfigChainMismatchError`, `ConfigHardforkMismatchError`,
+  `ConnectionCloseError`, `ConnectionError`, `ConnectionNotOpenError`,
+  `ConnectionTimeoutError`, `ContractEventDoesNotExistError`,
+  `ContractInstantiationError`, `ContractMissingABIError`,
+  `ContractMissingDeployDataError`, `ContractNoAddressDefinedError`,
+  `ContractNoFromAddressDefinedError`, `ContractOnceRequiresCallbackError`,
+  `ContractReservedEventError`, `ContractTransactionDataAndInputError`,
+  `ExistingPluginNamespaceError`, `IVLengthError`, `InvalidBlockError`,
+  `InvalidClientError`, `InvalidConnectionError`, `InvalidKdfError`,
+  `InvalidMethodParamsError`, `InvalidNumberOfParamsError`,
+  `InvalidPasswordError`, `InvalidPrivateKeyError`, `InvalidProviderError`,
+  `InvalidSignatureError`, `InvalidTypeAbiInputError`, `InvalidTypeError`,
+  `KeyDerivationError`, `KeyStoreVersionError`,
+  `MaxAttemptsReachedOnReconnectingError`, `MethodNotImplementedError`,
+  `OperationAbortError`, `PBKDF2IterationsError`,
+  `PendingRequestsOnReconnectingError`, `PrivateKeyLengthError`,
+  `ProviderError`, `RequestAlreadySentError`, `ResolverMethodMissingError`,
+  `SignatureError`, `SubscriptionError`, `Web3WSProviderError`.
+
+  Removed constants: everything in `error_codes.ts` the kept classes and the
+  other packages do not use - the connection (`ERR_CONN*`), provider,
+  subscription, signature, keystore and private key codes, all 39 transaction
+  codes (`ERR_TX_*`), the ENS codes, the EIP-1193 `JSONRPC_ERR_*` codes and
+  `GENESIS_BLOCK_NUMBER`.
+
 - **BREAKING:** `@beatoz/web3-types` no longer exports
   `Web3BaseProviderConstructor`. Its `net?: Socket` parameter was the only reason
   this package's declarations imported Node's `net` module, which forced every
