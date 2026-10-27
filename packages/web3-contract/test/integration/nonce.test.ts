@@ -60,13 +60,16 @@ describe('transfer token test', () => {
         const acctInfo = await web3.beatoz.getAccount(fromAcct!.address);
         console.log('acctInfo', acctInfo);
 
+        // Gas comes from the chain's rule. A hardcoded price here was
+        // rejected as `invalid gas price`, and nothing checked the result.
+        const { value: rule } = await web3.beatoz.rule();
         const tx: TrxProto = TrxProtoBuilder.buildTransferTrxProto({
             from: acctInfo.value.address,
             nonce: acctInfo.value.nonce,
             to: '0x0000000000000000000000000000000000000001',
             amount: '100',
-            gas: 1000000,
-            gasPrice: '250000000000',
+            gas: Number(rule.minTrxGas),
+            gasPrice: String(rule.gasPrice),
         });
 
         const { rawTransaction } = fromAcct!.signTransaction(tx, netInfo.CHAINID);
@@ -74,5 +77,7 @@ describe('transfer token test', () => {
         // broadcast raw transaction
         const result = await web3.beatoz.broadcastRawTxCommit(rawTransaction);
         console.log(result);
+        expect(result.check_tx.code).toEqual(0);
+        expect(result.deliver_tx?.code).toEqual(0);
     });
 });
