@@ -14,8 +14,8 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
-import { sendSampleTransfer } from '../chain_fixtures';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
+import { sendSampleTransfer, waitForTx } from '../chain_fixtures';
 import { TxResponse } from '@beatoz/web3-types';
 
 describe('txSearch check ', () => {
@@ -25,8 +25,11 @@ describe('txSearch check ', () => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
 
+    afterAll(() => closeProvider(testWebsocketWeb3Instance));
+
     it('returns a transaction this chain has actually seen', async () => {
         const hash = await sendSampleTransfer(testWebsocketWeb3Instance);
+        await waitForTx(testWebsocketWeb3Instance, hash);
 
         const testTxResponse: TxResponse = await testWebsocketWeb3Instance.beatoz.tx(hash);
 
