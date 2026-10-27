@@ -43,9 +43,12 @@ function isSet(value: any): boolean {
 /**
  * Parses a decimal string as a uint256.
  *
- * Only digits are accepted. bn.js is more lenient than that and not safely
- * so: it reads '' as 0, accepts '-1', and never returns on ' '. Checking the
- * form first keeps those inputs from becoming a zero, a negative or a hang.
+ * Only digits are accepted. bn.js is more lenient than that, and not safely:
+ * it reads '' as 0; it turns ' ' into a number with no value, which throws
+ * `Cannot read properties of null` when converted to bytes and never returns
+ * from toString(); and it reads '-1' as -1, whose bytes drop the sign - a
+ * transaction then carries 1. Checking the form first turns each of those
+ * into an error that names the field.
  */
 function parseUint256(name: string, value: string): BN {
     if (typeof value !== 'string' || !/^[0-9]+$/.test(value)) {
@@ -180,12 +183,9 @@ function buildTransferTrxProto(transaction: Transaction<object>): TrxProto {
         from: BytesUint8Array.fromHex(transaction.from),
         to: BytesUint8Array.fromHex(transaction.to),
         // proto3 default rule: If the field has default value, the filed should be omitted.
-        Amount:
-            transaction.amount === '0'
-                ? new Uint8Array()
-                : new Uint8Array(new BN(transaction.amount).toArrayLike(Buffer)),
+        Amount: toUint256Bytes(parseUint256('amount', transaction.amount)),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 1, // transfer type
         Payload: new Uint8Array(),
         sig: new Uint8Array(),
@@ -207,12 +207,9 @@ function buildDelegateTrxProto(transaction: Transaction<object>): TrxProto {
                 : Long.fromValue(0),
         from: BytesUint8Array.fromHex(transaction.from),
         to: BytesUint8Array.fromHex(transaction.to),
-        Amount:
-            transaction.amount === '0'
-                ? new Uint8Array()
-                : new Uint8Array(new BN(transaction.amount).toArrayLike(Buffer)),
+        Amount: toUint256Bytes(parseUint256('amount', transaction.amount)),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 2, // staking type
         Payload: new Uint8Array(),
         sig: new Uint8Array(),
@@ -245,12 +242,9 @@ function buildUnDelegateTrxProto(
                 : Long.fromValue(0),
         from: BytesUint8Array.fromHex(transaction.from),
         to: BytesUint8Array.fromHex(transaction.to),
-        Amount:
-            transaction.amount === '0'
-                ? new Uint8Array()
-                : new Uint8Array(new BN(transaction.amount).toArrayLike(Buffer)),
+        Amount: toUint256Bytes(parseUint256('amount', transaction.amount)),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 3, // unstaking type
         Payload: payloadBytes,
         sig: new Uint8Array(),
@@ -287,7 +281,7 @@ function buildProposalTrx(transaction: Transaction<TrxPayloadProposalProto>): Tr
         to: BytesUint8Array.fromHex(transaction.to),
         Amount: new Uint8Array(),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 4, // proposal type
         Payload: payloadBytes,
         sig: new Uint8Array(),
@@ -320,7 +314,7 @@ function buildVotingTrx(transaction: Transaction<TrxPayloadVotingProto>): TrxPro
         to: BytesUint8Array.fromHex(transaction.to),
         Amount: new Uint8Array(),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 5, // voting type
         Payload: payloadBytes,
         sig: new Uint8Array(),
@@ -350,12 +344,9 @@ function buildContractTrxProto(transaction: Transaction<TrxPayloadCreateContract
                 : Long.fromValue(0),
         from: BytesUint8Array.fromHex(transaction.from),
         to: BytesUint8Array.fromHex(transaction.to),
-        Amount:
-            transaction.amount === '0'
-                ? new Uint8Array()
-                : new Uint8Array(new BN(transaction.amount).toArrayLike(Buffer)),
+        Amount: toUint256Bytes(parseUint256('amount', transaction.amount)),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 6, // contract type
         Payload: payloadBytes,
         sig: new Uint8Array(),
@@ -435,7 +426,7 @@ function buildSetDocTrx(transaction: Transaction<object>): TrxProto {
         to: BytesUint8Array.fromHex(transaction.to),
         Amount: new Uint8Array(),
         gas: Long.fromValue(transaction.gas),
-        GasPrice: new Uint8Array(new BN(transaction.gasPrice).toArrayLike(Buffer)),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
         type: 7, // voting type
         Payload: payloadBytes,
         sig: new Uint8Array(),

@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** Every transaction builder now requires `amount` and `gasPrice`
+  to be decimal strings of digits, and encodes them the way the node does. Both
+  went straight to bn.js before, which is lenient in ways that reached the
+  chain:
+
+  - `'-1'` was read as -1 and encoded as `01`, because the bytes drop the sign:
+    it built a transfer of 1, and the node's CheckTx accepts that transaction.
+  - Zero was encoded as no bytes only when written exactly `'0'`. `'00'`,
+    `'000'` and `''` became `[0x00]`, while the node rebuilds zero as no bytes
+    to check the signature, so it refused them as `invalid signature`.
+  - `' '` became a number with no value, which failed with `Cannot read
+    properties of null`.
+
+  Now any spelling of zero in digits encodes as no bytes and reaches the chain,
+  and `''`, `' '`, a sign or anything but digits fails before anything is
+  signed, naming the field: `amount must be a decimal string of digits`. The
+  SDK's own callers and the internal services that use the builders already pass
+  decimal strings; a JavaScript caller passing a number instead of a string is
+  refused too.
+
 ### Added
 
 - `TrxProtoBuilder.buildWithdrawTrx` builds a withdraw transaction (type 8),
@@ -17,12 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
   requires. A zero `reqAmt` is refused before anything is sent: the chain would
   accept it, but it moves nothing and only pays the fee.
 
-  `reqAmt`, `amount` and `gasPrice` must be decimal strings of digits. bn.js,
-  which the other builders hand these to directly, reads `''` as 0, accepts
-  `'-1'` and never returns on `' '`. `reqAmt` and `gasPrice` are encoded the way
-  beatoz-go's `uint256.Int.Bytes()` encodes them - minimal, and empty for zero -
-  because the node re-encodes them that way to check the signature; any other
-  form of the same number fails as `invalid signature`.
+  `reqAmt`, `amount` and `gasPrice` must be decimal strings of digits. `reqAmt`
+  and `gasPrice` are encoded the way beatoz-go's `uint256.Int.Bytes()` encodes
+  them - minimal, and empty for zero - because the node re-encodes them that way
+  to check the signature; any other form of the same number fails as `invalid
+  signature`.
 
   Against the regular test node it reaches the reward check (`not found result`
   for an account with no reward), so the node decoded it and accepted the
