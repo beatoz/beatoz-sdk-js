@@ -17,11 +17,10 @@ import erc20Json from '../fixtures/erc20-abi.json';
 import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
-import { VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
 
-describe('deploy test', () => {
+describe('decimals test', () => {
     let deployedContract: { address: string; deployer: string };
     beforeAll(async () => {
         const web3 = new Web3(netInfo.WS);
@@ -33,17 +32,12 @@ describe('deploy test', () => {
     const provider = new WebsocketProvider(netInfo.WS);
     afterAll(() => provider.disconnect());
 
-    it('decimals function', (done) => {
+    it('decimals function', async () => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
         erc20Contract.setProvider(provider);
 
-        erc20Contract.methods
-            .decimals()
-            .call()
-            .then((resp: VmCallResponse) => {
-                const decimals = decodeParameter('uint', resp.value.returnData);
-                console.log('decimals', decimals);
-                done();
-            });
+        const resp = await erc20Contract.methods.decimals().call();
+
+        expect(decodeParameter('uint', resp.value.returnData)).toEqual(18n);
     });
 });

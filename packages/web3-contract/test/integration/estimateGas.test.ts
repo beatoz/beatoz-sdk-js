@@ -55,7 +55,7 @@ describe('estimateGas test', () => {
 
     it(
         'estimateGas',
-        (done) => {
+        async () => {
             async function deploy() {
                 const contract = new web3.beatoz.Contract(rep1155Json.abi);
                 contract.setProvider(provider);
@@ -122,10 +122,9 @@ describe('estimateGas test', () => {
                     )
                     .broadcast(commitOpt);
                 if (resp.check_tx.code != 0 || resp.deliver_tx.code != 0) {
-                    process.stdout.write(
+                    throw new Error(
                         `error: ${resp.check_tx.code != 0 ? resp.check_tx.log : resp.deliver_tx.log}`,
                     );
-                    return;
                 }
                 process.stdout.write('Success\n');
 
@@ -188,7 +187,7 @@ describe('estimateGas test', () => {
                 sendMode: 'commit',
             };
 
-            mint().then(() => done());
+            await mint();
         },
         1000 * 60,
     );

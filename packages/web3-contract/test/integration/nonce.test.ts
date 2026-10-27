@@ -13,13 +13,19 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Contract as _Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
-import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
+import {
+    assertCommitted,
+    closeProvider,
+    deployTestToken,
+    netInfo,
+    tokenBalance,
+} from './e2e_utils';
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
-import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
-import { decodeParameter } from '@beatoz/web3-abi';
+import { TrxProto } from '@beatoz/web3-types';
 import { Web3 } from '@beatoz/web3';
+
+const RECIPIENT = '0x0000000000000000000000000000000000000001';
 
 describe('transfer token test', () => {
     const web3 = new Web3(netInfo.WS);
@@ -33,32 +39,23 @@ describe('transfer token test', () => {
     });
     afterAll(() => closeProvider(web3));
 
-    it('transfer function', (done) => {
-        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
+    it('transfer function', async () => {
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
         const erc20Contract = new web3.beatoz.Contract(erc20Json, deployedContract.address) as any;
+        const before = await tokenBalance(erc20Contract, RECIPIENT);
 
-        erc20Contract.methods
-            .transfer('0x0000000000000000000000000000000000000001', '1000')
-            .broadcast({ from: fromAcct!.address, gas: '250000' })
-            .then((res: BroadcastTxCommitResponse) => {
-                console.log('response', res);
+        const res = await erc20Contract.methods
+            .transfer(RECIPIENT, '1000')
+            .broadcast({ from: fromAcct.address, gas: '250000' });
 
-                erc20Contract.methods
-                    .balanceOf('0x0000000000000000000000000000000000000001')
-                    .call()
-                    .then((resp: VmCallResponse) => {
-                        console.log('response', resp);
-                        const hexBalance = `0x${resp.value.returnData ?? '00'}`;
-                        console.log('balance', decodeParameter('uint', hexBalance));
-                        done();
-                    });
-            });
+        assertCommitted(res);
+        expect(await tokenBalance(erc20Contract, RECIPIENT)).toEqual(before + 1000n);
     });
 
     it('transfer coin test (not evm)', async () => {
-        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);
-        const acctInfo = await web3.beatoz.getAccount(fromAcct!.address);
-        console.log('acctInfo', acctInfo);
+        const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
+        const acctInfo = await web3.beatoz.getAccount(fromAcct.address);
+        const before = BigInt((await web3.beatoz.getAccount(RECIPIENT)).value.balance);
 
         // Gas comes from the chain's rule. A hardcoded price here was
         // rejected as `invalid gas price`, and nothing checked the result.
@@ -66,18 +63,15 @@ describe('transfer token test', () => {
         const tx: TrxProto = TrxProtoBuilder.buildTransferTrxProto({
             from: acctInfo.value.address,
             nonce: acctInfo.value.nonce,
-            to: '0x0000000000000000000000000000000000000001',
+            to: RECIPIENT,
             amount: '100',
             gas: Number(rule.minTrxGas),
             gasPrice: String(rule.gasPrice),
         });
+        const { rawTransaction } = fromAcct.signTransaction(tx, netInfo.CHAINID);
 
-        const { rawTransaction } = fromAcct!.signTransaction(tx, netInfo.CHAINID);
-
-        // broadcast raw transaction
-        const result = await web3.beatoz.broadcastRawTxCommit(rawTransaction);
-        console.log(result);
-        expect(result.check_tx.code).toEqual(0);
-        expect(result.deliver_tx?.code).toEqual(0);
+        assertCommitted(await web3.beatoz.broadcastRawTxCommit(rawTransaction));
+        const after = BigInt((await web3.beatoz.getAccount(RECIPIENT)).value.balance);
+        expect(after).toEqual(before + 100n);
     });
 });

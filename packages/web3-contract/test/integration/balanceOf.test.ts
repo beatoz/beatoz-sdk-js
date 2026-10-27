@@ -14,12 +14,15 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
-import _rep20Json from '../fixtures/REP20.json';
-import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
-import { VmCallResponse } from '@beatoz/web3-types';
+import {
+    closeProvider,
+    deployTestToken,
+    netInfo,
+    TEST_TOKEN_SUPPLY,
+    tokenBalance,
+} from './e2e_utils';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
-import { decodeParameter } from '@beatoz/web3-abi';
 import { Web3 } from '@beatoz/web3';
 
 describe('balanceOf test', () => {
@@ -34,18 +37,16 @@ describe('balanceOf test', () => {
     const provider = new WebsocketProvider(netInfo.WS);
     afterAll(() => provider.disconnect());
 
-    it('balanceOf function', (done) => {
+    it('balanceOf function', async () => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
-
         erc20Contract.setProvider(provider);
-        erc20Contract.methods
-            .balanceOf(deployedContract.deployer)
-            .call()
-            .then((resp: VmCallResponse) => {
-                console.log('resp', resp);
-                const balance = decodeParameter('uint', resp.value.returnData);
-                console.log('balance', balance);
-                done();
-            });
+
+        // A fresh token: the deployer holds the whole supply, nobody else holds any.
+        expect(await tokenBalance(erc20Contract, deployedContract.deployer)).toEqual(
+            TEST_TOKEN_SUPPLY,
+        );
+        expect(
+            await tokenBalance(erc20Contract, '0x0000000000000000000000000000000000000001'),
+        ).toEqual(0n);
     });
 });

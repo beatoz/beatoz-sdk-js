@@ -33,6 +33,8 @@
 
 import type { Web3 } from '@beatoz/web3';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
+import { decodeParameter } from '@beatoz/web3-abi';
+import type { BroadcastTxCommitResponse } from '@beatoz/web3-types';
 import tokenJson from '../fixtures/erc20-contract.json';
 
 const env = (key: string, fallback: string): string => process.env[key] ?? fallback;
@@ -177,4 +179,25 @@ export const closeProvider = (context: { getProvider(): unknown }): void => {
     if (provider instanceof WebsocketProvider) {
         provider.disconnect();
     }
+};
+
+/** Initial supply the test token mints to its deployer: 10^9 tokens of 18 decimals. */
+export const TEST_TOKEN_SUPPLY = 10n ** 27n;
+
+/**
+ * Throws unless the transaction passed both CheckTx and DeliverTx.
+ *
+ * Carries the node's log, so a rejected transaction fails with the reason
+ * instead of a bare "expected 0, received 5".
+ */
+export const assertCommitted = (res: BroadcastTxCommitResponse): void => {
+    if (res.check_tx.code !== 0 || res.deliver_tx?.code !== 0) {
+        throw new Error(`tx ${res.hash} failed: ${res.check_tx.log || res.deliver_tx?.log}`);
+    }
+};
+
+/** Reads an ERC20 balance through the contract's own `balanceOf`. */
+export const tokenBalance = async (contract: any, owner: string): Promise<bigint> => {
+    const resp = await contract.methods.balanceOf(owner).call();
+    return BigInt(String(decodeParameter('uint', resp.value.returnData)));
 };
