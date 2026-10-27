@@ -75,14 +75,20 @@ async function waitForRpc(timeoutMs = 60000) {
 }
 
 /**
- * Reads the wallet keys the entrypoint printed.
+ * Reads the funded wallet keys from the running container.
  *
- * They only appear in the container's logs, so this is the only place they can
- * come from. The entrypoint prints them as `address : 0x...` / `private key :
- * 0x...` pairs under a banner saying not to use them anywhere but a test.
+ * The entrypoint prints them on startup as `address : 0x...` / `private key :
+ * 0x...` pairs, under a banner saying not to use them anywhere but a test.
+ * This runs the same command it runs rather than reading its logs: the logs
+ * grow with every block, and once past execFileSync's 1 MB buffer they could
+ * no longer be read at all.
  */
 function readWallets() {
-    const logs = dockerQuiet(['logs', config.container]);
+    const printKeys =
+        'for file in /root/.beatoz/walkeys/wk*.json; do ' +
+        `beatoz wallet-key "$file" | grep -v 'wallet file' | ` +
+        `awk -F': ' '{print $1 ": 0x" tolower($2)}'; done`;
+    const logs = docker(['exec', config.container, 'sh', '-c', printKeys]);
     const wallets = [];
     let address;
     for (const line of logs.split('\n')) {
