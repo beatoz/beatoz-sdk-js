@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
   which moves part of the sender's accumulated staking reward into its balance.
   The chain accepted these all along; the SDK could decode one but not build it.
   The value goes in `payload.reqAmt`; `amount` must be zero, as the chain
-  requires.
+  requires. A zero `reqAmt` is refused before anything is sent: the chain would
+  accept it, but it moves nothing and only pays the fee.
 
   `reqAmt`, `amount` and `gasPrice` must be decimal strings of digits. bn.js,
   which the other builders hand these to directly, reads `''` as 0, accepts

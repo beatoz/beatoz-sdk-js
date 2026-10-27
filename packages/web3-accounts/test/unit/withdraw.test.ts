@@ -57,7 +57,6 @@ describe('buildWithdrawTrx', () => {
         ['256', '0a020100', '820100'],
         ['255', '0a01ff', '81ff'],
         ['1', '0a0101', '01'],
-        ['0', '', '80'],
         ['000256', '0a020100', '820100'],
         [(2n ** 256n - 1n).toString(), '0a20' + 'ff'.repeat(32), 'a0' + 'ff'.repeat(32)],
     ])('encodes reqAmt %s minimally, as the node re-encodes it', (reqAmt, payload, signed) => {
@@ -76,8 +75,16 @@ describe('buildWithdrawTrx', () => {
         expect(signedFields(tx)[AMOUNT]).toHaveLength(0);
     });
 
-    it('encodes gasPrice minimally', () => {
+    it('encodes gasPrice minimally, and zero as no bytes', () => {
         expect(signedFields(build('5'))[GAS_PRICE].toString('hex')).toEqual('0b2d05e000');
+        // The same rule the node uses for every uint256; a zero gasPrice is
+        // the case that reaches it here, since a zero reqAmt is refused.
+        expect(build('5', { gasPrice: '0' }).GasPrice).toHaveLength(0);
+        expect(signedFields(build('5', { gasPrice: '0' }))[GAS_PRICE]).toHaveLength(0);
+    });
+
+    it.each([['0'], ['000']])('refuses to withdraw %j, which would only pay the fee', (reqAmt) => {
+        expect(() => build(reqAmt)).toThrow('payload.reqAmt must be greater than 0');
     });
 
     it('decodes back to the same request', () => {

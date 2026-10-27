@@ -370,8 +370,8 @@ function buildContractTrxProto(transaction: Transaction<TrxPayloadCreateContract
 /**
  * Builds a transaction that moves part of the sender's accumulated staking
  * reward into its balance. The chain requires `amount` to be zero - the value
- * goes in `payload.reqAmt` - and rejects a request above the reward the
- * sender has accumulated as `insufficient reward`.
+ * goes in `payload.reqAmt`, which must be above zero - and rejects a request
+ * above the reward the sender has accumulated as `insufficient reward`.
  */
 function buildWithdrawTrx(transaction: Transaction<TransactionPayloadWithdraw>): TrxProto {
     const payload = transaction.payload as TransactionPayloadWithdraw;
@@ -379,6 +379,11 @@ function buildWithdrawTrx(transaction: Transaction<TransactionPayloadWithdraw>):
         throw Error('mandatory argument is missed');
     }
     const reqAmt = parseUint256('payload.reqAmt', payload.reqAmt);
+    // The chain accepts a zero request, but it moves nothing and still costs
+    // the fee - typically a ledger read as 0 and passed straight through.
+    if (reqAmt.isZero()) {
+        throw Error('payload.reqAmt must be greater than 0; withdrawing 0 only pays the fee');
+    }
     if (!parseUint256('amount', transaction.amount).isZero()) {
         throw Error('a withdraw moves no amount; put the value in payload.reqAmt');
     }
