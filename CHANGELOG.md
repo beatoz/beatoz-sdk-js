@@ -207,6 +207,13 @@ entries below name the packages they apply to.
 
 ### Fixed
 
+- `@beatoz/web3-core`: `setProvider()` with a URL now builds one provider. It
+  built two and kept the second, so for a `ws://` URL the first opened a socket
+  that nothing referenced and nothing could close, and a Node process that
+  called it never exited on its own. This now matches web3.js 4.x, where
+  `Web3Context.setProvider` hands the value to the request manager and the
+  request manager alone turns a URL into a provider.
+
 - `@beatoz/web3-providers-ws`: `disconnect()` now stays disconnected. The
   reconnect logic read the `Disconnected` status that `disconnect()` itself
   reports as a dropped connection, and opened a new socket about 100ms later.

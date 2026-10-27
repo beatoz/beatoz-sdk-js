@@ -44,6 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Fixed
 
+- `setProvider()` with a URL now builds one provider. It built two and kept the
+  second, so for a `ws://` URL the first opened a socket that nothing referenced
+  and nothing could close, and a Node process that called it never exited on
+  its own. This now matches web3.js 4.x, where `Web3Context.setProvider` hands
+  the value to the request manager and the request manager alone turns a URL
+  into a provider.
+
 - The published type declarations now follow ES module rules. `lib/types/` gets
   a `package.json` marking it as ESM, so a consumer's compiler reads the `.d.ts`
   files as ES modules rather than CommonJS. Without it the runtime half of the

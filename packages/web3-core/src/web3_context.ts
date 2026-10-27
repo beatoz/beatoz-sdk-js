@@ -101,17 +101,9 @@ export class Web3Context<API extends Web3APISpec = unknown> extends Web3Config {
     }
 
     public setProvider(provider?: HttpProvider | WebsocketProvider | string): boolean {
-        if (typeof provider === 'string') {
-            // HTTP
-            if (/^http(s)?:\/\//i.test(provider)) {
-                this.provider = new HttpProvider(provider);
-            }
-
-            // WS
-            if (/^ws(s)?:\/\//i.test(provider)) {
-                this.provider = new WebsocketProvider(provider);
-            }
-        }
+        // The request manager turns a URL into a provider. Doing it here as
+        // well built a second one, and the first - for a ws:// URL an open
+        // socket - was lost with no way to close it.
         this.provider = provider;
         return true;
     }
