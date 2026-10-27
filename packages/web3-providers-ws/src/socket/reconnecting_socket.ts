@@ -65,7 +65,10 @@ export class ReconnectingSocket {
                 if (status === ConnectionStatus.Connected) {
                     this.timeoutIndex = 0;
                 }
-                if (status === ConnectionStatus.Disconnected) {
+                // A disconnect() also reports Disconnected. Reconnecting then
+                // would undo it and keep the process alive with a socket
+                // nobody uses.
+                if (status === ConnectionStatus.Disconnected && !this.disconnected) {
                     if (this.reconnectTimeout) {
                         clearTimeout(this.reconnectTimeout);
                         this.reconnectTimeout = null;
@@ -91,11 +94,16 @@ export class ReconnectingSocket {
         if (this.unconnected) {
             throw new Error('Cannot disconnect: socket has not yet connected');
         }
+        // Set before the status update below, which reads it synchronously.
+        this.disconnected = true;
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
         this.socket.disconnect();
         if (this.eventProducerListener) {
             this.eventProducerListener.complete();
         }
-        this.disconnected = true;
     }
 
     public queueRequest(request: string): void {

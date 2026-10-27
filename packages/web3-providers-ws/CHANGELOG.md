@@ -36,6 +36,15 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ### Fixed
 
+- `disconnect()` now stays disconnected. The reconnect logic read the
+  `Disconnected` status that `disconnect()` itself reports as a dropped
+  connection, and opened a new socket about 100ms later. Nothing could close a
+  `WebsocketProvider` for good, so a Node process that used one never exited on
+  its own; under Jest the run hung after the last test.
+
+  The code comes from `@cosmjs/socket`, which still behaves this way as of
+  0.39.0.
+
 - The published type declarations now follow ES module rules. `lib/types/` gets
   a `package.json` marking it as ESM, so a consumer's compiler reads the `.d.ts`
   files as ES modules rather than CommonJS. Without it the runtime half of the

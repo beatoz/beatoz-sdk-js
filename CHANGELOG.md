@@ -207,6 +207,15 @@ entries below name the packages they apply to.
 
 ### Fixed
 
+- `@beatoz/web3-providers-ws`: `disconnect()` now stays disconnected. The
+  reconnect logic read the `Disconnected` status that `disconnect()` itself
+  reports as a dropped connection, and opened a new socket about 100ms later.
+  Nothing could close a `WebsocketProvider` for good, so a Node process that
+  used one never exited on its own; under Jest the run hung after the last test.
+
+  The code comes from `@cosmjs/socket`, which still behaves this way as of
+  0.39.0.
+
 - **Signing works in the ESM build.** `privateKeyToAccount`, and so every path
   that signs a transaction, threw `TypeError: secp256k1.privateKeyVerify is not
   a function`. An ESM consumer could not sign at all.
