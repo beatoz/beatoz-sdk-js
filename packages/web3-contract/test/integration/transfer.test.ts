@@ -82,79 +82,56 @@ describe('transfer loop test', () => {
 
 describe('transfer sync test', () => {
     it(
-        'transfer sync function',
-        (done) => {
-            const eventListener = new Web3(netInfo.WS);
-            const stream = eventListener.beatoz.subscribeTx();
-            const mapTxs = new Map<string, boolean>();
-            // const events: SubscriptionEvent[] = [];
-            // let evtSize = 0;
-            const subscription = stream.subscribe({
-                error: (err) => console.error(err),
-                complete: () => console.log('subscription should not complete'),
-                next: (event: SubscriptionEvent) => {
-                    // events.push(event);
-                    //expect(event.query).toEqual(query);
-                    // if (events.length === 2) {
-                    //     // make sure they are consecutive heights
-                    //     subscription.unsubscribe();
+        'delivers a tx event for every transfer sent with sync',
+        async () => {
+            const before = await tokenBalance(erc20Contract, RECIPIENT);
 
-                    //     // wait 1.5 * blockTime and check we did not get more events
-                    //     setTimeout(() => {
-                    //         expect(events.length).toEqual(2);
-                    //         done();
-                    //     }, 1.5 * blockTime);
-                    // }
-
-                    // const jsonEvt = JSON.stringify(event, null, 2);
-                    // console.log(jsonEvt);
-
-                    const txhash = event.events['tx.hash'][0];
-                    mapTxs.set(txhash, true);
-                    let completed = 0;
-                    for (const [, val] of mapTxs) {
-                        if (val) {
-                            completed++;
-                        }
-                    }
-                    // process.stdout.write(`\revents: ${txhash}`);
-                    process.stdout.write(`\r\t\t\t\treceived events: ${completed}`);
-                    if (mapTxs.size === completed) {
-                        process.stdout.write(
-                            `\nFor ${mapTxs.size} txs, ${completed} events has been received.\n`,
-                        );
-                        subscription.unsubscribe();
-                        closeProvider(eventListener);
-                        done();
-                    }
-                },
+            // Events and broadcast replies race: an event can arrive before
+            // the reply that names its hash. Keep the two apart and compare
+            // once both are in, instead of marking one map from both sides.
+            const seen = new Set<string>();
+            let failure: unknown;
+            const listener = new Web3(netInfo.WS);
+            const subscription = listener.beatoz.subscribeTx().subscribe({
+                next: (event: SubscriptionEvent) => seen.add(event.events['tx.hash'][0]),
+                error: (err: unknown) => (failure = err),
             });
 
-            const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR)!;
-            web3.beatoz.getAccount(fromAcct.address).then((resp) => {
-                let nonce = resp.value.nonce;
-
+            try {
+                // Sync returns once the node accepts a tx into the mempool, so
+                // the nonces are set by hand rather than read per send.
+                let nonce = (await web3.beatoz.getAccount(fromAddress())).value.nonce;
+                const sent: string[] = [];
                 for (let i = 0; i < iterations; i++) {
-                    erc20Contract.methods
-                        .transfer('0x0000000000000000000000000000000000000001', '1000')
+                    const resp: BroadcastTxSyncResponse = await erc20Contract.methods
+                        .transfer(RECIPIENT, '1000')
                         .broadcast({
-                            from: fromAcct.address,
+                            from: fromAddress(),
                             gas: '300000',
-                            nonce: numberToHex(nonce),
+                            nonce: numberToHex(nonce++),
                             sendMode: 'sync',
-                        })
-                        .then((resp: BroadcastTxSyncResponse) => {
-                            if (resp.code != 0) {
-                                console.error(resp);
-                            }
-                            mapTxs.set(resp.hash, false);
-                            // process.stdout.write(`\rtransfer[${i}] txhash:${resp.hash}, nonce: ${nonce}`);
-                            process.stdout.write(`\rtransfer txs: ${mapTxs.size}`);
                         });
-
-                    nonce = nonce + 1;
+                    expect(resp.code).toEqual(0);
+                    sent.push(resp.hash);
                 }
-            });
+
+                const deadline = Date.now() + 60000;
+                while (!sent.every((hash) => seen.has(hash))) {
+                    if (failure !== undefined) throw failure;
+                    if (Date.now() > deadline) {
+                        const missing = sent.filter((hash) => !seen.has(hash));
+                        throw new Error(`no tx event for ${missing.join(', ')}`);
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                }
+            } finally {
+                subscription.unsubscribe();
+                closeProvider(listener);
+            }
+
+            expect(await tokenBalance(erc20Contract, RECIPIENT)).toEqual(
+                before + BigInt(iterations) * 1000n,
+            );
         },
         1000 * 60 * 5,
     );
