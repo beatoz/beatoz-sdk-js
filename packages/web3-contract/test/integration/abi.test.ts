@@ -21,11 +21,13 @@ import WebsocketProvider from '@beatoz/web3-providers-ws';
 describe('abi test', () => {
     it('abi json import', async () => {
         const erc20Contract = new Contract(erc20Json, '0x4b007901049a210f8e1ce8f4d4ab8e6e1efd1b10');
-        erc20Contract.setProvider(new WebsocketProvider(getTestWsServer()));
+        const provider = new WebsocketProvider(getTestWsServer());
+        erc20Contract.setProvider(provider);
 
         const response = await erc20Contract.methods.decimals().call();
 
         console.log('response', response);
+        provider.disconnect();
 
         expect(1).toEqual(1);
     });

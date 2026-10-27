@@ -15,7 +15,7 @@
 */
 import { Contract as _Contract } from '../../src';
 import erc20Json from '../fixtures/erc20-abi.json';
-import { deployTestToken, netInfo } from './e2e_utils';
+import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
 import { TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { BroadcastTxCommitResponse, TrxProto, VmCallResponse } from '@beatoz/web3-types';
 import { decodeParameter } from '@beatoz/web3-abi';
@@ -31,6 +31,7 @@ describe('transfer token test', () => {
     beforeAll(async () => {
         deployedContract = await deployTestToken(web3);
     });
+    afterAll(() => closeProvider(web3));
 
     it('transfer function', (done) => {
         const fromAcct = web3.beatoz.accounts.wallet.get(netInfo.ACCTS[0].ADDR);

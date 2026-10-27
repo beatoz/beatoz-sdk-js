@@ -14,7 +14,12 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestChainId, getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
+import {
+    getTestChainId,
+    getTestProposalAccountPrivateKey,
+    getTestWsServer,
+    closeProvider,
+} from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 
 describe('transfer test', () => {
@@ -23,6 +28,8 @@ describe('transfer test', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('transfer', async () => {
         const account = privateKeyToAccount(getTestProposalAccountPrivateKey()) as Web3Account;

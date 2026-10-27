@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { deploySampleContract } from '../chain_fixtures';
 
 describe('contractAddrFromTx check', () => {
@@ -23,6 +23,8 @@ describe('contractAddrFromTx check', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('reads the address out of a deployment this chain performed', async () => {
         const hash = await deploySampleContract(web3);

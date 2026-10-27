@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { asNodeAddress, getValidatorAddress } from '../chain_fixtures';
 import { DelegateeResponse } from '@beatoz/web3-types';
 
@@ -24,6 +24,8 @@ describe('health check ', () => {
     beforeAll(() => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(testWebsocketWeb3Instance));
 
     it('returns the delegatee record for a validator on this chain', async () => {
         const validator = await getValidatorAddress(testWebsocketWeb3Instance);

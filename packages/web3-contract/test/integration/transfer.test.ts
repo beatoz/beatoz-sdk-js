@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import erc20Json from '../fixtures/erc20-abi.json';
-import { deployTestToken, netInfo } from './e2e_utils';
+import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
 import {
     BroadcastTxCommitResponse,
     VmCallResponse,
@@ -34,6 +34,7 @@ let deployedContract: { address: string; deployer: string };
 beforeAll(async () => {
     deployedContract = await deployTestToken(web3);
 });
+afterAll(() => closeProvider(web3));
 
 describe('transfer test', () => {
     it('transfer function', (done) => {
@@ -108,7 +109,7 @@ describe('transfer sync test', () => {
             const mapTxs = new Map<string, boolean>();
             // const events: SubscriptionEvent[] = [];
             // let evtSize = 0;
-            stream.subscribe({
+            const subscription = stream.subscribe({
                 error: (err) => console.error(err),
                 complete: () => console.log('subscription should not complete'),
                 next: (event: SubscriptionEvent) => {
@@ -142,6 +143,8 @@ describe('transfer sync test', () => {
                         process.stdout.write(
                             `\nFor ${mapTxs.size} txs, ${completed} events has been received.\n`,
                         );
+                        subscription.unsubscribe();
+                        closeProvider(eventListener);
                         done();
                     }
                 },

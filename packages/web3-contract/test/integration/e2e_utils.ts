@@ -32,6 +32,7 @@
  */
 
 import type { Web3 } from '@beatoz/web3';
+import WebsocketProvider from '@beatoz/web3-providers-ws';
 import tokenJson from '../fixtures/erc20-contract.json';
 
 const env = (key: string, fallback: string): string => process.env[key] ?? fallback;
@@ -161,5 +162,19 @@ export const deployTestToken = async (
             }
             await new Promise((resolve) => setTimeout(resolve, 200));
         }
+    }
+};
+
+/**
+ * Closes the WebSocket behind a Web3 instance or contract.
+ *
+ * An open socket keeps Node's event loop alive, so Jest never exits after the
+ * last test and the run hangs instead of finishing. Suites that open one close
+ * it in `afterAll`.
+ */
+export const closeProvider = (context: { getProvider(): unknown }): void => {
+    const provider = context.getProvider();
+    if (provider instanceof WebsocketProvider) {
+        provider.disconnect();
     }
 };

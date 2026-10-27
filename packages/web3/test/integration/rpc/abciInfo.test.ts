@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { AbciInfoResponse } from '@beatoz/web3-types';
 
 describe('abciInfo check ', () => {
@@ -23,6 +23,8 @@ describe('abciInfo check ', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('should call web3 with testWebsocketWeb3Instance.abciInfo method success return', async () => {
         const websocketAbciInfoResponse: AbciInfoResponse = await web3.beatoz.abciInfo();

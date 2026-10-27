@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { getSampleHeight } from '../chain_fixtures';
 import { BlockResponse } from '@beatoz/web3-types';
 
@@ -24,6 +24,8 @@ describe('blockchain check ', () => {
     beforeAll(() => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(testWebsocketWeb3Instance));
 
     it('should call web3 with testWebsocketWeb3Instance.block method success return', async () => {
         const testBlockResponse: BlockResponse = await testWebsocketWeb3Instance.beatoz.block(1);

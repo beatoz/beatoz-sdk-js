@@ -41,5 +41,7 @@ describe('WebsocketClient', () => {
 
         const statusResponse = await provider.execute(createJsonRpcRequest('status'));
         expect(statusResponse.result).toBeTruthy();
+
+        provider.disconnect();
     });
 });

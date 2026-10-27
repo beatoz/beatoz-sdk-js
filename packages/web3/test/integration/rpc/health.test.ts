@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestServer } from '../e2e_utils';
+import { getTestServer, closeProvider } from '../e2e_utils';
 
 describe('health check ', () => {
     let testServerWeb3Instance: Web3;
@@ -22,6 +22,8 @@ describe('health check ', () => {
     beforeAll(() => {
         testServerWeb3Instance = new Web3(getTestServer());
     });
+
+    afterAll(() => closeProvider(testServerWeb3Instance));
 
     it('should call web3 with testServerWeb3Instance.getHealth method success return', async () => {
         const healthResponse = await testServerWeb3Instance.beatoz.health();

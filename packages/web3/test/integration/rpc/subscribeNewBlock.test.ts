@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { assertUnbroken, produceBlocks, sendSampleTransfer, waitUntil } from '../chain_fixtures';
 import { SubscriptionEvent } from '@beatoz/web3-types';
 
@@ -24,6 +24,8 @@ describe('subscribeNewBlock check', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('delivers every block until the subscription is cancelled', async () => {
         const heights: number[] = [];

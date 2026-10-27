@@ -31,6 +31,8 @@
  * that imported it - including tests that never contacted a node.
  */
 
+import WebsocketProvider from '@beatoz/web3-providers-ws';
+
 const env = (key: string, fallback: string): string => process.env[key] ?? fallback;
 
 /** Reads a variable that has no safe default. */
@@ -88,5 +90,19 @@ export const isNodeReachable = async (): Promise<boolean> => {
         return response.ok;
     } catch {
         return false;
+    }
+};
+
+/**
+ * Closes the WebSocket behind a Web3 instance.
+ *
+ * An open socket keeps Node's event loop alive, so Jest never exits after the
+ * last test and the run hangs instead of finishing. Suites that open one close
+ * it in `afterAll`.
+ */
+export const closeProvider = (context: { getProvider(): unknown }): void => {
+    const provider = context.getProvider();
+    if (provider instanceof WebsocketProvider) {
+        provider.disconnect();
     }
 };

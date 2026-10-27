@@ -14,7 +14,12 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestChainId, getTestProposalAccountPrivateKey, getTestWsServer } from '../e2e_utils';
+import {
+    getTestChainId,
+    getTestProposalAccountPrivateKey,
+    getTestWsServer,
+    closeProvider,
+} from '../e2e_utils';
 import { privateKeyToAccount, Web3Account } from '@beatoz/web3-accounts';
 import tokenJson from '../../fixtures/erc20-contract.json';
 
@@ -24,6 +29,8 @@ describe('contract test', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('deploy', async () => {
         const account = privateKeyToAccount(getTestProposalAccountPrivateKey()) as Web3Account;

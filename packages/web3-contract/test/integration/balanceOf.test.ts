@@ -15,7 +15,7 @@
 */
 import erc20Json from '../fixtures/erc20-abi.json';
 import _rep20Json from '../fixtures/REP20.json';
-import { deployTestToken, netInfo } from './e2e_utils';
+import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
 import { VmCallResponse } from '@beatoz/web3-types';
 import { Contract } from '../../src';
 import WebsocketProvider from '@beatoz/web3-providers-ws';
@@ -28,12 +28,16 @@ describe('balanceOf test', () => {
         const web3 = new Web3(netInfo.WS);
         web3.beatoz.accounts.wallet.add(netInfo.ACCTS[0].KEY);
         deployedContract = await deployTestToken(web3);
+        closeProvider(web3);
     });
+
+    const provider = new WebsocketProvider(netInfo.WS);
+    afterAll(() => provider.disconnect());
 
     it('balanceOf function', (done) => {
         const erc20Contract = new Contract(erc20Json, deployedContract.address) as any;
 
-        erc20Contract.setProvider(new WebsocketProvider(netInfo.WS));
+        erc20Contract.setProvider(provider);
         erc20Contract.methods
             .balanceOf(deployedContract.deployer)
             .call()

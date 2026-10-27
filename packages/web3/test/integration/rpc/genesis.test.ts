@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 import { GenesisResponse } from '@beatoz/web3-types';
 
 describe('genesis check ', () => {
@@ -23,6 +23,8 @@ describe('genesis check ', () => {
     beforeAll(() => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(testWebsocketWeb3Instance));
 
     it('should call web3 with testWebsocketWeb3Instance.genesis method success return', async () => {
         const testWebsocketGenesisResponse: GenesisResponse =

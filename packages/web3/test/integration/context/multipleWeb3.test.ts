@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3, StatusResponse } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 
 describe('setProvider check ', () => {
     let web3_1: Web3;
@@ -23,6 +23,11 @@ describe('setProvider check ', () => {
     beforeAll(() => {
         web3_1 = new Web3(getTestWsServer());
         web3_2 = new Web3(getTestWsServer());
+    });
+
+    afterAll(() => {
+        closeProvider(web3_1);
+        closeProvider(web3_2);
     });
 
     it('should call web3_1 & web3_1 call status success ', async () => {

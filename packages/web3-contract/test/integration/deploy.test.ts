@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import { deployTestToken, netInfo } from './e2e_utils';
+import { closeProvider, deployTestToken, netInfo } from './e2e_utils';
 import { Web3 } from '@beatoz/web3';
 
 describe('deploy test', () => {
@@ -22,6 +22,7 @@ describe('deploy test', () => {
     for (const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
+    afterAll(() => closeProvider(web3));
 
     it('deploy function', async () => {
         const { address } = await deployTestToken(web3);

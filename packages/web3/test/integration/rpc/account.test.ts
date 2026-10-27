@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestAccountAddress, getTestWsServer } from '../e2e_utils';
+import { getTestAccountAddress, getTestWsServer, closeProvider } from '../e2e_utils';
 import { asNodeAddress } from '../chain_fixtures';
 import { AccountResponse } from '@beatoz/web3-types';
 
@@ -24,6 +24,8 @@ describe('account check ', () => {
     beforeAll(() => {
         web3 = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(web3));
 
     it('should call web3 with testWebsocketWeb3Instance.account method success return', async () => {
         const testAccountAddress = getTestAccountAddress();

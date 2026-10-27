@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import rep1155Json from '../fixtures/REP1155.json';
-import { netInfo } from './e2e_utils';
+import { closeProvider, netInfo } from './e2e_utils';
 import { Web3 } from '@beatoz/web3';
 import { Web3Account } from '@beatoz/web3-accounts';
 import { WebsocketProvider } from '@beatoz/web3-providers-ws';
@@ -47,12 +47,18 @@ describe('estimateGas test', () => {
     for (const acct of netInfo.ACCTS) {
         web3.beatoz.accounts.wallet.add(acct.KEY);
     }
+    const provider = new WebsocketProvider(netInfo.WS);
+    afterAll(() => {
+        provider.disconnect();
+        closeProvider(web3);
+    });
+
     it(
         'estimateGas',
         (done) => {
             async function deploy() {
                 const contract = new web3.beatoz.Contract(rep1155Json.abi);
-                contract.setProvider(new WebsocketProvider(netInfo.WS));
+                contract.setProvider(provider);
 
                 const resp = await contract
                     .deploy(
@@ -83,7 +89,7 @@ describe('estimateGas test', () => {
                 const contAddr = await deploy()!;
 
                 const contract = new web3.beatoz.Contract(rep1155Json.abi, contAddr) as any;
-                contract.setProvider(new WebsocketProvider(netInfo.WS));
+                contract.setProvider(provider);
 
                 // create company
                 const rn = Math.floor(Date.now() / 1000);

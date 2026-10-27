@@ -14,7 +14,7 @@
     limitations under the License.
 */
 import { Web3, StatusResponse } from '../../../src';
-import { getTestWsServer } from '../e2e_utils';
+import { getTestWsServer, closeProvider } from '../e2e_utils';
 
 describe('setProvider check ', () => {
     let defaultWeb3: Web3;
@@ -23,6 +23,8 @@ describe('setProvider check ', () => {
         defaultWeb3 = new Web3();
         defaultWeb3.setProvider(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(defaultWeb3));
 
     it('should call web3 setProvider success ', async () => {
         const websocketStatusResponse: StatusResponse = await defaultWeb3.beatoz.status();

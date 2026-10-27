@@ -14,7 +14,12 @@
     limitations under the License.
 */
 import { Web3 } from '../../../src';
-import { getTestAccountPrivateKey, getTestChainId, getTestWsServer } from '../e2e_utils';
+import {
+    getTestAccountPrivateKey,
+    getTestChainId,
+    getTestWsServer,
+    closeProvider,
+} from '../e2e_utils';
 import { privateKeyToAccount, Web3Account, TrxProtoBuilder } from '@beatoz/web3-accounts';
 import { AccountResponse, BroadcastTxCommitResponse } from '@beatoz/web3-types';
 
@@ -24,6 +29,8 @@ describe('broadcastTxCommit check ', () => {
     beforeAll(() => {
         testWebsocketWeb3Instance = new Web3(getTestWsServer());
     });
+
+    afterAll(() => closeProvider(testWebsocketWeb3Instance));
 
     it('should call web3 with testWebsocketWeb3Instance.broadcastTxCommit() method success return', async () => {
         const secretKey = getTestAccountPrivateKey();
