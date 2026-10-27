@@ -92,6 +92,7 @@ export type BeatozExecutionAPI = {
     account: (addr: string) => responses.AccountResponse;
     proposal: (txHash: string) => responses.ProposalResponse;
     stakes: (addr: string) => responses.StakesResponse;
+    reward: (addr: string) => responses.RewardResponse;
     vmCall: (vmCall: string) => responses.VmCallResponse;
     // end not tendermint apis
 

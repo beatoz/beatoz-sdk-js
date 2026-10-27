@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Added
+
+- `RewardResponse`, `ResponsesDecoder.decodeReward` and `reward` in
+  `BeatozExecutionAPI`, for the chain's `reward` query. `issued`, `withdrawn`
+  and `slashed` describe only the last block that changed the ledger, not
+  totals; `cumulated` is what a withdraw can take.
+
 ### Fixed
 
 - `crypto-js` and `base64-js` are imported as default rather than as

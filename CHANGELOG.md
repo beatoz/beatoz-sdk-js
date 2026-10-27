@@ -35,6 +35,11 @@ entries below name the packages they apply to.
 
 ### Added
 
+- `@beatoz/web3-methods`, `@beatoz/web3-rpc`, `@beatoz/web3-types`:
+  `web3.beatoz.reward(addr)` returns an account's reward ledger. `cumulated` is
+  the amount a withdraw transaction can take; `issued`, `withdrawn` and
+  `slashed` describe only the last block that changed the ledger.
+
 - Every package now has a `files` field, so a published package carries
   `lib/`, `src/`, `CHANGELOG.md`, `README.md`, `LICENSE` and `package.json`,
   and nothing else. Build leftovers no longer ship: `tsconfig.types.json`,

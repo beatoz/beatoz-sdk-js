@@ -49,6 +49,7 @@ import {
     VmCallResponse,
     ProposalResponse,
     StakesResponse,
+    RewardResponse,
     AccountResponse,
     HealthResponse,
 } from '@beatoz/web3-types';
@@ -547,6 +548,22 @@ export async function stakes(
     return ResponsesDecoder.decodeStakes(
         await requestManager.send({
             method: 'stakes',
+            params: { addr: addr },
+        }),
+    );
+}
+
+export async function reward(
+    requestManager: Web3RequestManager,
+    addr: string,
+): Promise<RewardResponse> {
+    if (!addr.startsWith('0x')) {
+        addr = '0x' + addr;
+    }
+
+    return ResponsesDecoder.decodeReward(
+        await requestManager.send({
+            method: 'reward',
             params: { addr: addr },
         }),
     );

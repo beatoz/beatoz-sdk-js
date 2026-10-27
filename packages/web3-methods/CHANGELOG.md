@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Added
+
+- `reward(addr)` on `Web3Method`, so `web3.beatoz.reward(addr)` returns an
+  account's reward ledger - in particular `cumulated`, the amount a withdraw
+  transaction can take. The chain had the query; the SDK had no way to call it.
+
 ### Changed
 
 - **BREAKING:** The minimum Node version is 22.13, raised from 22.12. Two things

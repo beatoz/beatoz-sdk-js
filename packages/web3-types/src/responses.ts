@@ -1027,6 +1027,36 @@ export interface StakesValue {
 }
 
 /**
+ * An account's reward ledger: what inflation has paid it as a staker, and what
+ * it can still withdraw. Fee rewards are not recorded here; the chain adds
+ * those straight to the block proposer's balance.
+ */
+export interface RewardResponse {
+    key: HexString;
+    value: {
+        address: HexString;
+        /**
+         * `issued`, `withdrawn` and `slashed` are what changed at `height`, the
+         * last block that touched this ledger - not totals. The chain resets
+         * them whenever a later block changes the ledger.
+         */
+        issued: string;
+        withdrawn: string;
+        slashed: string;
+        /** The amount a withdraw transaction can take now. */
+        cumulated: string;
+        /**
+         * The last block that changed the ledger, as a decimal string - the
+         * node encodes its int64 as a string. Absent until the ledger has
+         * been changed once.
+         */
+        height?: string;
+    };
+    /** The block height the query was answered at. */
+    height: string;
+}
+
+/**
  * Represents a governance proposal response.
  */
 export interface ProposalResponse {

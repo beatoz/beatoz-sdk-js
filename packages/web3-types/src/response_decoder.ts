@@ -234,6 +234,12 @@ export class ResponsesDecoder {
         return response.result as responses.StakesResponse;
     }
 
+    public static decodeReward(
+        response: JsonRpcResponseWithResult<responses.RewardResponse>,
+    ): responses.RewardResponse {
+        return response.result as responses.RewardResponse;
+    }
+
     public static decodeVmCall(
         response: JsonRpcResponseWithResult<responses.VmCallResponse>,
     ): responses.VmCallResponse {

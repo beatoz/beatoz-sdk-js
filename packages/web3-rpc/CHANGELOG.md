@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Added
+
+- `reward(requestManager, addr)` reads an account's reward ledger through the
+  chain's `reward` query. The address may come with or without `0x`.
+
 ### Changed
 
 - **BREAKING:** The minimum Node version is 22.13, raised from 22.12. Two things

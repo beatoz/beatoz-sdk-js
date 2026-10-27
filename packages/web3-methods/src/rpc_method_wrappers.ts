@@ -297,6 +297,10 @@ export async function stakes(web3Context: Web3Context<BeatozExecutionAPI>, addr:
     return rpcMethods.stakes(web3Context.requestManager, addr);
 }
 
+export async function reward(web3Context: Web3Context<BeatozExecutionAPI>, addr: string) {
+    return rpcMethods.reward(web3Context.requestManager, addr);
+}
+
 export async function vmCall(
     web3Context: Web3Context<BeatozExecutionAPI>,
     addr: string,

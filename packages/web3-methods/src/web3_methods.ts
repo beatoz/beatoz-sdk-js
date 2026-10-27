@@ -167,6 +167,10 @@ export class Web3Method extends Web3Context {
         return rpcMethodsWrappers.stakes(this, addr);
     }
 
+    reward(addr: string) {
+        return rpcMethodsWrappers.reward(this, addr);
+    }
+
     vmCall(addr: string, to: string, height: number, data: string) {
         return rpcMethodsWrappers.vmCall(this, addr, to, height, data);
     }
