@@ -27,13 +27,48 @@ import {
     TrxProtoUtils,
 } from './trx_pb.js';
 import { HexString, TrxProto } from '@beatoz/web3-types';
-import { Transaction, TransactionPayloadUnDelegating } from './tx_types.js';
+import {
+    Transaction,
+    TransactionPayloadUnDelegating,
+    TransactionPayloadWithdraw,
+} from './tx_types.js';
 import { Web3Account } from '../types.js';
 import { RlpUtils } from './trx_rlp.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isSet(value: any): boolean {
     return value !== undefined;
+}
+
+/**
+ * Parses a decimal string as a uint256.
+ *
+ * Only digits are accepted. bn.js is more lenient than that and not safely
+ * so: it reads '' as 0, accepts '-1', and never returns on ' '. Checking the
+ * form first keeps those inputs from becoming a zero, a negative or a hang.
+ */
+function parseUint256(name: string, value: string): BN {
+    if (typeof value !== 'string' || !/^[0-9]+$/.test(value)) {
+        throw Error(`${name} must be a decimal string of digits, got ${JSON.stringify(value)}`);
+    }
+    const n = new BN(value, 10);
+    if (n.bitLength() > 256) {
+        throw Error(`${name} does not fit in 256 bits: ${value}`);
+    }
+    return n;
+}
+
+/**
+ * Encodes a uint256 the way beatoz-go's uint256.Int.Bytes() does: minimal
+ * big-endian, and no bytes at all for zero.
+ *
+ * The node verifies a signature by decoding the transaction and encoding it
+ * again with Bytes(), so any other form of the same number - a leading zero
+ * byte, or [0x00] for zero - changes the signed preimage and the node rejects
+ * the transaction as `invalid signature`.
+ */
+function toUint256Bytes(n: BN): Uint8Array {
+    return n.isZero() ? new Uint8Array() : new Uint8Array(n.toArrayLike(Buffer));
 }
 
 interface TrxPayloadCreateContract {
@@ -332,6 +367,48 @@ function buildContractTrxProto(transaction: Transaction<TrxPayloadCreateContract
     };
 }
 
+/**
+ * Builds a transaction that moves part of the sender's accumulated staking
+ * reward into its balance. The chain requires `amount` to be zero - the value
+ * goes in `payload.reqAmt` - and rejects a request above the reward the
+ * sender has accumulated as `insufficient reward`.
+ */
+function buildWithdrawTrx(transaction: Transaction<TransactionPayloadWithdraw>): TrxProto {
+    const payload = transaction.payload as TransactionPayloadWithdraw;
+    if (!isSet(payload) || !isSet(payload.reqAmt)) {
+        throw Error('mandatory argument is missed');
+    }
+    const reqAmt = parseUint256('payload.reqAmt', payload.reqAmt);
+    if (!parseUint256('amount', transaction.amount).isZero()) {
+        throw Error('a withdraw moves no amount; put the value in payload.reqAmt');
+    }
+    const payloadBytes = trxPb.TrxPayloadWithdrawProto.encode({
+        ReqAmt: toUint256Bytes(reqAmt),
+    }).finish();
+
+    return {
+        version: isSet(transaction.version) ? Number(transaction.version) : 1,
+        time: isSet(transaction.time) ? getNanoSecond(transaction.time) : getNanoSecond(),
+        nonce:
+            isSet(transaction.nonce) && transaction.nonce
+                ? Long.fromValue(transaction.nonce)
+                : Long.fromValue(0),
+        from: BytesUint8Array.fromHex(transaction.from),
+        to: BytesUint8Array.fromHex(transaction.to),
+        Amount: new Uint8Array(),
+        gas: Long.fromValue(transaction.gas),
+        GasPrice: toUint256Bytes(parseUint256('gasPrice', transaction.gasPrice)),
+        type: 8, // withdraw type
+        Payload: payloadBytes,
+        sig: new Uint8Array(),
+        // Fee delegation is not built by this SDK yet; the chain treats
+        // empty payer fields as "sender pays", and proto3 omits them from
+        // the wire, so the encoded bytes are unchanged.
+        payer: new Uint8Array(),
+        payerSig: new Uint8Array(),
+    };
+}
+
 function buildSetDocTrx(transaction: Transaction<object>): TrxProto {
     const payload = transaction.payload as TrxPayloadSetDocProto;
     if (!isSet(payload)) {
@@ -421,4 +498,5 @@ export const TrxProtoBuilder = {
     buildVotingTrx,
     signedRawTrxProto,
     buildSetDocTrx,
+    buildWithdrawTrx,
 };

@@ -38,6 +38,15 @@ export interface TransactionPayloadUnDelegating {
     txhash: string;
 }
 
+export interface TransactionPayloadWithdraw {
+    /**
+     * How much of the account's accumulated reward to withdraw, in the
+     * smallest unit, as a decimal string. `reward(addr).value.cumulated` is
+     * the most the chain will accept.
+     */
+    reqAmt: string;
+}
+
 export class PubKey {
     compressed: BytesUint8Array;
     x: BytesUint8Array;

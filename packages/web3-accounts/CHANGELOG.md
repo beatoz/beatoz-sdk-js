@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
 
 ## [Unreleased]
 
+### Added
+
+- `TrxProtoBuilder.buildWithdrawTrx` builds a withdraw transaction (type 8),
+  which moves part of the sender's accumulated staking reward into its balance.
+  The chain accepted these all along; the SDK could decode one but not build it.
+  The value goes in `payload.reqAmt`; `amount` must be zero, as the chain
+  requires.
+
+  `reqAmt`, `amount` and `gasPrice` must be decimal strings of digits. bn.js,
+  which the other builders hand these to directly, reads `''` as 0, accepts
+  `'-1'` and never returns on `' '`. `reqAmt` and `gasPrice` are encoded the way
+  beatoz-go's `uint256.Int.Bytes()` encodes them - minimal, and empty for zero -
+  because the node re-encodes them that way to check the signature; any other
+  form of the same number fails as `invalid signature`.
+
+  Against the official node it reaches the reward check (`not found result` for
+  an account with no reward), so the node decoded it and accepted the signature.
+  Paying out a reward is not tested: the node issues withdrawable rewards every
+  10080 blocks.
+
 ### Security
 
 - `protobufjs` is now `^7.6.6`, up from an exact `7.2.5`. 7.2.5 is inside the
