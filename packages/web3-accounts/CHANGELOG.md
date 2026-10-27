@@ -23,10 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org). See
   because the node re-encodes them that way to check the signature; any other
   form of the same number fails as `invalid signature`.
 
-  Against the official node it reaches the reward check (`not found result` for
-  an account with no reward), so the node decoded it and accepted the signature.
-  Paying out a reward is not tested: the node issues withdrawable rewards every
-  10080 blocks.
+  Against the regular test node it reaches the reward check (`not found result`
+  for an account with no reward), so the node decoded it and accepted the
+  signature. The payout is tested against a second node from the same image
+  whose genesis lowers inflationCycleBlocks to 20 (`yarn node:start:reward`,
+  `yarn test:reward`): delegate, wait for a reward, withdraw exactly what
+  accumulated, and the balance rises by the reward less the fee; a request above
+  the reward is refused as `insufficient reward`.
 
 ### Security
 

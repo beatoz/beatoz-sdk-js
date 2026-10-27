@@ -4,5 +4,13 @@
     "digest": "sha256:0f6ae8dcd72c232dd7454257d010d74ec4404694b3eacc40a876d31cd51a1dbd",
     "container": "beatoz-sdk-testnode",
     "rpcPort": 26657,
-    "p2pPort": 26656
+    "p2pPort": 26656,
+    "reward": {
+        "container": "beatoz-sdk-rewardnode",
+        "volume": "beatoz-sdk-rewardnode-home",
+        "rpcPort": 26757,
+        "p2pPort": 26756,
+        "emptyBlockIntervalSecs": 1,
+        "inflationCycleBlocks": "20"
+    }
 }

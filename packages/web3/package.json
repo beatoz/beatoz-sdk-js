@@ -46,7 +46,8 @@
         "format": "prettier --write '**/*'",
         "test": "jest --config=./test/unit/jest.config.js",
         "test:silent": "jest --silent --config=./test/unit/jest.config.js",
-        "test:integration": "jest --config=./test/integration/jest.config.js"
+        "test:integration": "jest --config=./test/integration/jest.config.js",
+        "test:reward": "jest --config=./test/reward/jest.config.js"
     },
     "devDependencies": {
         "@openzeppelin/contracts": "^4.7.1",

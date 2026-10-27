@@ -78,6 +78,20 @@ export const getTestAccounts = (): ReadonlyArray<{ address: string; privateKey: 
 ];
 
 /**
+ * The reward node: the same image with a short inflation cycle, so a reward
+ * accumulates while a test waits. `yarn node:start:reward` starts it and
+ * writes these to `.env.reward`. They have no defaults - the regular node pays
+ * rewards once a week of blocks and cannot stand in for it.
+ */
+export const getRewardServer = (): string => requireEnv('BEATOZ_REWARD_RPC_URL');
+
+export const getRewardWsServer = (): string => requireEnv('BEATOZ_REWARD_WS_URL');
+
+export const getRewardChainId = (): string => requireEnv('BEATOZ_REWARD_CHAIN_ID');
+
+export const getRewardPrivateKey = (): string => requireEnv('BEATOZ_REWARD_PRIVATE_KEY');
+
+/**
  * Whether a node is reachable. Suites call this and skip instead of failing,
  * so running without a node reports skips rather than a wall of connection
  * errors.

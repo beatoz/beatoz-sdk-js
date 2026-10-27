@@ -46,7 +46,11 @@
     "node:start": "node scripts/testnode.mjs start",
     "node:stop": "node scripts/testnode.mjs stop",
     "node:env": "node scripts/testnode.mjs env",
+    "node:start:reward": "node scripts/testnode.mjs start reward",
+    "node:stop:reward": "node scripts/testnode.mjs stop reward",
+    "node:env:reward": "node scripts/testnode.mjs env reward",
     "test:integration": "lerna run test:integration --stream",
+    "test:reward": "lerna run test:reward --stream",
     "dev:example": "ts-node -P tsconfig.base.json --require tsconfig-paths/register examples/explorer/scanner.js"
   },
   "devDependencies": {

@@ -27,11 +27,11 @@ import {
     Web3Account,
 } from '@beatoz/web3-accounts';
 
-// The test node cannot pay out a withdrawable reward in a test's lifetime:
-// inflation rewards are issued every inflationCycleBlocks (10080), and fee
-// rewards go straight to the proposer's balance. So these tests check what
-// can be checked against it - that the node decodes the transaction and
-// accepts its signature - and leave the payout itself untested.
+// This node issues inflation rewards every inflationCycleBlocks (10080), and
+// fee rewards go straight to the proposer's balance, so no reward accumulates
+// here within a test. These tests check what this node can show - that it
+// decodes the transaction and accepts its signature. The payout itself is
+// tested against the reward node: test/reward/withdraw.test.ts.
 //
 // The node verifies the signature when it builds the transaction context,
 // before it looks at the reward ledger. A rejection for a missing reward

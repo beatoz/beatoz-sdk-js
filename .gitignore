@@ -29,3 +29,4 @@ documents/sdk-v2/
 
 # Local environment overrides for integration tests
 .env
+.env.reward

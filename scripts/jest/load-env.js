@@ -16,14 +16,18 @@
 
 // Integration tests read their node address and funded keys from the
 // environment. `.env` at the repository root is where `yarn node:start` writes
-// them, and it is gitignored because the container regenerates the keys every
-// time it initialises a fresh chain.
+// them, and `.env.reward` is where `yarn node:start:reward` writes the reward
+// node's. Both are gitignored because the containers regenerate the keys every
+// time they initialise a fresh chain. Their variable names do not overlap.
 //
 // Values already in the environment win, so CI can supply its own without a
 // file, and a developer can override one for a single run.
 const path = require('path');
 
-require('dotenv').config({
-    path: path.resolve(__dirname, '..', '..', '.env'),
-    override: false,
-});
+for (const file of ['.env', '.env.reward']) {
+    require('dotenv').config({
+        path: path.resolve(__dirname, '..', '..', file),
+        override: false,
+        quiet: true,
+    });
+}
